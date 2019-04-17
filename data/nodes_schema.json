@@ -1,0 +1,6 @@
+{
+    "_id": "Number",
+    "factors": ["Number"],
+    "class": "String",
+    "modules": ["Number"]
+}

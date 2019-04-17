@@ -1,0 +1,42 @@
+/* Page layout */
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0;
+  height: 100vh;
+  font-weight: 700;
+  font-family: sans-serif;
+}
+
+/* grid styling */
+.activePod:hover {
+  stroke-width: 2;
+  stroke: #FF00FF;
+}
+
+/* other styling */
+a {
+  color: #ccc;
+  padding: 10px;
+  text-decoration: none;
+  transition: color 0.4s;
+}
+
+a:hover {
+  color: #333;
+}
+
+#dataPanel {
+    display: block;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}

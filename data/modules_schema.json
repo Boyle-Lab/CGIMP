@@ -1,0 +1,10 @@
+{
+    "_id": "Number",
+    "loc": {"chrom": "String", "start": "Number", "end": "Number"},
+    "cell": "String",
+    "node": "Number",
+    "factors": ["String"],
+    "orth_type": "Number",
+    "maps_to": {"chrom": "String", "start": "Number", "end": "Number"},
+    "locus": "Number"
+}
