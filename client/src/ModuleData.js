@@ -1,14 +1,15 @@
 // /client/src/ModuleData.js
 import React, { Component } from "react";
 import EnhancedTable from './EnhancedTable';
-import { isDict, average } from './HelperFunctions';
+import { isDict, average, sum } from './HelperFunctions';
 import lunr from 'lunr';
 
 class ModuleData extends Component {
     constructor(props) {
         super(props);
         this.state = {
-	    displayedIndex: {}
+	    displayedIndex: {},
+	    dataSlice: {}
         }
     }
 
@@ -18,23 +19,24 @@ class ModuleData extends Component {
 
     componentDidUpdate(prevProps) {
         if (Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length) {
-            this.buildIndex(this.props.field);	    
+            this.buildIndex(this.props.displayedData);
         }
 	if (this.props.selectedNode !== prevProps.selectedNode) {
-            this.forceUpdate();  // Since there won't be a visible state change
+	    this.getDataSlice(this.state.displayedIndex);
         }
     }
 
     // Build the lunr search engine index from scratch.
     buildIndex = (data) => {
 	let fields = ['node']
-	this.props.fields.map(field => {
+	this.props.fields.forEach(field => {
 	    if (field.groupBy) {
 		fields.push(field.groupBy);
 	    }
 	});
+	
         const indexData = lunr(function () {
-	    fields.map(field => {
+	    fields.forEach(field => {
 		this.field(field);
 	    });
             this.ref('_id');
@@ -42,15 +44,29 @@ class ModuleData extends Component {
                 this.add(data[key]);
             }, this)
         });
-        this.setState({ displayedIndex: indexData });
+        this.setState({ displayedIndex: indexData }, function () {
+	    this.getDataSlice(indexData);
+	});
+    }
+
+    getDataSlice = (index) => {
+	const dataSlice = {};
+	index.search("node:" + this.props.selectedNode)
+	    .forEach( ({ ref, score, res }) => {
+		dataSlice[ref] = this.props.displayedData[ref];
+	    });
+	this.setState({ dataSlice: dataSlice }, function() {
+	    this.forceUpdate();
+	});
     }
 
     render () {
+	console.log(this.props.fields.length)
 	return (
-		<div>
-		{/*this.props.fields.map(field => {
-		    <ModuleDataTable ... />
-		});*/}
+	    <div>
+		{this.props.fields.map((field, index) => {
+		    return <ModuleDataTable key={index.toString()} data={this.state.dataSlice} config={field} />;
+		})}
 	    </div>
 	)
     }
@@ -62,84 +78,103 @@ class ModuleDataTable extends Component {
 	super(props);
 	this.state = {
 	    names: [],
-	    values: []
+	    values: {},
+	    title: ""
 	}
-	this.builder = this.builder.bind(this);
     }
 
     componentDidMount() {
-	this.builder(this.props.fields, this.props.nodeData, this.props.nDisplayed);
+	this.builder();
     }
 
     componentDidUpdate(prevProps) {
-	if (this.props.nodeData !== prevProps.nodeData ||
-	    Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length ||
-	    this.props.nDisplayed !== prevProps.nDisplayed) {
-	    this.builder(this.props.fields, this.props.nodeData, this.props.nDisplayed);
+	// Need to compare full objects!
+	if (Object.keys(this.props.data).length !== Object.keys(prevProps.data).length ||
+	    this.props.config !== prevProps.config) {
+	    this.builder();
 	}
     }
     
-    builder = (fields, nodeData, nDisplayed) => {
-        /* Build the node nodeData table */
-        let names = [];	
+    builder = () => {
+	const data = this.props.data;
+	const {field, type, aggregate} = this.props.config;
+	let names = [];
         let values = [];
-        for (let field of fields._config._order) {
-            let valStr = "";
-            let label = "";
-            if (field === "nDisplayed") {
-                valStr = nDisplayed;
-                label = "Rows Displayed";
-            } else if (fields[field] === "concat") {
-                if (Array.isArray(nodeData[field])) {
-                    valStr = nodeData[field].join(fields._config._fs);
-                } else if (isDict(nodeData[field])) {
-                    let vals = [];
-                    for (let key of Object.keys(nodeData[field])) {
-                        vals.push(key + ":" + nodeData[field][key]);
-                    }
-                    valStr = vals.join(fields._config._fs);
-                }
-            } else if (fields[field] === "count") {
-                if (Array.isArray(nodeData[field])) {
-                    valStr = nodeData[field].length;
-                } else if (isDict(nodeData[field])) {
-                    valStr = Object.keys(nodeData[field]).length;
-                }
-                label = field + " count";
-            } else if (fields[field] === "average") {
-                if (Array.isArray(nodeData[field])) {
-                    valStr = average(nodeData[field]);
-                } else if (isDict(nodeData[field])) {
-                    valStr = average(nodeData[field].values());
-                }
-                label = field + " average";
-            } else if (fields[field] === "string") {
-                valStr = nodeData[field];
-            }
-            if ("_labels" in fields._config) {
-                label = fields._config._labels[field];
-            }
-	    let isNumeric = typeof valStr === 'number';
-	    names.push({id: field,
-			numeric: isNumeric,
-			disablePadding: false,
-			label: label
-		       });
-            values.push(valStr);
-        }
+	let label = this.props.config.title ?
+            this.props.config.title :
+            this.props.config.field
+
+	if (type === "string" || type === "numeric") {	
+	    if (aggregate === false) {
+		names = [{id: "id", numeric: true, disablePadding: false, label: "id"},
+			 {id: field, numeric: false, disablePadding: false, label: field}];
+		Object.keys(data).forEach(function(key, index) {
+		    values.push({id: key, values: [key, data[key][field]]});
+		});
+	    } else if (aggregate === "count") {
+		({names, values} = this.countStrings(data, field));
+	    } else if (aggregate === "density") {
+		({names, values} = this.countStrings(data, field));
+		values[0].values = this.toDensity(values[0].values);
+	    } else if (aggregate === "average") {
+		names = [{id: "average", numeric: true, disablePadding: false, label: "average value"}];
+		values = [{id: 1, values: [this.getAverage(data, field)]}];
+	    }
+	}
+
 	this.setState({
-            names: names,
-            values: values
+	    names: names,
+	    values: values,
+	    title: label
         });
     }
 
+    countStrings = (data, field) => {
+	const counter = {};
+	Object.keys(data).forEach( function(key, index) {
+            if (counter[data[key][field]]) {
+		counter[data[key][field]]++;
+            } else {
+		counter[data[key][field]] = 1;
+            }
+	});
+	
+	const names = [];
+	const counts = [];
+	Object.keys(counter).forEach( function(key, index) {
+            names.push( {id: key, numeric: true, disablePadding: false, label: key} );
+            counts.push( counter[key] );
+	});
+	const values = [{id: 1, values: counts}];
+	return {names, values}
+    }
+
+    toDensity = (counts, globalSum=null, precision=3) => {
+	if (!Array.isArray(counts) || !counts.length) {
+	    return;
+	}
+	if (globalSum) {
+	    return counts.map(x => (x / globalSum).foFixed(precision));
+	} else {
+	    return counts.map(x => (x / sum(counts)).toFixed(precision));
+	}
+    }
+
+    getAverage = (data, field) => {
+	const values = [];
+        Object.keys(data).forEach( function(key, index) {
+            values.push(data[key][field]);
+        });
+	const avg = average(values);
+	return avg;
+    }
+        
     render () {
 	return (
 	    <div>
-	    {this.state.names.length ?
-	     <EnhancedTable names={this.state.names} data={[{id: 1, values: this.state.values}]} title={this.props.title}/> :
-	     <div></div>
-	    }
+		{Object.keys(this.state.names).length ?
+		 <EnhancedTable names={this.state.names} data={this.state.values} title={this.state.title}/> :
+		 <div />}
 	    </div>
 	);
     }

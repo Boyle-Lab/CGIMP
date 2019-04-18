@@ -47,15 +47,15 @@ class EnhancedTableHead extends React.Component {
     
     render() {
 	const { names, order, orderBy } = this.props;
-	
+
 	return (
 		<TableHead>
 		<TableRow>
 		{names.map(
 		    row => (
 			    <TableCell
-			key={row.id}
-			align={row.numeric ? 'right' : 'left'}
+			key={row.id.toString()}
+			align='right'
 			padding={row.disablePadding ? 'none' : 'default'}
 			sortDirection={orderBy === row.id ? order : false}
 			    >
@@ -153,16 +153,20 @@ class EnhancedTable extends React.Component {
 	super(props)
 	this.state = {
 	    order: 'asc',
-	    orderBy: 'calories',  //FIXME
+	    orderBy: 'id',
 	    page: 0,
 	    rowsPerPage: 5,
 	}
     };
+
+    componentDidMount() {
+	this.setState({ orderBy: this.props.names[0].id });
+    }
     
     handleRequestSort = (event, property) => {
 	const orderBy = property;
 	let order = 'desc';
-	
+
 	if (this.state.orderBy === property && this.state.order === 'desc') {
 	    order = 'asc';
 	}
@@ -182,7 +186,6 @@ class EnhancedTable extends React.Component {
     render() {
 	const { classes, names, data } = this.props;
 	const { order, orderBy, rowsPerPage, page } = this.state;
-
 	return (
 		<Paper className={classes.root}>
 		<EnhancedTableToolbar title={this.props.title} />
@@ -203,9 +206,9 @@ class EnhancedTable extends React.Component {
 			     <TableRow
 			 hover
 			 tabIndex={-1}
-			 key={n.id} >
-			     {n.values.map(value =>
-					   <TableCell align="right">{value}</TableCell>
+			 key={n.id.toString()} >
+			     {n.values.map( (value, index) =>
+					    <TableCell key={index.toString()} align="right">{value}</TableCell>
 					  )}
 			 </TableRow>
                      );

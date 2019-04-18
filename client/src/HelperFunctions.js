@@ -4,10 +4,19 @@ function isDict(v) {
     return typeof v==='object' && v!==null && !(v instanceof Array) && !(v instanceof Date);
 }
 
-function average(arr) {
+function average(arr, precision=3) {
     // Calculate the average over a numeric array
-    const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
-    return arrAvg;
+    if (!Array.isArray(arr) || !arr.length) {
+	return
+    }
+    return (sum(arr) / arr.length).toFixed(precision);
+}
+
+function sum(arr) {
+    if (!Array.isArray(arr) || !arr.length) {
+        return
+    }
+    return arr.reduce( (a, b) => Number(a) + Number(b) );
 }
 
 function compareArrays(arr1,arr2){
@@ -30,4 +39,4 @@ function compareArrays(arr1,arr2){
     return result    
 }
 
-export { isDict, average, compareArrays };
+export { isDict, average, sum, compareArrays };

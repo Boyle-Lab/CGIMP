@@ -69,26 +69,50 @@ class App extends Component {
 		dataFields: [
 		    /* 
 		       Fields in the module-level data to display (as individual tables). Fields are 
-		       specified as objects, where the object key is the field name in the data object,
-		       and key:value pairs inside the field object tell the display component how to
-		       handle and display the data within the given field. 
+		       specified as a list of objects containign key:value pairs to specify the field 
+		       and tell the display component how to handle data contained therein. Tables will
+		       be rendered in the order in which they are supplied.
 
 		       Mandatory parameters:
-		       action: How to aggregate values for list/object data. Available options are "concat", "count", and "average".
-		       metric: Metric to report for aggregated data. Available options are "raw", "count", and "density".
-		       from: Which dataset(s) to show results from. Options are "all", "displayed", and "both".
+		       field: The name of the desired field.
+		       type: The type of value stored in the field: "string", "numeric", "array", or "object".
+		       aggregate: <false/aggType> Whether and how to aggregate data. "false" will report all rows
+		           while supplying an aggType will report aggregated values. Available options are "concat", 
+			   "count", "average", and "density". Not all options make sense for all data types!
+		       from: Which dataset to show results from. Options are "all", "displayed".
 
 		       Optional parameters:
 		       groupBy: Group results by another data field before aggregation. Only one groupBy condition is allowed.
 		       title: Title for results table. Defaults to the field name if not given.
 		    */
-		    "factors": {
-			"action": "count",
-			"metric": "density",
-			"from": "all",
-			"groupBy": "cell",
-			"title": "Factors"
-		    },
+		    {
+                        "field": "cell",
+                        "type": "string",
+                        "aggregate": false,
+                        "from": "displayed",
+                        "title": "Cells"
+                    },
+		    {
+                        "field": "cell",
+			"type": "string",
+                        "aggregate": "count",
+                        "from": "displayed",
+                        "title": "Cells"
+                    },
+		    {
+                        "field": "cell",
+                        "type": "string",
+                        "aggregate": "density",
+                        "from": "displayed",
+                        "title": "Cells"
+                    },
+		    {
+                        "field": "orth_type",
+                        "type": "string",
+                        "aggregate": "average",
+                        "from": "displayed",
+                        "title": "Ortholog Type"
+                    },
 		],
 	    }
 	};

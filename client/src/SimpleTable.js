@@ -27,16 +27,16 @@ function SimpleTable(props) {
 	    <Table className={classes.table}>
             <TableHead>
             <TableRow key="0">
-	    {names.map( name => (
-		    <TableCell align="right">{name}</TableCell>
+	    {names.map( (name, index) => (
+		    <TableCell key={index.toString()} align="right">{name}</TableCell>
 	    ))}
 	</TableRow>
             </TableHead>
             <TableBody>
             {rows.map(row => (
 		    <TableRow key={row.id}>
-		    {row.values.map(value => (
-			    <TableCell align="right">{value}</TableCell>
+		    {row.values.map( (value, index) => (
+			    <TableCell key={index.toString()} align="right">{value}</TableCell>
 		    ))}
 		    </TableRow>
             ))}

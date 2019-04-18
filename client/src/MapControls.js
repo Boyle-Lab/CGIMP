@@ -12,11 +12,10 @@ class MapControls extends Component {
     
     onCellChange = value => {
         const index = this.props.index;
-        const dataForCell = [];
-        const searchStr = "cell:" + value;
-        index.search(searchStr)
+        const dataForCell = {};
+        index.search("cell:" + value)
             .map(({ ref, score, res }) => {
-                dataForCell.push(this.props.data[ref]);
+                dataForCell[ref] = this.props.data[ref];
 		return true;
             });
         this.props.onDataChange(dataForCell);
