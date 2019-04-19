@@ -79,11 +79,25 @@ class App extends Component {
 		       aggregate: <false/aggType> Whether and how to aggregate data. "false" will report all rows
 		           while supplying an aggType will report aggregated values. Available options are "concat", 
 			   "count", "average", and "density". Not all options make sense for all data types!
+			   
+			   For types "string" and "numeric", aggregation will return a single table row (unless groupBy
+			   is used), and "concat" is not available.
+
+			   For type "array", the default mode is to concatenate all values and return a single result
+			   column ("aggregate: false" and "aggregate: concat" are equivalent), with a row for each module.
+			   "count" and "density" will summarize data for all rows into a single row, with a
+			   column for every value present in the given field across all rows in the data.
+			   "average" also reports a row for each entry, with the value reported being the
+			   numeric average of all values in the array for each record.
+
+			   Type "object" behaves similarly to array....
+
 		       from: Which dataset to show results from. Options are "all", "displayed".
 
 		       Optional parameters:
 		       groupBy: Group results by another data field before aggregation. Only one groupBy condition is allowed.
 		       title: Title for results table. Defaults to the field name if not given.
+		       fs: Field separator for value concatenation.
 		    */
 		    {
                         "field": "cell",
@@ -97,9 +111,9 @@ class App extends Component {
 			"type": "string",
                         "aggregate": "count",
                         "from": "displayed",
-                        "title": "Cells"
+                        "title": "Cells (count)"
                     },
-		    {
+/*		    {
                         "field": "cell",
                         "type": "string",
                         "aggregate": "density",
@@ -112,6 +126,30 @@ class App extends Component {
                         "aggregate": "average",
                         "from": "displayed",
                         "title": "Ortholog Type"
+                    },*/
+		    {
+                        "field": "factors",
+                        "type": "array",
+                        "aggregate": "concat",
+                        "from": "displayed",
+                        "title": "Factors",
+			"fs" : ","
+                    },
+		    {
+                        "field": "factors",
+                        "type": "array",
+                        "aggregate": "count",
+                        "from": "displayed",
+                        "title": "Factors (count)",
+                        "fs" : ","
+                    },
+		    {
+                        "field": "factors",
+                        "type": "array",
+                        "aggregate": "density",
+                        "from": "displayed",
+                        "title": "Factors (density)",
+                        "fs" : ","
                     },
 		],
 	    }

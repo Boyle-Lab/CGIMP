@@ -6,12 +6,11 @@
     font-family: Arial, sans-serif;
 }
 body {
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  text-align: center;
   margin: 0;
-  height: 100vh;
   font-weight: 700;
   font-family: sans-serif;
 }

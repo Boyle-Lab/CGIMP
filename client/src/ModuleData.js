@@ -1,7 +1,7 @@
 // /client/src/ModuleData.js
 import React, { Component } from "react";
 import EnhancedTable from './EnhancedTable';
-import { isDict, average, sum } from './HelperFunctions';
+import { average, sum } from './HelperFunctions';
 import lunr from 'lunr';
 
 class ModuleData extends Component {
@@ -61,7 +61,6 @@ class ModuleData extends Component {
     }
 
     render () {
-	console.log(this.props.fields.length)
 	return (
 	    <div>
 		{this.props.fields.map((field, index) => {
@@ -98,11 +97,21 @@ class ModuleDataTable extends Component {
     builder = () => {
 	const data = this.props.data;
 	const {field, type, aggregate} = this.props.config;
+	let nRows;
+	if (data) {
+	    nRows = Object.keys(data).length;
+	} else {
+	    nRows = 1;
+	}
+	let fs = ',';
+	if (this.props.config.fs) {
+	    fs = this.props.config.fs;
+	}
 	let names = [];
         let values = [];
 	let label = this.props.config.title ?
             this.props.config.title :
-            this.props.config.field
+            this.props.config.field	
 
 	if (type === "string" || type === "numeric") {	
 	    if (aggregate === false) {
@@ -119,6 +128,28 @@ class ModuleDataTable extends Component {
 	    } else if (aggregate === "average") {
 		names = [{id: "average", numeric: true, disablePadding: false, label: "average value"}];
 		values = [{id: 1, values: [this.getAverage(data, field)]}];
+	    } else {
+		// Illegal argument
+		return
+	    }
+	} else if (type === "array") {
+	    if (aggregate === false || aggregate === "concat") {
+		names = [{id: "id", numeric: true, disablePadding: false, label: "id"},
+                         {id: field, numeric: false, disablePadding: false, label: field}];
+                Object.keys(data).forEach(function(key, index) {
+                    values.push({ id: key, values: [key, data[key][field].join(fs)] });
+                });
+	    } else if (aggregate === "count") {
+		({names, values} = this.arrCountStrings(data, field));		
+	    } else if (aggregate === "density") {
+		({names, values} = this.arrCountStrings(data, field));
+		values[0].values = this.toDensity(values[0].values, nRows);
+	    } else if (aggregate === "average") {
+		names = [{id: "id", numeric: true, disablePadding: false, label: "id"},
+                         {id: field, numeric: false, disablePadding: false, label: "average value"}];
+		Object.keys(data).forEach(function(key, index) {
+                    values.push({ id: key, values: [key, average(data[key][field])] });
+		});
 	    }
 	}
 
@@ -137,16 +168,33 @@ class ModuleDataTable extends Component {
             } else {
 		counter[data[key][field]] = 1;
             }
+	});	
+	return this.counterObjToNamesVals(counter);
+    }
+
+    arrCountStrings = (data, field) => {
+	const counter = {};
+        Object.keys(data).forEach( function(key) {
+	    data[key][field].forEach( function(val) {		
+		if (counter[val]) {
+                    counter[val]++;
+		} else {
+                    counter[val] = 1;
+		}
+	    })
 	});
-	
+	return this.counterObjToNamesVals(counter);
+    }
+
+    counterObjToNamesVals = (counter) => {
 	const names = [];
-	const counts = [];
-	Object.keys(counter).forEach( function(key, index) {
+        const counts = [];
+        Object.keys(counter).forEach( function(key, index) {
             names.push( {id: key, numeric: true, disablePadding: false, label: key} );
             counts.push( counter[key] );
-	});
-	const values = [{id: 1, values: counts}];
-	return {names, values}
+        });
+        const values = [{id: 1, values: counts}];
+        return {names, values}
     }
 
     toDensity = (counts, globalSum=null, precision=3) => {
@@ -154,7 +202,7 @@ class ModuleDataTable extends Component {
 	    return;
 	}
 	if (globalSum) {
-	    return counts.map(x => (x / globalSum).foFixed(precision));
+	    return counts.map(x => (x / globalSum).toFixed(precision));
 	} else {
 	    return counts.map(x => (x / sum(counts)).toFixed(precision));
 	}
@@ -172,7 +220,7 @@ class ModuleDataTable extends Component {
     render () {
 	return (
 	    <div>
-		{Object.keys(this.state.names).length ?
+		{this.state.names.length ?
 		 <EnhancedTable names={this.state.names} data={this.state.values} title={this.state.title}/> :
 		 <div />}
 	    </div>
