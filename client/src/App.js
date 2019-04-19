@@ -90,7 +90,13 @@ class App extends Component {
 			   "average" also reports a row for each entry, with the value reported being the
 			   numeric average of all values in the array for each record.
 
-			   Type "object" behaves similarly to array....
+			   Type "object" behaves similarly to array. Default mode (aggregate: false) is to return
+			   a table with a row for each module and a column for each object key. Nested objects
+			   are NOT supported! "aggregate: concat" will also return a row for each module, but all
+			   key:value pairs will be reported as a string in a single table column. "aggregate: count"
+			   and "aggregate: density" report the number and density of occurences of each object key
+			   in the dataset, ignoring the actual values stored therein. "aggregate: average" reports
+			   the numeric average of values for each object key. 
 
 		       from: Which dataset to show results from. Options are "all", "displayed".
 
@@ -135,21 +141,55 @@ class App extends Component {
                         "title": "Factors",
 			"fs" : ","
                     },
-		    {
+/*		    {
                         "field": "factors",
                         "type": "array",
                         "aggregate": "count",
                         "from": "displayed",
                         "title": "Factors (count)",
-                        "fs" : ","
-                    },
+                    },*/
 		    {
                         "field": "factors",
                         "type": "array",
                         "aggregate": "density",
                         "from": "displayed",
                         "title": "Factors (density)",
-                        "fs" : ","
+                    },
+		    {
+                        "field": "loc",
+                        "type": "object",
+                        "aggregate": false,
+                        "from": "displayed",
+                        "title": "Location",
+                    },
+/*		    {
+                        "field": "loc",
+                        "type": "object",
+                        "aggregate": "concat",
+                        "from": "displayed",
+                        "title": "Location",
+			"fs": ", "
+                    },*/
+		    {
+                        "field": "loc",
+                        "type": "object",
+                        "aggregate": "count",
+                        "from": "displayed",
+                        "title": "Location",
+                    },
+		    {
+                        "field": "loc",
+                        "type": "object",
+                        "aggregate": "density",
+                        "from": "displayed",
+                        "title": "Location",
+                    },
+		    {
+                        "field": "loc",
+                        "type": "object",
+                        "aggregate": "average",
+                        "from": "displayed",
+                        "title": "Location",
                     },
 		],
 	    }
