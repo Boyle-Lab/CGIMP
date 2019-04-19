@@ -293,7 +293,7 @@ class App extends Component {
 	                    displayedData={this.state.displayedData}
 		            nDisplayed={this.state.selectedNodeModuleCount}
 	                    nodeData={this.state.nodeData[this.state.selectedNode]}
-		            mainIndex={this.state.index}
+		            index={this.state.index}
 	                    config={this.state.dataPanelConfig}
 		        /> :
 		 (<div id="dataPanel"><p>Click on a map node for more information.</p></div>)

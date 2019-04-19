@@ -14,47 +14,21 @@ class ModuleData extends Component {
     constructor(props) {
         super(props);
         this.state = {
-	    displayedIndex: {},
 	    dataSlice: {}
         }
     }
 
     componentDidMount() {
-	//this.buildIndex(this.props.displayedData);
-	this.getDataSlice(this.props.mainIndex, this.props.displayedData);
+	this.getDataSlice(this.props.index, this.props.displayedData);
     }
 
     componentDidUpdate(prevProps) {
         if (Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length) {
-            //this.buildIndex(this.props.displayedData);
         }
 	if (this.props.selectedNode !== prevProps.selectedNode ||
 	    Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length) {
-	    this.getDataSlice(this.props.mainIndex, this.props.displayedData);
+	    this.getDataSlice(this.props.index, this.props.displayedData);
         }
-    }
-
-    // Build the lunr search engine index from scratch.
-    buildIndex = (data) => {
-	let fields = ['node']
-	this.props.fields.forEach(field => {
-	    if (field.groupBy) {
-		fields.push(field.groupBy);
-	    }
-	});
-	
-        const indexData = lunr(function () {
-	    fields.forEach(field => {
-		this.field(field);
-	    });
-            this.ref('_id');
-            Object.keys(data).forEach(function (key) {
-                this.add(data[key]);
-            }, this)
-        });
-        this.setState({ displayedIndex: indexData }, function () {
-	    this.getDataSlice(indexData, data);
-	});
     }
 
     getDataSlice = (index, data) => {
