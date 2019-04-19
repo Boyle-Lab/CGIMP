@@ -9,7 +9,7 @@ class DataPanel extends Component {
 	return (
 		<div id="dataPanel">
 		<NodeData fields={this.props.config.nodeFields} nodeData={this.props.nodeData} nDisplayed={this.props.nDisplayed} displayedData={this.props.displayedData} />
-		<ModuleData fields={this.props.config.dataFields} data={this.props.data} displayedData={this.props.displayedData} selectedNode={this.props.nodeData._id} mainIndex={this.props.mainIndex} />
+		<ModuleData fields={this.props.config.dataFields} data={this.props.data} displayedData={this.props.displayedData} selectedNode={this.props.nodeData._id} index={this.props.index} />
 		</div>
 	);
     }

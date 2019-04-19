@@ -2,7 +2,6 @@
 import React, { Component } from "react";
 import EnhancedTable from './EnhancedTable';
 import { average, sum } from './HelperFunctions';
-import lunr from 'lunr';
 
 /* TODO:
    1) Switch single-row tables to SimpleTable (need to add title support to SimpleTable)
