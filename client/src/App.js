@@ -104,6 +104,8 @@ class App extends Component {
 		       groupBy: Group results by another data field before aggregation. Only one groupBy condition is allowed.
 		       title: Title for results table. Defaults to the field name if not given.
 		       fs: Field separator for value concatenation.
+
+		       TODO: Add ability to append additional fields (strings and numerics only) to output rows.
 		    */
 		    {
                         "field": "cell",
@@ -119,20 +121,13 @@ class App extends Component {
                         "from": "displayed",
                         "title": "Cells (count)"
                     },
-/*		    {
+		    {
                         "field": "cell",
                         "type": "string",
                         "aggregate": "density",
                         "from": "displayed",
                         "title": "Cells"
                     },
-		    {
-                        "field": "orth_type",
-                        "type": "string",
-                        "aggregate": "average",
-                        "from": "displayed",
-                        "title": "Ortholog Type"
-                    },*/
 		    {
                         "field": "factors",
                         "type": "array",
@@ -141,13 +136,13 @@ class App extends Component {
                         "title": "Factors",
 			"fs" : ","
                     },
-/*		    {
+		    {
                         "field": "factors",
                         "type": "array",
                         "aggregate": "count",
                         "from": "displayed",
                         "title": "Factors (count)",
-                    },*/
+                    },
 		    {
                         "field": "factors",
                         "type": "array",
@@ -156,40 +151,12 @@ class App extends Component {
                         "title": "Factors (density)",
                     },
 		    {
-                        "field": "loc",
-                        "type": "object",
-                        "aggregate": false,
-                        "from": "displayed",
-                        "title": "Location",
-                    },
-/*		    {
-                        "field": "loc",
+                        "field": "maps_to",
                         "type": "object",
                         "aggregate": "concat",
                         "from": "displayed",
-                        "title": "Location",
+                        "title": "Orthologous Location",
 			"fs": ", "
-                    },*/
-		    {
-                        "field": "loc",
-                        "type": "object",
-                        "aggregate": "count",
-                        "from": "displayed",
-                        "title": "Location",
-                    },
-		    {
-                        "field": "loc",
-                        "type": "object",
-                        "aggregate": "density",
-                        "from": "displayed",
-                        "title": "Location",
-                    },
-		    {
-                        "field": "loc",
-                        "type": "object",
-                        "aggregate": "average",
-                        "from": "displayed",
-                        "title": "Location",
                     },
 		],
 	    }

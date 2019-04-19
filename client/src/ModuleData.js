@@ -4,6 +4,12 @@ import EnhancedTable from './EnhancedTable';
 import { average, sum } from './HelperFunctions';
 import lunr from 'lunr';
 
+/* TODO:
+   1) Switch single-row tables to SimpleTable (need to add title support to SimpleTable)
+   2) Add ability to append additional columns for single-value fields to data tables.
+*/
+
+
 class ModuleData extends Component {
     constructor(props) {
         super(props);
@@ -14,15 +20,17 @@ class ModuleData extends Component {
     }
 
     componentDidMount() {
-	this.buildIndex(this.props.displayedData);
+	//this.buildIndex(this.props.displayedData);
+	this.getDataSlice(this.props.mainIndex, this.props.displayedData);
     }
 
     componentDidUpdate(prevProps) {
         if (Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length) {
-            this.buildIndex(this.props.displayedData);
+            //this.buildIndex(this.props.displayedData);
         }
-	if (this.props.selectedNode !== prevProps.selectedNode) {
-	    this.getDataSlice(this.state.displayedIndex);
+	if (this.props.selectedNode !== prevProps.selectedNode ||
+	    Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length) {
+	    this.getDataSlice(this.props.mainIndex, this.props.displayedData);
         }
     }
 
@@ -45,15 +53,17 @@ class ModuleData extends Component {
             }, this)
         });
         this.setState({ displayedIndex: indexData }, function () {
-	    this.getDataSlice(indexData);
+	    this.getDataSlice(indexData, data);
 	});
     }
 
-    getDataSlice = (index) => {
+    getDataSlice = (index, data) => {
 	const dataSlice = {};
 	index.search("node:" + this.props.selectedNode)
 	    .forEach( ({ ref, score, res }) => {
-		dataSlice[ref] = this.props.displayedData[ref];
+		if (ref in data) {
+		    dataSlice[ref] = data[ref];
+		}
 	    });
 	this.setState({ dataSlice: dataSlice }, function() {
 	    this.forceUpdate();
@@ -209,7 +219,7 @@ class ModuleDataTable extends Component {
 	    } else if (aggregate === "concat") {
                 names = [{id: "id", numeric: true, disablePadding: false, label: "id"},
                          {id: "location", numeric: false, disablePadding: false, label: "location"},
-                         {id: "values", numeric: false, disablePadding: false, label: "values"}];		
+                         {id: "values", numeric: false, disablePadding: false, label: field}];
 		Object.keys(data).forEach((key) => {
 		    const vals = [];
 		    Object.keys(data[key][field]).forEach((subKey) => {
