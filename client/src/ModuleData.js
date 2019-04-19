@@ -83,14 +83,18 @@ class ModuleDataTable extends Component {
     }
 
     componentDidMount() {
-	this.builder();
+	if (Object.keys(this.props.data).length) {
+	    this.builder();
+	}
     }
 
     componentDidUpdate(prevProps) {
 	// Need to compare full objects!
 	if (Object.keys(this.props.data).length !== Object.keys(prevProps.data).length ||
 	    this.props.config !== prevProps.config) {
-	    this.builder();
+	    if (Object.keys(this.props.data).length) {
+		this.builder();
+	    }
 	}
     }
     
@@ -113,7 +117,13 @@ class ModuleDataTable extends Component {
             this.props.config.title :
             this.props.config.field	
 
-	if (type === "string" || type === "numeric") {	
+	if (type === "string" || type === "numeric") {
+	    if (Array.isArray(data[Object.keys(data)[0]][field]) ||
+		typeof data[Object.keys(data)[0]][field] === "object" ||
+		data[Object.keys(data)[0]][field] instanceof Date) {
+	        // Wrong data type!
+                return
+            }
 	    if (aggregate === false) {
 		names = [{id: "id", numeric: true, disablePadding: false, label: "id"},
 			 {id: field, numeric: false, disablePadding: false, label: field}];
@@ -133,6 +143,10 @@ class ModuleDataTable extends Component {
 		return
 	    }
 	} else if (type === "array") {
+	    if (!Array.isArray(data[Object.keys(data)[0]][field])) {
+		// Wrong data type!
+		return
+	    }
 	    if (aggregate === false || aggregate === "concat") {
 		names = [{id: "id", numeric: true, disablePadding: false, label: "id"},
                          {id: field, numeric: false, disablePadding: false, label: field}];
@@ -150,6 +164,12 @@ class ModuleDataTable extends Component {
 		Object.keys(data).forEach(function(key, index) {
                     values.push({ id: key, values: [key, average(data[key][field])] });
 		});
+	    }
+	} else if (type === "object") {
+	    if (typeof data[Object.keys(data)[0]][field] !== "object" ||
+		Array.isArray(data[Object.keys(data)[0]][field])) {
+		// Wrong data type!
+		return
 	    }
 	}
 
