@@ -1,4 +1,4 @@
-# CGIMAP
+# CGIMP
 Clustered Genomic Interval Mapping Platform
 
 
