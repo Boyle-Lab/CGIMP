@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@appbaseio/reactivesearch": "^3.0.0-rc.4",
     "@material-ui/core": "^3.9.3",
     "ajv": "^6.10.0",
     "ajv-keywords": "^3.4.0",

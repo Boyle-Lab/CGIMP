@@ -8,14 +8,14 @@ import argparse
 def jsonToBedInts(jsonData):
     # Return a Bedtool object for a JSON file.
     ints = []
-    for i in range(len(jsonData)):
-        mod = jsonData[i]
-        ints.append( (mod["loc"]["chrom"], mod["loc"]["start"], mod["loc"]["end"], mod["_id"], i) )
+    for key in jsonData.keys():
+        mod = jsonData[key]
+        ints.append( (mod["loc"]["chrom"], mod["loc"]["start"], mod["loc"]["end"], mod["_id"], key) )
     return(pybedtools.BedTool(ints))
 
 def buildResult(res, origData):
-    idx = int(res[4])
-    compositeRec = origData[int(idx)]
+    key = res[4]
+    compositeRec = origData[key]
     bRec = {
 	"loc": { "chrom": res[5],
                "start": res[6],
