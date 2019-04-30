@@ -9,6 +9,7 @@
     "ajv-keywords": "^3.4.0",
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
+    "elasticsearch": "^15.4.1",
     "filepond": "^4.3.5",
     "lunr": "^2.3.6",
     "prop-types": "^15.7.2",

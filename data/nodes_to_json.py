@@ -37,7 +37,7 @@ def parse_rec(rec):
     """
     vals = rec.split("\t")
     ret = {
-        "_id": vals[3],
+        "id": vals[3],
         "loc": {
             "chrom": vals[0],
             "start": vals[1],

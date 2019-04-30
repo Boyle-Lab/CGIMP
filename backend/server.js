@@ -6,6 +6,12 @@ const cors = require('cors')
 const fs = require('fs-extra');
 const compression = require('compression');
 const {PythonShell} = require('python-shell');
+const { Client } = require('@elastic/elasticsearch');
+
+const ES_HOST = 'http://localhost:9200';
+const client = new Client({
+    host: ES_HOST,
+});
 
 const API_PORT = 3001;
 const app = express();
@@ -96,7 +102,6 @@ router.delete('/delete', (req, res) => {
     return res.status(200).send('Deleted');
 });
 
-
 // Retrieve a local file from the given path.
 router.post("/getFile", (req, res) => {
     const { fileName, contentType, encodingType } = req.body;
@@ -119,7 +124,8 @@ router.post('/writeJson', (req, res) => {
     return res.status(200).send('Success');
 });
 
-// This method takes the serverId of a previously uploaded BED file and a JSON object
+// This method intersects data in BED format with genomic intervals in the map dataset.
+// It takes the serverId of a previously uploaded BED file and a JSON object
 // describing map data and dispatches a call to the pybedtools adapter to find the intersection.
 router.post('/intersectData', (req, res) => {
     const { serverId, filename, data, bedtoolsOptions } = req.body; // bedtoolsOptions will eventually receive a JSON object describing the desired params to pass to bedtools.
@@ -140,6 +146,136 @@ router.post('/intersectData', (req, res) => {
 	}
 	return res.status(200).send(results);
     });
+});
+
+// Index the dataset with elasticsearch.
+router.post("/indexData", (req, res) => {
+    const { fileName, indexName, typeName, contentType, encodingType } = req.body;
+
+    const loadIndex = (dataObj) => {
+	// Create records of the given type.	
+ 	addMappings(dataObj); // Parse a record and add data type mappings to the index.
+	const documents = [];
+	Object.keys(dataObj).forEach( (key) => {
+	    documents.push({index: {_index: indexName, _type: typeName, _id: key}},
+			   dataObj[key]);
+	});
+	client.bulk({body: documents},
+		    (err) => {
+			if (err) {
+			    console.log(err);
+			}
+		    });
+    }
+
+    const textType = JSON.stringify({
+	"type" : "text",
+        "fields" : {
+	    "keyword" : {
+		"type" : "keyword",
+		"ignore_above" : 256
+	    }
+        }
+    });
+
+    const numericType = JSON.stringify({
+	"type": "long"
+    });
+    
+    const addMappings = (dataObj) => {
+        // Add data mappings to the index based on fields found in the first document.
+	const obj = dataObj[Object.keys(dataObj)[0]];
+	
+	Object.keys(obj).forEach( (key) => {
+	    let reqBody = '{"properties": {';
+	    if (isNaN(obj[key])) {
+		if (typeof obj[key]==='object' && obj[key]!==null && !(obj[key] instanceof Array) && !(obj[key] instanceof Date)) {
+		    // Nested object.
+		    reqBody += addNestedMapping(obj[key], key);
+		} else {
+		    reqBody += '"' + key + '": ' + textType;
+		}
+	    } else {
+		reqBody += '"' + key + '": ' + numericType;
+	    }
+	    reqBody += '}}'
+	    //console.log(reqBody);
+	    client.indices.putMapping({
+		"index": indexName,
+		"includeTypeName": true,
+		"type": typeName,
+		"body": JSON.parse(reqBody)
+	    });
+	});
+    }
+
+    const addNestedMapping = (obj, key) => {
+	ret = '"' + key + '": {"properties": {';
+	Object.keys(obj).forEach( (subKey, index) => {
+	    if (index > 0) {
+                ret += ',';
+            }
+            if (isNaN(obj[subKey])) {
+		if (typeof v==='object' && v!==null && !(v instanceof Array) && !(v instanceof Date)) {
+		    ret += addNestedMapping(obj[subKey], subKey);
+		}
+                ret += '"' + subKey + '": ' + textType;
+            } else {
+                ret += '"' + subKey + '": ' + numericType;
+            }
+        });
+	ret += '}}';
+	return ret;
+    }
+    
+    res.set('Content-Type', contentType);
+    // First create the index if it does not already exist.
+    client.indices.exists({ "index": indexName })
+	.then( (res) => {
+	    if (!res.body) {
+		console.log('Creating Index');
+		client.indices.create({
+		    "index": indexName,
+		    "body": {
+			"settings" : {
+			    "number_of_shards" : 3  // This is arbitrary. No replica shards because data are easily reproduced.
+			}
+		    }
+		}, (err, response) => {
+		    if (err) {
+			console.log(err);
+		    } else {
+			console.log('Index Created');
+			// Add the data type mappings for each field and load the data.			
+			fs.readFile(fileName, encodingType, (err, data) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            loadIndex(JSON.parse(data));
+                        });
+		    }
+		});
+	    } else {
+		client.indices.existsType({ "index": indexName,
+					    "type": typeName },
+					  (err, res) => {
+					      if (err) {
+						  return res.json({ success: false, error: err });
+					      } else {
+						  if (!res.body) {
+						      fs.readFile(fileName, encodingType, (err, data) => {
+							  if (err) {
+							      console.log(err);
+							  }
+							  loadIndex(JSON.parse(data));
+						      });
+						  }
+					      }
+					  })
+	    }
+	    
+	});
+    return res.status(200).send('Success');
 });
 
 

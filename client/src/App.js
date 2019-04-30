@@ -14,6 +14,8 @@ class App extends Component {
     constructor(props) {
 	super(props);
 	this.state = {
+	    dataFile: 'dataMap.json',
+	    nodeDataFile: 'nodes.json',
  	    data: [],            // Reference copy of locus-level data. Treated as immutable.
 	    nodeData: [],        // Descriptive data for active nodes in the map topography.
 	    index: {},           // Search engine index.
@@ -25,11 +27,11 @@ class App extends Component {
 		dim: [47, 34],       // Map dimensions: [nCols, nRows]
 		tipFields: {	     // Data fields to include in SVG tooltips. Format =  'key: display_mode'.
 		                     // Display modes are "string", "count", "average", and "concat".  
-		    "_id": "string",
+		    "id": "string",
 		    "factors": "concat",
 		    "modules": "count",
 		    "_config": {     // options for tooltip construction
-			"_order": ["_id", "modules", "factors"],  // order in which fields should display
+			"_order": ["id", "modules", "factors"],  // order in which fields should display
 			"_fs": ","   // field separator for concatenated values
 		    }
 		}
@@ -49,16 +51,16 @@ class App extends Component {
 		           nDisplayed: Number of modules currently displayed in the selected node.
 			   ...
 		    */
-		    "_id": "string",
+		    "id": "string",
                     "factors": "concat",
                     "modules": "count",
 		    "class": "string",
 		    "nDisplayed": "count",  // Special Key: number of rows in the currently selected node.
 		    "_config": {
-                        "_order": ["_id", "modules", "nDisplayed", "factors", "class"],  // order in which fields should display
+                        "_order": ["id", "modules", "nDisplayed", "factors", "class"],  // order in which fields should display
                         "_fs": ",",   // field separator for concatenated values
 			"_labels": {  // Labels to be shown in the table header. Without this, field names will be used as the default
-			    "_id" : "Pattern",
+			    "id" : "Pattern",
 			    "factors": "Factors",
 			    "modules": "Total Modules",
 			    "nDisplayed": "Displayed Modules",
@@ -159,7 +161,7 @@ class App extends Component {
 			"fs": ", "
                     },
 		],
-	    }
+	    },	    
 	};
     }
 
@@ -176,7 +178,7 @@ class App extends Component {
     // to enable search functionality.
     initDataStores = () => {
 	axios.post(server.apiAddr + "/getFile",
-		   { fileName: server.dataPath + "/dataMap.json",
+		   { fileName: server.dataPath + '/' + this.state.dataFile,
 		     contentType: "application/json",
 		     encodingType: "utf8" }
 		  )
@@ -191,13 +193,20 @@ class App extends Component {
 	    })
 	    .then(res => { this.setState({ displayedData: this.state.data }) });
 	axios.post(server.apiAddr + "/getFile",
-                   { fileName: server.dataPath + "/nodes.json",
+                   { fileName: server.dataPath + '/' + this.state.nodeDataFile,
                      contentType: "application/json",
                      encodingType: "utf8" }
                   )
             .then(res => {
                 this.setState({ nodeData: JSON.parse(res.data.data) })
             })
+	axios.post(server.apiAddr + '/indexData',
+		   { fileName: server.dataPath + '/' + this.state.dataFile,
+		     indexName: "browser",
+		     typeName: "modules",
+                     contentType: "application/json",
+                     encodingType: "utf8" }
+                  );
     };
 
     // Load a precomputed lunr search engine from a file.
@@ -225,7 +234,7 @@ class App extends Component {
             this.field('factors');
 	    this.field('node');
 	    this.field('orth_type');
-            this.ref('_id');
+            this.ref('id');
             Object.keys(data).forEach(function (key) {
                 this.add(data[key]);
             }, this)
@@ -259,7 +268,8 @@ class App extends Component {
     // Handle node clicks on the map.
     handleNodeClick = (selectedNode, moduleCount) => {
 	this.setState({ selectedNode: selectedNode,
-			selectedNodeModuleCount: moduleCount });
+			selectedNodeModuleCount: moduleCount }, () => {
+			});
     }
 
     // Render the UI.

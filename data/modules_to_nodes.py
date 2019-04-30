@@ -10,7 +10,7 @@ def node_init(key, vals):
     """
     
     node = {
-        "_id": key,
+        "id": key,
         "modules": [vals[3]],
         "class": vals[7].strip('"'),
         "factors": [vals[6].split("-")]

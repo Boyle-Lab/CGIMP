@@ -6,6 +6,7 @@ import { average, sum } from './HelperFunctions';
 /* TODO:
    1) Switch single-row tables to SimpleTable (need to add title support to SimpleTable)
    2) Add ability to append additional columns for single-value fields to data tables.
+   3) Add support for groupBy fields.
 */
 
 
