@@ -17,27 +17,6 @@ const API_PORT = 3001;
 const app = express();
 const router = express.Router();
 
-/* Database connectivity components
-const mongoose = require("mongoose");
-const Data = require("./data");
-// this is our MongoDB database
-//const dbRoute = "mongodb+srv://privileged-user:Nnv6S8uPnNRxx32S@som-browser-os6ux.mongodb.net/somBrowser?retryWrites=true";
-const dbRoute = "mongodb://172.18.0.3:27017/somBrowser?retryWrites=true";
-
-// connects our back end code with the database
-mongoose.connect(
-    dbRoute,
-    { useNewUrlParser: true }
-);
-
-let db = mongoose.connection;
-db.once("open", () => console.log("connected to the database"));
-
-// checks if connection with the database is successful
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
-const Nodes = mongoose.model("Nodes", Data.NodeSchema, 'nodes');
-const Modules = mongoose.model("Modules", Data.ModuleSchema, 'modules');
-*/
 
 // (optional) only made for logging and
 // bodyParser, parses the request body to be a readable json format
@@ -55,25 +34,6 @@ app.use(cors(corsOptions))
 
 // Enable file uploads
 app.use(fileUpload());
-
-/*
-// this is our get method
-// this method fetches all node data in our databse
-router.get("/getNodes", (req, res) => {
-    Nodes.find((err, data) => {
-	if (err) return res.json({ success: false, error: err });
-	return res.json({ success: true, data: data });
-    });
-});
-
-// this method fetches all module data in our database
-router.get("/getModules", (req, res) => {
-    Modules.find((err, data) => {
-        if (err) return res.json({ success: false, error: err });
-        return res.json({ success: true, data: data });
-    });
-});
-*/
 
 // This is our file upload method.
 router.post('/upload', (req, res) => {
