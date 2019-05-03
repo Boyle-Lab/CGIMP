@@ -10,7 +10,7 @@ const { Client } = require('@elastic/elasticsearch');
 
 const ES_HOST = 'http://localhost:9200';
 const client = new Client({
-    host: ES_HOST,
+    node: ES_HOST,
 });
 
 const API_PORT = 3001;
@@ -206,6 +206,9 @@ router.post("/indexData", (req, res) => {
 		"type": typeName,
 		"body": JSON.parse(reqBody)
 	    });
+	    client.indices.putSettings({
+                "index": indexName
+            });
 	});
     }
 
@@ -238,7 +241,7 @@ router.post("/indexData", (req, res) => {
 		    "index": indexName,
 		    "body": {
 			"settings" : {
-			    "number_of_shards" : 3  // This is arbitrary. No replica shards because data are easily reproduced.
+			    "number_of_shards" : 3,  // This is arbitrary. No replica shards because data are easily reproduced.
 			}
 		    }
 		}, (err, response) => {
@@ -246,7 +249,7 @@ router.post("/indexData", (req, res) => {
 			console.log(err);
 		    } else {
 			console.log('Index Created');
-			// Add the data type mappings for each field and load the data.			
+			// Add the data type mappings for each field and load the data.
 			fs.readFile(fileName, encodingType, (err, data) => {
                             if (err) {
                                 console.log(err);

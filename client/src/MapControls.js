@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import server from './server_config';
 import axios from "axios";
-import { ReactiveBase, DataSearch, MultiList, SelectedFilters, DynamicRangeSlider, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
+import FacetedSearch from './Facets';
 
 import FileUploader from './FileUploader';
+
 
 class MapControls extends Component {
     constructor(props) {
@@ -12,7 +13,7 @@ class MapControls extends Component {
 	this.state = {
 	    facets: {}
 	}
-        this.onCellChange = this.onCellChange.bind(this);
+        //this.onCellChange = this.onCellChange.bind(this);
 	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
     }
 
@@ -20,7 +21,7 @@ class MapControls extends Component {
 	this.getFacetsFromElasticsearch();
     }
     
-    onCellChange = value => {
+    /*onCellChange = value => {
         const index = this.props.index;
         const dataForCell = {};
         index.search("cell:" + value)
@@ -29,11 +30,11 @@ class MapControls extends Component {
 		return true;
             });
         this.props.onDataChange(dataForCell);
-    }
+    }*/
 
     getFacetsFromElasticsearch = () => {
 	const client = new Client({
-	    host: server.elasticAddr,
+	    host: server.elasticAddr,	    
 	    //log: 'trace'
 	})
 	const facets = [];
@@ -74,87 +75,24 @@ class MapControls extends Component {
 		       }
 		   });
     }
-    
+
     render() {
 	const keys = Object.keys(this.state.facets);
-        keys.push("mainSearch", "results");
+        keys.push("mainSearch", "resultsList");
 	const dataFields = [];
 	Object.keys(this.state.facets).forEach( (key) => {
 	    dataFields.push(this.state.facets[key].dataField);
 	});
-	console.log(dataFields);
 	
         return (
-            <div>
-		<ReactiveBase
-	    app="browser"
-	    url={server.elasticAddr}
-	    type="modules"
-		>
-		
-		<DataSearch            
-	            componentId="mainSearch"            
-	            dataField={dataFields}
-	            className="search-bar"            
-	            queryFormat="and"
-	            placeholder="Search the dataset..."
-		/>
-		
-		<SelectedFilters showClearAll={true} clearAllLabel="Clear filters"/>
-		
-	    {/*		<ReactiveList
-	    componentId="results"
-	    dataField="id"
-	            react={{
-		        and: keys
-	            }}
-	            renderItem={(res) => <div/>}
-		    />*/}
-		
-		{Object.keys(this.state.facets).map( (key, index) => {
-		    const facet = this.state.facets[key];
-
-		    if (facet.dataType === "text") {
-			return (<MultiList
-				key={index}
-				componentId={facet.componentId}
-				dataField={facet.dataField}
-				title={facet.title}
-				sortBy="asc"
-				queryFormat="and"
-				selectAllLabel={facet.selectAllLabel}
-				showCheckbox={true}
-				showCount={true}
-				showSearch={false}
-				react={{          
-				    and: keys
-				}}
-				showFilter={true}
-				filterLabel={facet.filterLabel}
-				URLParams={false} 
-				innerClass={{ 
-				    label: "list-item",
-				    input: "list-input"
-				}}
-				/>);
-		    } else if (facet.dataType === "numeric") {
-			return (<DynamicRangeSlider
-				key={index}
-				componentId={facet.componentId}
-				dataField={facet.dataField}
-				title={facet.title}				
-				/>);
-		    }
-		    return(<div/>);
-		})}
-	    
-	        </ReactiveBase>
+		<div>
+		<FacetedSearch facets={this.state.facets} onDataChange={this.props.onDataChange}/>
 		<IntersectUserData data={this.props.displayedData} onDataChange={this.props.onDataChange} />
 		</div>
         );
     }
 }
-
+/*
 class CellSelect extends Component {
     constructor(props) {
 	super(props);
@@ -191,7 +129,7 @@ class CellSelect extends Component {
         );
     }
 }
-
+*/
 class IntersectUserData extends Component {
     constructor(props) {
         super(props);
@@ -260,20 +198,5 @@ class IntersectUserData extends Component {
     }
 }
 
-/*
-class dynamicSearchControl extends Component {
-    constructor (props) {
-	super(props);
-    }
-
-    
-    
-    render () {
-	return (
-
-	);
-    }
-}
-*/
 
 export default MapControls;
