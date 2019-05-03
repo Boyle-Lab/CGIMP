@@ -1,79 +1,26 @@
 import React, { Component } from "react";
 import server from './server_config';
 import axios from "axios";
-import { Client } from 'elasticsearch';
 import FacetedSearch from './Facets';
 
 import FileUploader from './FileUploader';
 
 
 class MapControls extends Component {
-    constructor(props) {
-        super(props);
-	this.state = {
-	    facets: {}
-	}
-	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
-    }
 
-    componentDidMount() {
-	this.getFacetsFromElasticsearch();
+/*    shouldComponentUpdate(nextProps, nextState) {
+        if (this.props.data === nextProps.data) {
+            return false;
+        } else {
+            return true;
+        }
     }
+*/
     
-    getFacetsFromElasticsearch = () => {
-	const client = new Client({
-	    host: server.elasticAddr
-	})
-	const facets = [];
-	client.get({index: "browser",
-		    type: "modules",
-		    id: 1},
-		   (err, res) => {
-		       if (err) {
-			   console.log(err);
-		       } else {
-			   Object.keys(res._source).forEach( (key) => {
-			       let facetParams = {
-				   dataType: "numeric",
-				   componentId: "",
-				   dataField: "",
-				   title: "",
-				   selectAllLabel:"",
-				   filterLabel: ""
-			       }
-			       if (key !== "id" && key !== "node") {
-				   facetParams.componentId = key + 'List';
-				   facetParams.title = key;
-				   facetParams.selectAllLabel = 'All ' + key;
-				   facetParams.filterLabel = key;
-				   if (isNaN(res._source[key])) {
-				       facetParams.dataField = key + '.keyword';
-				       facetParams.dataType = "text";
-				   } else {
-				       facetParams.dataField = key;
-				   }
-				   facets[key + 'List'] = facetParams;
-			       }
-			   });
-			   this.setState({facets: facets},
-					 () => {
-					     //console.log(this.state.facets);
-					 });
-		       }
-		   });
-    }
-
     render() {
-	const keys = Object.keys(this.state.facets);
-        keys.push("mainSearch", "resultsList");
-	const dataFields = [];
-	Object.keys(this.state.facets).forEach( (key) => {
-	    dataFields.push(this.state.facets[key].dataField);
-	});
-	
         return (
 		<div>
-		<FacetedSearch facets={this.state.facets} onDataChange={this.props.onDataChange}/>
+		<FacetedSearch onDataChange={this.props.onDataChange}/>
 		<IntersectUserData data={this.props.displayedData} onDataChange={this.props.onDataChange} />
 		</div>
         );
