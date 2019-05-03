@@ -13,7 +13,6 @@ class MapControls extends Component {
 	this.state = {
 	    facets: {}
 	}
-        //this.onCellChange = this.onCellChange.bind(this);
 	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
     }
 
@@ -21,21 +20,9 @@ class MapControls extends Component {
 	this.getFacetsFromElasticsearch();
     }
     
-    /*onCellChange = value => {
-        const index = this.props.index;
-        const dataForCell = {};
-        index.search("cell:" + value)
-            .map(({ ref, score, res }) => {
-                dataForCell[ref] = this.props.data[ref];
-		return true;
-            });
-        this.props.onDataChange(dataForCell);
-    }*/
-
     getFacetsFromElasticsearch = () => {
 	const client = new Client({
-	    host: server.elasticAddr,	    
-	    //log: 'trace'
+	    host: server.elasticAddr
 	})
 	const facets = [];
 	client.get({index: "browser",
@@ -92,44 +79,7 @@ class MapControls extends Component {
         );
     }
 }
-/*
-class CellSelect extends Component {
-    constructor(props) {
-	super(props);
-	this.state = {value: 'all'};
-	this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
 
-    handleChange(event) {
-        this.setState({value: event.target.value });
-        event.preventDefault();
-    }
-
-    handleSubmit(event) {
-        this.props.onSubmit(this.state.value);
-        event.preventDefault();
-    }
-
-    render() {
-        return (
-            <form onSubmit={this.handleSubmit}>
-                <label>
-                Show data for cell:
-                <select value={this.state.value} onChange={this.handleChange}>
-                <option value="*">All</option>
-                <option value="GM12878">GM12878</option>
-                <option value="K562">K562</option>
-                <option value="CH12">CH12</option>
-                <option value="MEL">MEL</option>
-                </select>
-                </label>
-                <input type="submit" value="Submit" />
-                </form>
-        );
-    }
-}
-*/
 class IntersectUserData extends Component {
     constructor(props) {
         super(props);
@@ -143,6 +93,7 @@ class IntersectUserData extends Component {
     componentWillUnmount() {
         // Clean up our area.
         // This is probably where we need to put function call to delete user datafile(s).
+	// However, this currently isn't working because unmount events don't appear to be triggered.
         /*this.state.files.forEach(function (file) {
             console.log(file);
             axios.delete(server.apiAddr + '/delete',
