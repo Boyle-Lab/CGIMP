@@ -5,7 +5,6 @@ import axios from "axios";
 import lunr from "lunr";
 
 import SvgModuleMap from './SvgModulesMap';
-import HorizontalSplit from './Layouts';
 import MapControls from './MapControls';
 import DataPanel from './DataPanel';
 import Dashboard from './Dashboard';
@@ -15,6 +14,7 @@ class App extends Component {
     constructor(props) {
 	super(props);
 	this.state = {
+	    mainTitle: "Human-Mouse Self-Organizing Map Data",
 	    dataFile: 'dataMap.json',
 	    nodeDataFile: 'nodes.json',
  	    data: [],            // Reference copy of locus-level data. Treated as immutable.
@@ -313,6 +313,7 @@ class App extends Component {
 	    );*/
 	return (
 		<Dashboard
+	    title={this.state.mainTitle}
 	    controls={Object.keys(this.state.displayedData).length ?
                       <MapControls
                       data={this.state.data}
