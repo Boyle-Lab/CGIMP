@@ -8,6 +8,7 @@ import SvgModuleMap from './SvgModulesMap';
 import HorizontalSplit from './Layouts';
 import MapControls from './MapControls';
 import DataPanel from './DataPanel';
+import Dashboard from './Dashboard';
 
 class App extends Component {
     // initialize our state
@@ -274,7 +275,7 @@ class App extends Component {
 
     // Render the UI.
     render() {
-	return (
+/*	return (
 	    <div>
 		<HorizontalSplit
 	            leftSide={Object.keys(this.state.displayedData).length ?
@@ -309,6 +310,40 @@ class App extends Component {
 		 : (<span></span>)
 		}
 	    </div>
+	    );*/
+	return (
+		<Dashboard
+	    controls={Object.keys(this.state.displayedData).length ?
+                      <MapControls
+                      data={this.state.data}
+                      displayedData={this.state.displayedData}
+                      onDataChange={this.handleDataChange}
+                      /> :
+                      (<div></div>)}
+	    map={Object.keys(this.state.displayedData).length ?
+                 <SvgModuleMap
+                 data={this.state.displayedData}
+                 nodeData={this.state.nodeData}
+                 selectedNode={this.state.selectedNode}
+                 config={this.state.mapConfig}
+                 onNodeClick={this.handleNodeClick}
+                 onMapChange={this.handleMapChange}
+                 /> :
+                 (<span>Loading Data...</span>)}
+	    content={Object.keys(this.state.displayedData).length ?
+                     this.state.selectedNode ?
+                     <DataPanel
+                     data={this.state.data}
+                     displayedData={this.state.displayedData}
+                     nDisplayed={this.state.selectedNodeModuleCount}
+                     nodeData={this.state.nodeData[this.state.selectedNode]}
+                     index={this.state.index}
+                     config={this.state.dataPanelConfig}
+                     /> :
+                     (<div id="dataPanel"><p>Click on a map node for more information.</p></div>)
+                     : (<span></span>)
+                    }
+		/>
 	);
     }
 }
