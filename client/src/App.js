@@ -281,7 +281,6 @@ class App extends Component {
 		      <MapControls
 			      data={this.state.data}
 			      displayedData={this.state.displayedData}
-			      index={this.state.index}
 			      onDataChange={this.handleDataChange}
 		      /> :
 		      (<div></div>)}
