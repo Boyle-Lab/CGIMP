@@ -6,6 +6,7 @@
     "@appbaseio/reactivesearch": "^3.0.0-rc.6",
     "@elastic/elasticsearch": "^7.0.0-rc.2",
     "@material-ui/core": "^3.9.3",
+    "@material-ui/icons": "^3.0.2",
     "ajv": "^6.10.0",
     "ajv-keywords": "^3.4.0",
     "axios": "^0.18.0",
