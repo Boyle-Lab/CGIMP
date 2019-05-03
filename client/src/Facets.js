@@ -6,8 +6,6 @@ import { Client } from 'elasticsearch';
 const url = server.elasticAddr + '/browser/modules/_search?scroll=1m';
 const scrollUrl = server.elasticAddr + '/_search/scroll';
 
-
-
 class FacetedSearch extends Component {
     constructor(props) {
 	super(props);
@@ -15,7 +13,8 @@ class FacetedSearch extends Component {
 	    facets: {},
 	    facetsSet: false,
 	    url: "",
-	    scrollUrl: ""
+	    scrollUrl: "",
+	    displayedDataHash: ""
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
@@ -24,6 +23,7 @@ class FacetedSearch extends Component {
     }
 
     componentDidMount() {
+	console.log('reproting for duty!');
 	this.getFacetsFromElasticsearch();
     }
 
