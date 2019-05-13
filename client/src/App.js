@@ -19,10 +19,12 @@ class App extends Component {
 	    nodeDataFile: 'nodes.json',
  	    data: [],            // Reference copy of locus-level data. Treated as immutable.
 	    nodeData: [],        // Descriptive data for active nodes in the map topography.
-	    index: {},           // Search engine index.
-	    displayedData: [],   // Locus-level data currently displayed on the map.
+	    index: {},           // Lunr search engine index for client-side search.
+	    displayedData: [],   // Locus-level data currently displayed on the map (used for detailed data display)
+	    displayedNodes: [],  // Node-level data currently displayed on the map (used to draw the map images)
 	    selectedNode: null,  // Which node is currently selected?
 	    selectedNodeModuleCount: 0,
+	    dataIsLoaded: false,  // Tracks promise fulfilments from elasticsearch.
 	    mapConfig: {
 		doLog: true,         // Should map data be log transformed?
 		dim: [47, 34],       // Map dimensions: [nCols, nRows]
@@ -199,8 +201,10 @@ class App extends Component {
                      encodingType: "utf8" }
                   )
             .then(res => {
-                this.setState({ nodeData: JSON.parse(res.data.data) })
-            })
+		const nodeData = JSON.parse(res.data.data);
+                this.setState({ nodeData: nodeData });
+		this.transformNodeData(nodeData);
+            });
 	axios.post(server.apiAddr + '/indexData',
 		   { fileName: server.dataPath + '/' + this.state.dataFile,
 		     indexName: "browser",
@@ -247,18 +251,44 @@ class App extends Component {
         });
         this.setState({ index: indexData });                                                                                         
     }
+
+    // Initial processing of node data to display on the map.
+    transformNodeData = (nodeData) => {
+	const displayedNodeData = {};
+	Object.keys(nodeData).forEach( (key) => {
+	    displayedNodeData[key] = nodeData[key].modules.length;
+	});
+	this.setState({ displayedNodeData: displayedNodeData });
+    }
     
     // Update map data as needed.
-    handleDataChange = updatedData => {
+    handleMapDataChange = (updatedData) => {
 	if (updatedData === null) {
 	    // reset the display when null data are passed
 	    //console.log("null data passed");
 	    this.setState({ displayedData: this.state.data });
+	    this.transformNodeData(this.state.nodeData);
 	    return true;
 	}
-	this.setState({ displayedData: updatedData });
+	this.setState({
+	    displayedNodeData: updatedData
+	});
     };
 
+    // Update map data as needed.
+    handleDataChange = (updatedData) => {
+        if (updatedData === null) {
+	    this.setState({ displayedData: this.state.data });
+            this.transformNodeData(this.state.nodeData);
+            return true;
+        }
+        this.setState({
+            displayedData: updatedData
+        });
+    };
+
+
+	    
     // Update selected node module count when map data changes
     handleMapChange = selectedNodeModuleCount => {
 	this.setState({ selectedNodeModuleCount: selectedNodeModuleCount }, function() {
@@ -273,44 +303,18 @@ class App extends Component {
 			});
     }
 
+    // Keep track of elasticsearch promise fulfillments.
+    handleNewElasticsearchPromise = (status) => {
+	//console.log("new search action: ", status, this.state.dataIsLoaded);
+	if (status === "loaded") {
+	    this.setState({ dataIsLoaded: true });
+	} else {
+	    this.setState({ dataIsLoaded: false });
+	}
+    }
+
     // Render the UI.
     render() {
-/*	return (
-	    <div>
-		<HorizontalSplit
-	            leftSide={Object.keys(this.state.displayedData).length ?
-		      <MapControls
-			      data={this.state.data}
-			      displayedData={this.state.displayedData}
-			      onDataChange={this.handleDataChange}
-		      /> :
-		      (<div></div>)}
-                    rightSide={Object.keys(this.state.displayedData).length ?
-		       <SvgModuleMap
-		           data={this.state.displayedData}
-			   nodeData={this.state.nodeData}
-			   selectedNode={this.state.selectedNode}
-			   config={this.state.mapConfig}
-			   onNodeClick={this.handleNodeClick}
-			   onMapChange={this.handleMapChange}
-		       /> :
-		       (<span>Loading Data...</span>)}
-		/>
-		{Object.keys(this.state.displayedData).length ?
-		 this.state.selectedNode ?
-		        <DataPanel
-	                    data={this.state.data}
-	                    displayedData={this.state.displayedData}
-		            nDisplayed={this.state.selectedNodeModuleCount}
-	                    nodeData={this.state.nodeData[this.state.selectedNode]}
-		            index={this.state.index}
-	                    config={this.state.dataPanelConfig}
-		        /> :
-		 (<div id="dataPanel"><p>Click on a map node for more information.</p></div>)
-		 : (<span></span>)
-		}
-	    </div>
-	    );*/
 	return (
 		<Dashboard
 	    title={this.state.mainTitle}
@@ -318,12 +322,14 @@ class App extends Component {
                       <MapControls
                       data={this.state.data}
                       displayedData={this.state.displayedData}
-                      onDataChange={this.handleDataChange}
+                      onMapDataChange={this.handleMapDataChange}
+		      onDataChange={this.handleDataChange}
+		      onNewSearchAction={this.handleNewElasticsearchPromise}
                       /> :
                       (<div></div>)}
 	    map={Object.keys(this.state.displayedData).length ?
                  <SvgModuleMap
-                 data={this.state.displayedData}
+                 data={this.state.displayedNodeData}
                  nodeData={this.state.nodeData}
                  selectedNode={this.state.selectedNode}
                  config={this.state.mapConfig}
@@ -340,6 +346,7 @@ class App extends Component {
                      nodeData={this.state.nodeData[this.state.selectedNode]}
                      index={this.state.index}
                      config={this.state.dataPanelConfig}
+		     dataIsLoaded={this.state.dataIsLoaded}
                      /> :
                      (<div id="dataPanel"><p>Click on a map node for more information.</p></div>)
                      : (<span></span>)

@@ -51,13 +51,6 @@ function drawKey(svg, x, y, dataRange, title) {
         .attr("transform", "translate(" + xPos + ", " + yPos  + ")");    
 }
 
-function getModuleCounts(data) {
-    /* Get the module counts from the data object. */
-    const moduleCounts = {};
-    d3.map(d3.entries(data), function(d) { if (d.value.node in moduleCounts) {moduleCounts[d.value.node] += 1} else {moduleCounts[d.value.node] = 1} });
-    return(moduleCounts);
-}
-
 function getDataRange(moduleCounts) {
     /* Return a range with the minimum, maximum, and sum of values in moduleCounts. */
     let dataRange = [];
@@ -182,7 +175,7 @@ class SvgModuleMap extends Component {
     }
 
     d3DrawGrid = () => {
-	const data = this.props.data;
+	const moduleCounts = this.props.data;
 	const nodeData = this.props.nodeData;
 	const doLog = this.props.config.doLog;
 	
@@ -202,16 +195,11 @@ class SvgModuleMap extends Component {
 	const xAxisTranslate = svgHeight - 50;
 	const origin = 20;
 	
-	const moduleCounts = getModuleCounts(data);
-	const dataRange = getDataRange(moduleCounts);
  	let mapData = moduleCounts;
-        let mapRange = dataRange;
 	if (doLog) {
-	    const logCounts = logTransform(moduleCounts);
-	    const logRange = getDataRange(logCounts);
-	    mapData = logCounts;
-            mapRange = logRange;
+	    mapData = logTransform(moduleCounts);
 	}
+	const mapRange = getDataRange(mapData);
 	
 	let pod = 1;
 	for (let i = 0; i < dim[1]; i++) {

@@ -335,7 +335,7 @@ class ModuleDataTable extends Component {
         
     render () {
 	return (
-	    <div>
+		<div>
 		{this.state.names.length ?
 		 <EnhancedTable names={this.state.names} data={this.state.values} title={this.state.title}/> :
 		 <div />}

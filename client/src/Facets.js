@@ -3,7 +3,8 @@ import server from './server_config';
 import { ReactiveBase, DataSearch, MultiList, SelectedFilters, DynamicRangeSlider, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 
-const url = server.elasticAddr + '/browser/modules/_search?scroll=1m';
+const initScrollUrl = server.elasticAddr + '/browser/modules/_search?scroll=1m';
+const url = server.elasticAddr + '/browser/modules/_search';
 const scrollUrl = server.elasticAddr + '/_search/scroll';
 
 class FacetedSearch extends Component {
@@ -12,9 +13,6 @@ class FacetedSearch extends Component {
 	this.state = {
 	    facets: {},
 	    facetsSet: false,
-	    url: "",
-	    scrollUrl: "",
-	    displayedDataHash: ""
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
@@ -23,7 +21,6 @@ class FacetedSearch extends Component {
     }
 
     componentDidMount() {
-	console.log('reproting for duty!');
 	this.getFacetsFromElasticsearch();
     }
 
@@ -99,48 +96,45 @@ class FacetedSearch extends Component {
 	return [];
     };
     
-    handleQueryChange = async (prev, next) => {
+    getAllDisplayedData = async (prev, next) => {
 	if (next && !next.query.match_all) {
+	    this.props.onNewSearchAction("loading");
 	    //console.log("Fetching all results for query:", next);
 	    next.size = 100000;
 	    // initial url to obtain scroll id is different
-	    const initialResults = await this.fetchResults(next, url);
+	    const initialResults = await this.fetchResults(next, initScrollUrl);
 	    // keep scrolling till hits are present
-	    // NOTE: careful if you've a lot of results,
-	    // in that case you might want to add a condition to limit calls to scroll API
 	    const scrollResults = await this.fetchScrollResults({
 		scroll: "1m",
 		scroll_id: initialResults._scroll_id
 	    });
-	    // combine the two to get all results
 	    // concat hits from initialResults with hits from scrollResults
-	    //const allResults = initialResults.hits.hits.concat(scrollResults);
-	    // For some reason, the above method yields duplicate values in allResults
-	    // where the _id value from the search result is used as the array index.
-	    // It is unclear why this is happening, but seems to result from some
-	    // eccentricity of javascript under the hood. I've sidestepped it with the
-	    // hack below, which works but is probably nowhere near as efficient!
-	    const allResults = [];
+	    const allResults = {};
 	    initialResults.hits.hits.forEach( (hit) => {
-		allResults.push(hit._source);
-	    });
-	    scrollResults.forEach( (hit) => {
-                allResults.push(hit._source);
+                allResults[hit._id] = hit._source;
             });
-	    this.onSearchChange(allResults);
-	    //console.log(`${allResults.length} results found:`, allResults);
+	    scrollResults.forEach( (hit) => {
+                allResults[hit._id] = hit._source;
+            });
+	    this.props.onDataChange(allResults);
+	    this.props.onNewSearchAction("loaded");
+	    //console.log(`${Object.keys(allResults).length} results found:`, allResults);
 	}
     };
 
-    onSearchChange = (searchData) => {
-	const newData = {}
-	searchData.forEach( (res, index) => {
-	    newData[res.id.toString()] = res;
-	});
-	console.log(newData);
-	this.props.onDataChange(newData);
-    }
-    
+    handleQueryChange = async (prev, next) => {
+        if (next && !next.query.match_all) {
+            //console.log("Fetching aggregate results for query:", next);
+            const initialResults = await this.fetchResults(next, url);
+            const allResults = {};
+            initialResults.aggregations.nodes.buckets.forEach( (hit) => {
+                allResults[hit.key] = hit.doc_count;
+            });
+            this.props.onMapDataChange(allResults);
+	    this.getAllDisplayedData(prev, next);
+        }
+    };
+
     render () {
 	if (!this.state.facetsSet) {
 	    return (<div/>)
@@ -172,13 +166,25 @@ class FacetedSearch extends Component {
 		    
 		    <ReactiveList
 		componentId="resultsList"
-		dataField="cell"
+		dataField="id"
+		defaultQuery={() => ({
+		    size: 1,
+		    aggs: {
+			nodes: {
+			    terms: {
+				field: 'node',
+				size: 100000
+			    }
+			}
+		    }
+		})}
 		react={{
 		    and: keys
 		}}
 		render={({ data }) => (
 			<div/>
 		)}
+		resultStats={false}
 		renderResultStats={props => 
 				   <div/>
 				  }
@@ -194,7 +200,6 @@ class FacetedSearch extends Component {
 				componentId={facet.componentId}
 				dataField={facet.dataField}
 				title={facet.title}
-				sortBy="asc"
 				queryFormat="and"
 				selectAllLabel={facet.selectAllLabel}
 				showCheckbox={true}
