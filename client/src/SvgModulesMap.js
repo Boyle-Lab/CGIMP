@@ -51,24 +51,6 @@ function drawKey(svg, x, y, dataRange, title) {
         .attr("transform", "translate(" + xPos + ", " + yPos  + ")");    
 }
 
-function getDataRange(moduleCounts) {
-    /* Return a range with the minimum, maximum, and sum of values in moduleCounts. */
-    let dataRange = [];
-    dataRange[0] = d3.min(Object.values(moduleCounts));
-    dataRange[1] = d3.max(Object.values(moduleCounts));
-    dataRange[2] = d3.sum(Object.values(moduleCounts));
-    return(dataRange);
-}
-
-function logTransform(moduleCounts) {
-    /* Perform a log2 transformation on the module counts. */
-    let ret = {};
-    Object.entries(moduleCounts).forEach(entry => {
-	ret[entry[0]] = Math.log(entry[1]) / Math.log(2);
-    })
-    return(ret);
-}
-
 function clearMap(svg) {
     /* Clear all pod data from the map */
     d3.selectAll("#dataMap > *").remove();
@@ -131,7 +113,9 @@ class SvgModuleMap extends Component {
 	    podWidth: 18,
 	    podHeight: 20,
 	    colOffset: 9,
-	    rowOffset: 15
+	    rowOffset: 15,
+	    displayType: "Count",
+	    logTransform: false
 	};
 	this.d3DrawGrid = this.d3DrawGrid.bind(this);
 	this.handleClick = this.handleClick.bind(this);
@@ -146,13 +130,33 @@ class SvgModuleMap extends Component {
 	this.d3DrawGrid();
 	this.updateParentState();
     }
-
+    
     shouldComponentUpdate(nextProps, nextState) {
-	if (this.props.data === nextProps.data) {
+	// Not the best way to tell if data changed! Really should be looking inside
+	// the object...
+	if (Object.keys(this.props.data).length === Object.keys(nextProps.data).length &&
+	    this.state.displayType === nextState.displayType &&
+	    this.state.logTransform === nextState.logTransform) {
 	    return false;
 	} else {
 	    return true;
 	}
+    }
+
+    handleDisplayTypeChange = (displayType) => {
+        this.setState({
+            displayType: displayType
+        }, () => {
+	    //console.log(this.state.displayType);
+	});
+    }
+
+    handleLogSelect = (checked) => {
+        this.setState({
+            logTransform: checked
+        }, () => {
+	    //console.log(this.state.logTransform);
+	});
     }
 
     updateParentState = () => {
@@ -174,10 +178,35 @@ class SvgModuleMap extends Component {
 	this.props.onNodeClick(data.id, data.moduleCount);
     }
 
+    toDensity =	(moduleCounts, nodeData) => {
+        const mapData = {};
+	Object.keys(moduleCounts).forEach( (key) => {
+            mapData[key] = moduleCounts[key] / nodeData[key].modules.length;
+	});
+        return mapData;
+    }
+
+    logTransform = (moduleCounts) => {
+	/* Perform a log2 transformation on the module counts. */
+	let ret = {};
+	Object.entries(moduleCounts).forEach(entry => {
+            ret[entry[0]] = Math.log(entry[1]) / Math.log(2);
+	});
+	return(ret);
+    }
+
+    getDataRange = (moduleCounts) => {
+	// Return a range with the minimum, maximum, and sum of values in moduleCounts.
+	let dataRange = [];
+	dataRange[0] = d3.min(Object.values(moduleCounts));
+	dataRange[1] = d3.max(Object.values(moduleCounts));
+	dataRange[2] = d3.sum(Object.values(moduleCounts));
+	return(dataRange);
+    }    
+
     d3DrawGrid = () => {
 	const moduleCounts = this.props.data;
 	const nodeData = this.props.nodeData;
-	const doLog = this.props.config.doLog;
 	
 	const dim = this.props.config.dim;
 	const podWidth = this.state.podWidth;
@@ -196,10 +225,13 @@ class SvgModuleMap extends Component {
 	const origin = 20;
 	
  	let mapData = moduleCounts;
-	if (doLog) {
-	    mapData = logTransform(moduleCounts);
+	if (this.state.displayType === "Density") {
+	    mapData = this.toDensity(mapData, nodeData);
 	}
-	const mapRange = getDataRange(mapData);
+	if (this.state.logTransform) {
+	    mapData = this.logTransform(mapData, nodeData);
+	}
+	const mapRange = this.getDataRange(mapData);
 	
 	let pod = 1;
 	for (let i = 0; i < dim[1]; i++) {
@@ -263,18 +295,82 @@ class SvgModuleMap extends Component {
 	}
 	
 	// Add color key
-	let title = doLog ? "Log2 Count" : "Count";
+	let title = this.state.logTransform ?
+	    "Log2 " + this.state.displayType :
+	    this.state.displayType;
 	drawKey(svg,
 		(podWidth * dim[0] + (podWidth * 2)),
 		(xAxisTranslate - (svgHeight / 2)), mapRange, title);
     }
-    
+
     render() {
 	return(
+	    <div>
 		<svg id="dataMap" width={this.state.svgWidth} height={this.state.svgHeight}></svg>
+		<DisplayPicker onDisplayTypeChange={this.handleDisplayTypeChange} onLogSelect={this.handleLogSelect} />
+	    </div>
 	);
     }
     
+}
+
+class DisplayPicker extends Component {
+    constructor(props) {
+	super(props);
+	this.state = {
+	    selectedOption: 'Count',
+	    logTransform: false
+	}
+    }
+
+    handleDisplayTypeChange = (event) => {
+	this.setState({
+	    selectedOption: event.target.value
+	}, () => {
+	    this.props.onDisplayTypeChange(this.state.selectedOption);
+	});
+    }
+
+    handleLogTransformClick = (event) => {
+	this.setState({ logTransform: !this.state.logTransform }, () => {
+	    //console.log(this.state.logTransform);
+	    this.props.onLogSelect(this.state.logTransform);
+	});
+    }
+    
+    render() {
+	return (
+		<div>
+		<form>
+		<label>
+		<input
+	    type="radio"
+	    value="Count"
+	    onChange={this.handleDisplayTypeChange}
+	    checked={this.state.selectedOption === 'Count'} />
+		Count
+	    </label>
+		<label>
+                <input
+	    type="radio"
+	    value="Density"
+	    onChange={this.handleDisplayTypeChange}
+	    checked={this.state.selectedOption === 'Density'} />
+		Density
+            </label>
+		<div>
+		<label>
+		<input
+	    type="checkbox"
+	    checked={this.state.logTransform}
+	    onChange={this.handleLogTransformClick} />
+		Log2 Transform
+	    </label>
+	    </div>
+		</form>
+		</div>
+	);
+    }
 }
 
 export default SvgModuleMap;
