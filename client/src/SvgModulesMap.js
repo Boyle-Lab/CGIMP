@@ -322,10 +322,14 @@ class SvgModuleMap extends Component {
 		<svg id="dataMap" ref={this.dataMap} width={this.state.svgWidth} height={this.state.svgHeight}></svg>
 		<View style={{flex: 1, flexDirection: 'row', width: "100%", padding: 0}}>
 		<View style={{ width: "50%", alignItems: "flex-start" }}>
-		<DisplayConfig onDisplayTypeChange={this.handleDisplayTypeChange} onLogSelect={this.handleLogSelect} />
+		<DisplayConfig
+	    onDisplayTypeChange={this.handleDisplayTypeChange}
+	    onLogSelect={this.handleLogSelect} />
 		</View>
 		<View style={{ width: "50%", alignItems: "flex-end" }}>
-		<Downloader dataMap={this.dataMap.current} />
+		<Downloader
+	    dataMap={this.dataMap.current}
+	    onDataDownload={this.props.onDataDownload} />
 		</View>
 		</View>
 		</div>
@@ -344,11 +348,21 @@ class Downloader extends Component {
 	document.body.appendChild(el);
 	el.click();	
     }
+
+    downloadBed = () => {
+	this.props.onDataDownload("bed");
+    }
+
+    downloadJSON = () =>	{
+	this.props.onDataDownload("json");
+    }
     
     render() {
 	return (
 		<div>
 		<button onClick={this.downloadSvg}>Save Image as SVG</button>
+		<button onClick={this.downloadBed}>Save BED Data</button>
+		<button onClick={this.downloadJSON}>Save JSON Data</button>
 		</div>
 	);
     }

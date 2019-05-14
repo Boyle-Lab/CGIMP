@@ -164,7 +164,34 @@ class App extends Component {
 			"fs": ", "
                     },
 		],
-	    },	    
+	    },
+	    // Fields to include in BED output. "loc" is included by default.
+	    // Format: { field: <fieldname>, type: <string|array|object>[, sep: <field separator>, format: [subField1, sep1, ..., sepN, subFieldN] ]}
+	    // "format" for object types is an array that specfies an arrangement
+	    // of fields and separators, from which a string will be built.
+	    includeFields: [
+		{ "field": "cell",
+		  "type": "string"
+		},
+		{"field": "node",
+		 "type": "string"
+		},
+		{"field": "factors",
+                 "type": "array",
+		 "sep": ","
+                },
+		{"field": "orth_type",
+                 "type": "string"
+                },
+		{"field": "locus",
+		 "type": "string"
+		},		
+		{"field": "maps_to",
+		 "type": "object",
+		 "format": ['chrom', ':', 'start', '-', 'end']
+		}
+	    ],	    
+	    nameField: "id"  // Field used as BED name (column 4)
 	};
     }
 
@@ -286,8 +313,6 @@ class App extends Component {
             displayedData: updatedData
         });
     };
-
-
 	    
     // Update selected node module count when map data changes
     handleMapChange = selectedNodeModuleCount => {
@@ -313,6 +338,58 @@ class App extends Component {
 	}
     }
 
+    // Handle settings icon clicks.
+    handleSettingsClick = () => {
+	console.log("Settings click!");
+    }
+
+    // Handle data download requests.
+    handleDataDownload = (format) => {
+	//console.log("Data download click!", format);
+	const el = document.createElement("a");
+	if (format === "json") {
+	    // JSON format requested.
+	    const jsonStr = JSON.stringify(this.state.displayedData);
+	    const jsonBlob = new Blob([jsonStr], {type: "application/json"});
+            el.href = URL.createObjectURL(jsonBlob);
+	    el.download = "BrowserMapData.json";
+	} else {
+	    // BED format requested. Must convert data.
+	    const bedData = [];	    
+	    Object.keys(this.state.displayedData).forEach( (key) => {
+		let dat = this.state.displayedData[key];
+		let row = [];
+		row.push(dat.loc.chrom, dat.loc.start, dat.loc.end, dat[this.state.nameField]);
+		this.state.includeFields.forEach( (field) => {
+		    if (field.type === "string") {
+			row.push(dat[field.field])
+		    } else if (field.type === "array") {
+			row.push(dat[field.field].join(field.sep));
+		    } else if (field.type === "object") {
+			let subDat = dat[field.field];
+			let valStr = "";
+			field.format.forEach( (val, idx) => {
+			    if (!(idx % 2)) {
+				// Fields are at odd indices
+				valStr += subDat[val]
+			    } else {
+				// Separators are at even indices
+				valStr += val
+			    }
+			});
+			row.push(valStr);			
+		    }
+		});
+		bedData.push(row.join("\t"));
+	    });
+            const textBlob = new Blob([bedData.join("\n")], {type: "text/plain"});
+            el.href = URL.createObjectURL(textBlob);
+            el.download = "BrowserMapData.bed";
+	}
+	document.body.appendChild(el);
+        el.click();
+    }
+
     // Render the UI.
     render() {
 	return (
@@ -335,6 +412,7 @@ class App extends Component {
                  config={this.state.mapConfig}
                  onNodeClick={this.handleNodeClick}
                  onMapChange={this.handleMapChange}
+		 onDataDownload={this.handleDataDownload}
                  /> :
                  (<span>Loading Data...</span>)}
 	    content={Object.keys(this.state.displayedData).length ?
@@ -351,6 +429,7 @@ class App extends Component {
                      (<div id="dataPanel"><p>Click on a map node for more information.</p></div>)
                      : (<span></span>)
                     }
+	    onSettingsClick={this.handleSettingsClick}
 		/>
 	);
     }

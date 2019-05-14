@@ -106,6 +106,10 @@ class Dashboard extends React.Component {
     this.setState({ open: false });
   };
 
+    handleSettingsClick = () => {
+	this.props.onSettingsClick();
+    }
+
   render() {
     const { classes } = this.props;
 
@@ -137,8 +141,8 @@ class Dashboard extends React.Component {
             >
             {this.props.title}
             </Typography> 
-	    <IconButton color="inherit">
-                <SettingsIcon />
+	    <IconButton color="inherit" onClick={this.handleSettingsClick} >
+            <SettingsIcon/>
             </IconButton>
           </Toolbar>
         </AppBar>
