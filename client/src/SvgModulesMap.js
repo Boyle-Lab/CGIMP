@@ -2,9 +2,10 @@
 import React, { Component } from "react";
 import './index.css';
 import * as d3 from "d3";
-import { isDict, average } from './HelperFunctions';
+import { isDict, average, round } from './HelperFunctions';
+import { View } from "react-native";
 
-function drawKey(svg, x, y, dataRange, title) {
+function drawKey(svg, x, y, dataRange, title, precision) {
     /* Draw a shading key for the specified range */
     let xPos = x;
     let yPos = y - 20;
@@ -37,17 +38,16 @@ function drawKey(svg, x, y, dataRange, title) {
     xPos += 30;
     yPos = y + 180;
     svg.append("text")
-        .text( function() {return( Math.round(dataRange[0])) } )
+        .text( function() {return( round(dataRange[0], precision)) } )
         .attr("transform", "translate(" + xPos + ", " + yPos  + ")");
-    
     yPos = y + 85;
     svg.append("text")
-        .text( function() { return( Math.round( (dataRange[1]  - dataRange[0]) / 2 ) ) })
+        .text( function() { return( round((dataRange[1]  - dataRange[0]) / 2, precision) ) })
         .attr("transform", "translate(" + xPos + ", " + yPos  + ")");
     
     yPos = y - 10;
     svg.append("text")
-        .text( function() { return( Math.round(dataRange[1]) ) })
+        .text( function() { return( round(dataRange[1], precision) ) })
         .attr("transform", "translate(" + xPos + ", " + yPos  + ")");    
 }
 
@@ -115,11 +115,13 @@ class SvgModuleMap extends Component {
 	    colOffset: 9,
 	    rowOffset: 15,
 	    displayType: "Count",
-	    logTransform: false
+	    logTransform: false,
+	    dataMapDrawn: false
 	};
 	this.d3DrawGrid = this.d3DrawGrid.bind(this);
 	this.handleClick = this.handleClick.bind(this);
 	this.updateParentState = this.updateParentState.bind(this);
+	this.dataMap = React.createRef();
     }
 
     componentDidMount() {
@@ -133,10 +135,11 @@ class SvgModuleMap extends Component {
     
     shouldComponentUpdate(nextProps, nextState) {
 	// Not the best way to tell if data changed! Really should be looking inside
-	// the object...
+	// the object...	
 	if (Object.keys(this.props.data).length === Object.keys(nextProps.data).length &&
 	    this.state.displayType === nextState.displayType &&
-	    this.state.logTransform === nextState.logTransform) {
+	    this.state.logTransform === nextState.logTransform &&
+	    this.state.dataMapDrawn === true) {
 	    return false;
 	} else {
 	    return true;
@@ -201,6 +204,9 @@ class SvgModuleMap extends Component {
 	dataRange[0] = d3.min(Object.values(moduleCounts));
 	dataRange[1] = d3.max(Object.values(moduleCounts));
 	dataRange[2] = d3.sum(Object.values(moduleCounts));
+	if (dataRange[0] === dataRange[1]) {
+	    dataRange[0] = 0;
+	}
 	return(dataRange);
     }    
 
@@ -298,23 +304,57 @@ class SvgModuleMap extends Component {
 	let title = this.state.logTransform ?
 	    "Log2 " + this.state.displayType :
 	    this.state.displayType;
+	let precision = 0;
+	if (this.state.displayType === "Density") {
+	    precision = 1;
+	}
 	drawKey(svg,
 		(podWidth * dim[0] + (podWidth * 2)),
-		(xAxisTranslate - (svgHeight / 2)), mapRange, title);
+		(xAxisTranslate - (svgHeight / 2)), mapRange, title, precision);
+	// This is a hack to make sure the download SVG button works by forcing
+	// an update once we know the ref binding is no longer null.
+	this.setState({ dataMapDrawn: true });
     }
 
     render() {
 	return(
-	    <div>
-		<svg id="dataMap" width={this.state.svgWidth} height={this.state.svgHeight}></svg>
-		<DisplayPicker onDisplayTypeChange={this.handleDisplayTypeChange} onLogSelect={this.handleLogSelect} />
-	    </div>
+		<div>
+		<svg id="dataMap" ref={this.dataMap} width={this.state.svgWidth} height={this.state.svgHeight}></svg>
+		<View style={{flex: 1, flexDirection: 'row', width: "100%", padding: 0}}>
+		<View style={{ width: "50%", alignItems: "flex-start" }}>
+		<DisplayConfig onDisplayTypeChange={this.handleDisplayTypeChange} onLogSelect={this.handleLogSelect} />
+		</View>
+		<View style={{ width: "50%", alignItems: "flex-end" }}>
+		<Downloader dataMap={this.dataMap.current} />
+		</View>
+		</View>
+		</div>
 	);
     }
     
 }
 
-class DisplayPicker extends Component {
+class Downloader extends Component {
+    downloadSvg = () => {
+	const xml = new	XMLSerializer().serializeToString(this.props.dataMap);
+	const el = document.createElement("a");
+	const img = new Blob([xml], {type: "image/svg"});
+	el.href = URL.createObjectURL(img);
+	el.download = "BrowserMapImage.svg";
+	document.body.appendChild(el);
+	el.click();	
+    }
+    
+    render() {
+	return (
+		<div>
+		<button onClick={this.downloadSvg}>Save Image as SVG</button>
+		</div>
+	);
+    }
+}
+
+class DisplayConfig extends Component {
     constructor(props) {
 	super(props);
 	this.state = {
@@ -341,7 +381,7 @@ class DisplayPicker extends Component {
     render() {
 	return (
 		<div>
-		<form>
+		<form>	
 		<label>
 		<input
 	    type="radio"
@@ -350,6 +390,7 @@ class DisplayPicker extends Component {
 	    checked={this.state.selectedOption === 'Count'} />
 		Count
 	    </label>
+		&nbsp;&nbsp;
 		<label>
                 <input
 	    type="radio"
@@ -358,7 +399,7 @@ class DisplayPicker extends Component {
 	    checked={this.state.selectedOption === 'Density'} />
 		Density
             </label>
-		<div>
+		&nbsp;&nbsp;&nbsp;&nbsp;
 		<label>
 		<input
 	    type="checkbox"
@@ -366,7 +407,6 @@ class DisplayPicker extends Component {
 	    onChange={this.handleLogTransformClick} />
 		Log2 Transform
 	    </label>
-	    </div>
 		</form>
 		</div>
 	);
