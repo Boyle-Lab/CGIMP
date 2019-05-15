@@ -40,7 +40,6 @@ router.post('/upload', (req, res) => {
     if (Object.keys(req.files).length == 0) {
 	return res.status(400).send('No files were uploaded.');
     }
-    //console.log(req.files.filepond);
     const serverId = Math.floor(1000000000 + Math.random() * 9000000000);
     fs.mkdir('/tmp/' + serverId, { recursive: true }, (err) => {
 	if (err) { return res.status(500).send(err); };
