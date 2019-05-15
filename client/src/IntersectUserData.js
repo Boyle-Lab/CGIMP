@@ -81,7 +81,7 @@ class IntersectUserData extends Component {
                 Upload BED data to Intersect:
                 <FileUploader onFilesChange={this.handleFilesChange} files={this.state.files}/>
 	        <form onSubmit={this.intersectData}>
-		<input type="submit" value="Intersect" disabled={!this.state.files.length}/>
+		<input type="submit" value="Intersect" disabled={!(this.state.files.length && this.props.dataIsLoaded)}/>
 	        </form>
 	    </div>
         );

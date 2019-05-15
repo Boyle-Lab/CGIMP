@@ -402,6 +402,7 @@ class App extends Component {
                       onMapDataChange={this.handleMapDataChange}
 		      onDataChange={this.handleDataChange}
 		      onNewSearchAction={this.handleNewElasticsearchPromise}
+		      dataIsLoaded={this.state.dataIsLoaded}
                       /> :
                       (<div></div>)}
 	    map={Object.keys(this.state.displayedData).length ?

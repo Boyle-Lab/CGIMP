@@ -15,7 +15,8 @@ class MapControls extends Component {
 	    data={this.props.displayedData}
 	    onDataChange={this.props.onDataChange}
 	    onMapDataChange={this.props.onMapDataChange}
-	    onNewSearchAction={this.props.onNewSearchAction} />
+	    onNewSearchAction={this.props.onNewSearchAction}
+	    dataIsLoaded={this.props.dataIsLoaded} />
 		</div>
         );
     }
