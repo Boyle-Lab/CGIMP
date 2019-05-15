@@ -10,7 +10,7 @@ def jsonToBedInts(jsonData):
     ints = []
     for key in jsonData.keys():
         mod = jsonData[key]
-        ints.append( (mod["loc"]["chrom"], mod["loc"]["start"], mod["loc"]["end"], mod["_id"], key) )
+        ints.append( (mod["loc"]["chrom"], mod["loc"]["start"], mod["loc"]["end"], mod["id"], key) )
     return(pybedtools.BedTool(ints))
 
 def buildResult(res, origData):
@@ -20,7 +20,7 @@ def buildResult(res, origData):
 	"loc": { "chrom": res[5],
                "start": res[6],
                "end": res[7] },
-	"_id": res[8],
+	"id": res[8],
 	"_meta": res[9:-1]
     }
     compositeRec["intersecting"] = bRec
