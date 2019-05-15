@@ -15,7 +15,7 @@ def jsonToBedInts(jsonData):
 
 def buildResult(res, origData):
     key = res[4]
-    compositeRec = origData[key]
+    compositeRec = origData[key].copy()
     bRec = {
 	"loc": { "chrom": res[5],
                "start": res[6],

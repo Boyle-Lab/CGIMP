@@ -380,6 +380,14 @@ class App extends Component {
 			row.push(valStr);			
 		    }
 		});
+		// Handle intersecting data fields.
+		if ("intersecting" in dat) {
+		    let iDat = dat.intersecting;
+		    row.push(iDat["loc"].chrom, iDat["loc"].start, iDat["loc"].end, iDat.id);
+		    iDat._meta.forEach( (val) => {
+			row.push(val);
+		    });
+		}
 		bedData.push(row.join("\t"));
 	    });
             const textBlob = new Blob([bedData.join("\n")], {type: "text/plain"});
