@@ -35,6 +35,21 @@ class IntersectUserData extends Component {
 	}
     }
 
+    // Convert locus-level data to node-level data for map display.
+    convertToNodeData = (data) => {
+	const nodeData = {}
+	Object.keys(data).forEach( (key) => {
+	    let node = data[key].node
+	    if (node in nodeData) {
+		nodeData[node]++;
+	    } else {
+		nodeData[node] = 1;
+	    }
+	});
+	console.log(nodeData);
+	return nodeData;
+    }
+    
     // This is where we call pybedtools to do the intersection.
     intersectData = (event) => {
 	//console.log(event);
@@ -50,6 +65,7 @@ class IntersectUserData extends Component {
                   )
             .then(res => {
 		const intersectingData = JSON.parse(res.data[0]);
+		this.props.onMapDataChange(this.convertToNodeData(intersectingData));
 		this.props.onDataChange(intersectingData);
             })
             .catch(error => {

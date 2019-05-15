@@ -7,8 +7,15 @@ class MapControls extends Component {
     render() {
         return (
 		<div>
-		<FacetedSearch onDataChange={this.props.onDataChange} onMapDataChange={this.props.onMapDataChange} onNewSearchAction={this.props.onNewSearchAction} />
-		<IntersectUserData data={this.props.displayedData} onDataChange={this.props.onDataChange} onNewSearchAction={this.props.onNewSearchAction} />
+		<FacetedSearch
+	    onDataChange={this.props.onDataChange}
+	    onMapDataChange={this.props.onMapDataChange}
+	    onNewSearchAction={this.props.onNewSearchAction} />
+		<IntersectUserData
+	    data={this.props.displayedData}
+	    onDataChange={this.props.onDataChange}
+	    onMapDataChange={this.props.onMapDataChange}
+	    onNewSearchAction={this.props.onNewSearchAction} />
 		</div>
         );
     }
