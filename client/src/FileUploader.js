@@ -9,9 +9,10 @@ const FileUploader = ({ onFilesChange, files }) => (
             ref={ref => this.pond = ref}
             files={files}
             server={{
-	        process: "/api/upload",
+		url: server.apiAddr,
+	        process: "/upload",
                 revert: (serverId, load, error) => {
-                    axios.delete(server.api_addr + '/delete',
+                    axios.delete(server.apiAddr + '/delete',
                         {params: { serverId: serverId }}
                     );
                     load();
