@@ -381,14 +381,19 @@ class App extends Component {
 		    }
 		});
 		// Handle intersecting data fields.
-		if ("intersecting" in dat) {
+		if ("intersecting" in dat) {		    
 		    let iDat = dat.intersecting;
-		    row.push(iDat["loc"].chrom, iDat["loc"].start, iDat["loc"].end, iDat.id);
-		    iDat._meta.forEach( (val) => {
-			row.push(val);
+		    iDat.forEach( (rec) => {
+			let tmpRow = [...row];
+			tmpRow.push(rec["loc"].chrom, rec["loc"].start, rec["loc"].end, rec.id);
+			rec._meta.forEach( (val) => {
+			    tmpRow.push(val);
+			});
+			bedData.push(tmpRow.join("\t"));
 		    });
+		} else {
+		    bedData.push(row.join("\t"));
 		}
-		bedData.push(row.join("\t"));
 	    });
             const textBlob = new Blob([bedData.join("\n")], {type: "text/plain"});
             el.href = URL.createObjectURL(textBlob);

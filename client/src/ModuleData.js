@@ -32,6 +32,7 @@ class ModuleData extends Component {
     }
 
     getDataSlice = (index, data) => {
+	//console.log(Object.keys(data).length);
 	const dataSlice = {};
 	index.search("node:" + this.props.selectedNode)
 	    .forEach( ({ ref, score, res }) => {
@@ -39,6 +40,7 @@ class ModuleData extends Component {
 		    dataSlice[ref] = data[ref];
 		}
 	    });
+	//console.log(Object.keys(dataSlice).length);
 	this.setState({ dataSlice: dataSlice }, function() {
 	    this.forceUpdate();
 	});
