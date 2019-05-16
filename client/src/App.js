@@ -8,6 +8,7 @@ import SvgModuleMap from './SvgModulesMap';
 import MapControls from './MapControls';
 import DataPanel from './DataPanel';
 import Dashboard from './Dashboard';
+import SettingsDialog from './Settings';
 
 class App extends Component {
     // initialize our state
@@ -25,6 +26,7 @@ class App extends Component {
 	    selectedNode: null,  // Which node is currently selected?
 	    selectedNodeModuleCount: 0,
 	    dataIsLoaded: false,  // Tracks promise fulfilments from elasticsearch.
+	    settingsOpen: false,  // Settings dialog display state
 	    mapConfig: {
 		doLog: true,         // Should map data be log transformed?
 		dim: [47, 34],       // Map dimensions: [nCols, nRows]
@@ -341,6 +343,7 @@ class App extends Component {
     // Handle settings icon clicks.
     handleSettingsClick = () => {
 	console.log("Settings click!");
+	this.setState({ settingsOpen: !this.state.settingsOpen });
     }
 
     // Handle data download requests.
@@ -406,6 +409,7 @@ class App extends Component {
     // Render the UI.
     render() {
 	return (
+		<div>
 		<Dashboard
 	    title={this.state.mainTitle}
 	    controls={Object.keys(this.state.displayedData).length ?
@@ -445,6 +449,11 @@ class App extends Component {
                     }
 	    onSettingsClick={this.handleSettingsClick}
 		/>
+		<SettingsDialog
+	    onSettingsClick={this.handleSettingsClick}
+            open={this.state.settingsOpen}
+		/>
+		</div>
 	);
     }
 }

@@ -7,7 +7,8 @@ class IntersectUserData extends Component {
     constructor(props) {
         super(props);
 	this.state = {
-            files: []
+            files: [],
+	    working: false
         };
 	this.handleFilesChange = this.handleFilesChange.bind(this);
 	this.intersectData = this.intersectData.bind(this);
@@ -46,14 +47,14 @@ class IntersectUserData extends Component {
 		nodeData[node] = 1;
 	    }
 	});
-	console.log(nodeData);
+	//console.log(nodeData);
 	return nodeData;
     }
     
     // This is where we call pybedtools to do the intersection.
     intersectData = (event) => {
 	//console.log(event);
-
+	this.setState({ working: true });
 	// Since there should only be one file in the filepond,
 	// we will assume files[0] is the desired user file.
 	//console.log(this.state.files[0].filename);
@@ -67,6 +68,7 @@ class IntersectUserData extends Component {
 		const intersectingData = JSON.parse(res.data[0]);
 		this.props.onMapDataChange(this.convertToNodeData(intersectingData));
 		this.props.onDataChange(intersectingData);
+		this.setState({ working: false });
             })
             .catch(error => {
                 console.log(error.response);
@@ -81,6 +83,7 @@ class IntersectUserData extends Component {
                 Upload BED data to Intersect:
                 <FileUploader onFilesChange={this.handleFilesChange} files={this.state.files}/>
 	        <form onSubmit={this.intersectData}>
+		{this.state.working ? <div>Working...</div> : <div/>}
 		<input type="submit" value="Intersect" disabled={!(this.state.files.length && this.props.dataIsLoaded)}/>
 	        </form>
 	    </div>
