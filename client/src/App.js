@@ -28,7 +28,6 @@ class App extends Component {
 	    dataIsLoaded: false,  // Tracks promise fulfilments from elasticsearch.
 	    settingsOpen: false,  // Settings dialog display state
 	    mapConfig: {
-		doLog: true,         // Should map data be log transformed?
 		dim: [47, 34],       // Map dimensions: [nCols, nRows]
 		tipFields: {	     // Data fields to include in SVG tooltips. Format =  'key: display_mode'.
 		                     // Display modes are "string", "count", "average", and "concat".  
@@ -42,37 +41,35 @@ class App extends Component {
 		}
 	    },
 	    dataPanelConfig: {
-		nodeFields: {
-		    /* 
-		       Fields to display regarding the map nodes. Field names and display modes
-		       are given as key:value pairs, where the value specifies how the field data
-		       should be handled for display. Available display modes are "string", "concat",
-		       "count", and "average". 
-
-		       The "_config" object controls how the overall display is constructed. 
-
-		       Certain special keys are avaialble to display computed values based on data in the map. 
-		       These are:
-		           nDisplayed: Number of modules currently displayed in the selected node.
-			   ...
+		nodeFields: [
+		    /*  Fields to display in the node summary data table. 
+			Each field is represented as an object within the nodeFields
+			array, and fields will be rendered in the order they are 
+			supplied. Field objects contain key:value pairs to configure
+			the source field, display types, etc.
+			Certain special keys are avaialble to display computed values 
+			based on data in the map. These are:
+		            nDisplayed: Number of modules currently displayed in the 
+			    selected node after all search filters are applied. (count
+			    type).
+			    ...
 		    */
-		    "id": "string",
-                    "factors": "concat",
-                    "modules": "count",
-		    "class": "string",
-		    "nDisplayed": "count",  // Special Key: number of rows in the currently selected node.
-		    "_config": {
-                        "_order": ["id", "modules", "nDisplayed", "factors", "class"],  // order in which fields should display
-                        "_fs": ",",   // field separator for concatenated values
-			"_labels": {  // Labels to be shown in the table header. Without this, field names will be used as the default
-			    "id" : "Pattern",
-			    "factors": "Factors",
-			    "modules": "Total Modules",
-			    "nDisplayed": "Displayed Modules",
-			    "class": "Grammatical Class"
-			}
-                    }
-		},
+		    { "field": "id",
+		      "type": "string",
+		      "label": "Pattern" },
+		    { "field": "modules",
+                      "type": "count",
+                      "label": "Total Modules" },
+		    { "field": "nDisplayed",
+                      "label": "Displayed Modules" },
+		    { "field": "factors",
+                      "type": "concat",
+		      "fs": "'",
+                      "label": "Factors" },
+		    { "field": "class",
+                      "type": "string",
+                      "label": "Grammatical Class" },
+		],
 		dataFields: [
 		    /* 
 		       Fields in the module-level data to display (as individual tables). Fields are 
@@ -167,33 +164,35 @@ class App extends Component {
                     },
 		],
 	    },
-	    // Fields to include in BED output. "loc" is included by default.
-	    // Format: { field: <fieldname>, type: <string|array|object>[, sep: <field separator>, format: [subField1, sep1, ..., sepN, subFieldN] ]}
-	    // "format" for object types is an array that specfies an arrangement
-	    // of fields and separators, from which a string will be built.
-	    includeFields: [
-		{ "field": "cell",
-		  "type": "string"
-		},
-		{"field": "node",
-		 "type": "string"
-		},
-		{"field": "factors",
-                 "type": "array",
-		 "sep": ","
-                },
-		{"field": "orth_type",
-                 "type": "string"
-                },
-		{"field": "locus",
-		 "type": "string"
-		},		
-		{"field": "maps_to",
-		 "type": "object",
-		 "format": ['chrom', ':', 'start', '-', 'end']
-		}
-	    ],	    
-	    nameField: "id"  // Field used as BED name (column 4)
+	    dataDownloadConfig: {
+		// Fields to include in BED output. "loc" is included by default.
+		// Format: { field: <fieldname>, type: <string|array|object>[, sep: <field separator>, format: [subField1, sep1, ..., sepN, subFieldN] ]}
+		// "format" for object types is an array that specfies an arrangement
+		// of fields and separators, from which a string will be built.
+		includeFields: [
+		    { "field": "cell",
+		      "type": "string"
+		    },
+		    {"field": "node",
+		     "type": "string"
+		    },
+		    {"field": "factors",
+                     "type": "array",
+		     "sep": ","
+                    },
+		    {"field": "orth_type",
+                     "type": "string"
+                    },
+		    {"field": "locus",
+		     "type": "string"
+		    },		
+		    {"field": "maps_to",
+		     "type": "object",
+		     "format": ['chrom', ':', 'start', '-', 'end']
+		    }
+		],	    
+		nameField: "id"  // Field used as BED name (column 4)
+	    }
 	};
     }
 
@@ -362,8 +361,8 @@ class App extends Component {
 	    Object.keys(this.state.displayedData).forEach( (key) => {
 		let dat = this.state.displayedData[key];
 		let row = [];
-		row.push(dat.loc.chrom, dat.loc.start, dat.loc.end, dat[this.state.nameField]);
-		this.state.includeFields.forEach( (field) => {
+		row.push(dat.loc.chrom, dat.loc.start, dat.loc.end, dat[this.state.dataDownloadConfig.nameField]);
+		this.state.dataDownloadConfig.includeFields.forEach( (field) => {
 		    if (field.type === "string") {
 			row.push(dat[field.field])
 		    } else if (field.type === "array") {
@@ -404,6 +403,11 @@ class App extends Component {
 	}
 	document.body.appendChild(el);
         el.click();
+    }
+
+    // Handle state change requests from the settings dialog.
+    updateStateSettings = (name, value) => {
+	this.setState({ [name]: value });
     }
 
     // Render the UI.
@@ -452,6 +456,8 @@ class App extends Component {
 		<SettingsDialog
 	    onSettingsClick={this.handleSettingsClick}
             open={this.state.settingsOpen}
+	    parentState={this.state}
+	    updateParentState={this.updateStateSettings}
 		/>
 		</div>
 	);

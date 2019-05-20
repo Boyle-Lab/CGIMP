@@ -29,48 +29,65 @@ class NodeData extends Component {
         /* Build the node nodeData table */
         let names = [];
         let values = [];
-        for (let field of fields._config._order) {
+        fields.forEach( (fieldObj) => {
+	    let field = fieldObj.field
+	    
             let valStr = "";
+
             let label = "";
+	    if ("label" in fieldObj) {
+		label = fieldObj.label;
+	    } else {
+		label = field;
+	    }
+	    
             if (field === "nDisplayed") {
+		// The nDisplayed field always returns the number of modules in the
+		// current display.
                 valStr = nDisplayed;
                 label = "Rows Displayed";
-            } else if (fields[field] === "concat") {
-                if (Array.isArray(nodeData[field])) {
-                    valStr = nodeData[field].join(fields._config._fs);
-                } else if (isDict(nodeData[field])) {
-                    let vals = [];
-                    for (let key of Object.keys(nodeData[field])) {
-                        vals.push(key + ":" + nodeData[field][key]);
-                    }
-                    valStr = vals.join(fields._config._fs);
-                }
-            } else if (fields[field] === "count") {
-                if (Array.isArray(nodeData[field])) {
-                    valStr = nodeData[field].length;
-                } else if (isDict(nodeData[field])) {
-                    valStr = Object.keys(nodeData[field]).length;
-                }
-                label = field + " count";
-            } else if (fields[field] === "average") {
-                if (Array.isArray(nodeData[field])) {
-                    valStr = average(nodeData[field]);
-                } else if (isDict(nodeData[field])) {
-                    valStr = average(nodeData[field].values());
-                }
-                label = field + " average";
-            } else if (fields[field] === "string") {
-                valStr = nodeData[field];
-            }
-            if ("_labels" in fields._config) {
-                names.push(fields._config._labels[field]);
+		
             } else {
-                names.push(label);
+		
+		if (fieldObj.type === "concat") {
+		    
+                    if (Array.isArray(nodeData[field])) {
+			valStr = nodeData[field].join(fields.fs);
+                    } else if (isDict(nodeData[field])) {
+			let vals = [];
+			for (let key of Object.keys(nodeData[field])) {
+                            vals.push(key + ":" + nodeData[field][key]);
+			}
+			valStr = vals.join(fieldObj.fs);
+                    }
+		    
+		} else if (fieldObj.type === "count") {
+		    
+                    if (Array.isArray(nodeData[field])) {
+			valStr = nodeData[field].length;
+                    } else if (isDict(nodeData[field])) {
+			valStr = Object.keys(nodeData[field]).length;
+                    }
+                    label = label + " count";
+		    
+		} else if (fieldObj.type === "average") {
+		    
+                    if (Array.isArray(nodeData[field])) {
+			valStr = average(nodeData[field]);
+                    } else if (isDict(nodeData[field])) {
+			valStr = average(nodeData[field].values());
+                    }
+                    label = label + " average";
+		    
+		} else if (fieldObj.type === "string") {		    
+                    valStr = nodeData[field];
+		}
             }
+	    names.push(label);
             values.push(valStr);
-        }
+        });
 	this.setState({
-            names: names,
+	    names: names,
             values: values
         });
     }
