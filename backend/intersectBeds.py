@@ -23,15 +23,31 @@ def buildResult(res, origData):
 	"id": res[8],
 	"_meta": res[9:-1]
     }
-    compositeRec["intersecting"] = bRec
+    compositeRec["intersecting"] = [bRec]
     return(compositeRec)
-    
+
+def appendResult(res, compositeRec):
+    ret = compositeRec.copy()
+    bRec = {
+        "loc": { "chrom": res[5],
+               "start": res[6],
+               "end": res[7] },
+        "id": res[8],
+        "_meta": res[9:-1]
+    }
+    ret["intersecting"].append(bRec)
+    return(ret)
+
 def resultsToJson(intersection, origData):
     # Convert intersection results to a JSON object.
-    formattedResults = []
-    for res in intersection[0:len(intersection)]:       
-        out = buildResult(res, origData)
-        formattedResults.append(out)
+    formattedResults = {}
+    for res in intersection[0:len(intersection)]:
+        key = res[4]
+        if key in formattedResults:
+            formattedResults[key] = appendResult(res, formattedResults[key])
+        else:
+            out = buildResult(res, origData)
+            formattedResults[key] = out
     return json.dumps(formattedResults)
 
 def fileToBedInts(bed_f):
