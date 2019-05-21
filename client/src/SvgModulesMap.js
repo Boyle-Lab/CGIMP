@@ -59,49 +59,61 @@ function clearMap(svg) {
 function buildToolTip(tipFields, nodeData) {
     /* Add a tooltip to the current pod */
     let components = [];
-    for (let field of tipFields._config._order) {
+    tipFields.forEach( (tipField) => {
 	let valStr = "";
-	if (tipFields[field] === "concat") {
+	let field = tipField.field;
+	let label = field;
+	if ("label" in tipField) {
+	    label = tipField.label;
+	}
+	
+	if (tipField.type === "concat") {
 	    // Concatenate values from an array or object.
+
 	    if (Array.isArray(nodeData[field])) {
 		// Concatenate values
-		valStr = nodeData[field].join(tipFields._config._fs);
+		valStr = nodeData[field].join(tipField.fs);
 	    } else if (isDict(nodeData[field])) {
 		// Concatenate object key-value pairs
 		let vals = [];
 		for (let key of Object.keys(nodeData[field])) {
 		    vals.push(key + ":" + nodeData[field][key]);
 		}
-		valStr = vals.join(tipFields._config._fs);
+		valStr = vals.join(tipField.fs);
 	    }
-	} else if (tipFields[field] === "count") {
+	    
+	} else if (tipField.type === "count") {
 	    // Report the number of values in the given field.
+	    
 	    if (Array.isArray(nodeData[field])) {
 		valStr = nodeData[field].length;
 	    } else if (isDict(nodeData[field])) {
 		valStr = Object.keys(nodeData[field]).length;
 	    }
-	    field = field + " count";
-	} else if (tipFields[field] === "average") {
+	    label = label + " count";
+	    
+	} else if (tipField.type === "average") {
 	    // Report the average of all values in the given field.
 	    // Note this does NOT check for a numeric value and using
 	    // a non-numeric field may give unexpected results!
 	    // Also note that this does NOT support nested objects!
+
 	    if (Array.isArray(nodeData[field])) {
 		valStr = average(nodeData[field]);
             } else if (isDict(nodeData[field])) {
 		valStr = average(nodeData[field].values());
             }
-	    field = field + " average";
-	} else if (tipFields[field] === "string") {
+	    label = label + " average";
+	    
+	} else if (tipField.type === "string") {
 	    // Report a string representation of the given field.
 	    // If the field contains an object, this may not do what
 	    // you want!
 	    valStr = nodeData[field];
 	}
-	valStr = field + ": " +	valStr;
+	valStr = label + ": " + valStr;
 	components.push(valStr);
-    }
+    });
     return components.join('; ');    
 }
 

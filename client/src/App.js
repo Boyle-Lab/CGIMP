@@ -29,16 +29,20 @@ class App extends Component {
 	    settingsOpen: false,  // Settings dialog display state
 	    mapConfig: {
 		dim: [47, 34],       // Map dimensions: [nCols, nRows]
-		tipFields: {	     // Data fields to include in SVG tooltips. Format =  'key: display_mode'.
-		                     // Display modes are "string", "count", "average", and "concat".  
-		    "id": "string",
-		    "factors": "concat",
-		    "modules": "count",
-		    "_config": {     // options for tooltip construction
-			"_order": ["id", "modules", "factors"],  // order in which fields should display
-			"_fs": ","   // field separator for concatenated values
-		    }
-		}
+		tipFields: [
+		    // Data fields to include in SVG tooltips. Fields are specfied as
+		    // an array of objects containing key:value pairs to specify
+		    // source data and formatting.
+		    // Display modes are "string", "count", "average", and "concat".
+		    { "field": "id",
+		      "type": "string",
+		      "label": "Pattern"},
+		    { "field": "factors",
+		      "type": "concat",
+		      "fs": "," },
+		    { "field": "modules",
+		      "type": "count" },
+		]
 	    },
 	    dataPanelConfig: {
 		nodeFields: [
@@ -64,7 +68,7 @@ class App extends Component {
                       "label": "Displayed Modules" },
 		    { "field": "factors",
                       "type": "concat",
-		      "fs": "'",
+		      "fs": ",",
                       "label": "Factors" },
 		    { "field": "class",
                       "type": "string",
@@ -72,44 +76,42 @@ class App extends Component {
 		],
 		dataFields: [
 		    /* 
-		       Fields in the module-level data to display (as individual tables). Fields are 
-		       specified as a list of objects containign key:value pairs to specify the field 
-		       and tell the display component how to handle data contained therein. Tables will
-		       be rendered in the order in which they are supplied.
+		       Fields to display in module-level data tables. Fields are
+		       specified as a list of objects containinn key:value pairs to
+		       specify source data and formatting. Tables are rendered in the 
+		       order in which they are supplied.
 
 		       Mandatory parameters:
 		       field: The name of the desired field.
-		       type: The type of value stored in the field: "string", "numeric", "array", or "object".
-		       aggregate: <false/aggType> Whether and how to aggregate data. "false" will report all rows
-		           while supplying an aggType will report aggregated values. Available options are "concat", 
-			   "count", "average", and "density". Not all options make sense for all data types!
-			   
-			   For types "string" and "numeric", aggregation will return a single table row (unless groupBy
-			   is used), and "concat" is not available.
-
-			   For type "array", the default mode is to concatenate all values and return a single result
-			   column ("aggregate: false" and "aggregate: concat" are equivalent), with a row for each module.
-			   "count" and "density" will summarize data for all rows into a single row, with a
-			   column for every value present in the given field across all rows in the data.
-			   "average" also reports a row for each entry, with the value reported being the
-			   numeric average of all values in the array for each record.
-
-			   Type "object" behaves similarly to array. Default mode (aggregate: false) is to return
-			   a table with a row for each module and a column for each object key. Nested objects
-			   are NOT supported! "aggregate: concat" will also return a row for each module, but all
-			   key:value pairs will be reported as a string in a single table column. "aggregate: count"
-			   and "aggregate: density" report the number and density of occurences of each object key
-			   in the dataset, ignoring the actual values stored therein. "aggregate: average" reports
-			   the numeric average of values for each object key. 
-
-		       from: Which dataset to show results from. Options are "all", "displayed".
+		       type: The type of value stored in the field: "string", "numeric,
+		       "array", or "object".
+		       aggregate: <false/aggType> How to aggregate data: 
+		           "false": report raw row data for all diplayed modules
+			   "concat": Concatenate field values on a row-by-row basis
+			             for all displayed modules. Not availalbe for
+				     "string" and "numeric" data types.
+			   "count": Report the nuber of matching rows for each observed
+			            value in the given field.
+	                   "density": Report the fraction of displayed rows for each
+			              observed value in the given field.
+		           "average": Report the average value for the field calculated
+			              over all displayed rows. 
+		         		      
+		           Note that not all aggregations are a good fit for all data
+			   types!
 
 		       Optional parameters:
-		       groupBy: Group results by another data field before aggregation. Only one groupBy condition is allowed.
-		       title: Title for results table. Defaults to the field name if not given.
-		       fs: Field separator for value concatenation.
+			   title: Title for results table. Defaults to the field name.
+			   fs: Field separator for value concatenation.
 
-		       TODO: Add ability to append additional fields (strings and numerics only) to output rows.
+			   TO DO: 
+			    - Add ability to append additional fields (strings and
+			      numerics only) to output rows.
+			    - groupBy: Group results by another data field before
+                              aggregation. Only one groupBy condition is allowed.
+
+
+			   
 		    */
 		    {
                         "field": "cell",
