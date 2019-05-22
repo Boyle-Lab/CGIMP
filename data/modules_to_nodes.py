@@ -13,7 +13,7 @@ def node_init(key, vals):
         "id": key,
         "modules": [vals[3]],
         "class": vals[7].strip('"'),
-        "factors": [vals[6].split("-")]
+        "factors": vals[6].split("-")
     }
     return(node)
 
