@@ -10,7 +10,6 @@ class NodeData extends Component {
 	    names: [],
 	    values: []
 	}
-	this.builder = this.builder.bind(this);
     }
 
     componentDidMount() {
@@ -18,8 +17,7 @@ class NodeData extends Component {
     }
 
     componentDidUpdate(prevProps) {
-	if (this.props.nodeData !== prevProps.nodeData ||
-	    Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length ||
+	if (this.props.changeFlag !== prevProps.changeFlag ||
 	    this.props.nDisplayed !== prevProps.nDisplayed) {
 	    this.builder(this.props.fields, this.props.nodeData, this.props.nDisplayed);
 	}
@@ -42,7 +40,7 @@ class NodeData extends Component {
 	    }
 	    
             if (field === "nDisplayed") {
-		// The nDisplayed field always returns the number of modules in the
+		// nDisplayed pseudofiled returns the number of modules in the
 		// current display.
                 valStr = nDisplayed;
                 label = "Rows Displayed";

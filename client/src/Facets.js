@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import server from './server_config';
-import { ReactiveBase, DataSearch, MultiList, SelectedFilters, DynamicRangeSlider, ReactiveList } from '@appbaseio/reactivesearch';
+import { ReactiveBase, MultiList, SelectedFilters, DynamicRangeSlider, ReactiveList } from '@appbaseio/reactivesearch';
+//import DataSearch from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 
 const initScrollUrl = server.elasticAddr + '/browser/modules/_search?scroll=1m';
@@ -146,21 +147,24 @@ class FacetedSearch extends Component {
 		dataFields.push(this.state.facets[key].dataField);
 	    });
 	    
-	    return (
+	    return (		
 		    <div>
+		    <div>
+                    Filter Data
+                    </div>
 		    <ReactiveBase
 		app="browser"
 		url={server.elasticAddr}
 		type="modules"
 		    >
 		    
-		    <DataSearch
+		{/*<DataSearch
 		componentId="mainSearch"
 		dataField={dataFields}
 		className="search-bar"
 		queryFormat="and"
 		placeholder="Search the dataset..."
-		    />
+		/>*/}
 		    
 		    <SelectedFilters showClearAll={true} clearAllLabel="Clear filters"/>
 		    

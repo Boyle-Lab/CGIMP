@@ -18,22 +18,29 @@ class App extends Component {
 	    mainTitle: "Human-Mouse Self-Organizing Map Data",
 	    dataFile: 'dataMap.json',
 	    nodeDataFile: 'nodes.json',
- 	    data: [],            // Reference copy of locus-level data. Treated as immutable.
-	    nodeData: [],        // Descriptive data for active nodes in the map topography.
-	    index: {},           // Lunr search engine index for client-side search.
-	    displayedData: [],   // Locus-level data currently displayed on the map (used for detailed data display)
-	    displayedNodes: [],  // Node-level data currently displayed on the map (used to draw the map images)
+ 	    data: [],            // Immutable copy of locus-level data.
+	    nodeData: [],        // Descriptive data for active map nodes.
+	    index: {},           // Lunr search index for client-side search.
+	    displayedData: [],   // Locus-level data in current map display.
+	                         // (used only by ModuleData component)
+	    displayedNodes: [],  // Node-level data in current map display.
+	                         // (used to draw the map images)
 	    selectedNode: null,  // Which node is currently selected?
 	    selectedNodeModuleCount: 0,
-	    dataIsLoaded: false,  // Tracks promise fulfilments from elasticsearch.
-	    settingsOpen: false,  // Settings dialog display state
+	    dataIsLoaded: false,  // Keeps track of elasticsearch promises.
+	    settingsOpen: false,  // Settings dialog display state.
+	    moduleFields: null,   // List of fields in module documents.
+	    nodeFields: null,     // List of fields in node documents.
+	    mapChangeFlag: 0,     // Direct observable to flag map changes.
+	    dataChangeFlag: 0,    // Direct observable to flag data changes.
 	    mapConfig: {
 		dim: [47, 34],       // Map dimensions: [nCols, nRows]
-		tipFields: [
-		    // Data fields to include in SVG tooltips. Fields are specfied as
-		    // an array of objects containing key:value pairs to specify
-		    // source data and formatting.
-		    // Display modes are "string", "count", "average", and "concat".
+		toolTips: [
+		    /* Data fields used in SVG tooltips: an array of objects
+		       containing key:value pairs specifying source data and
+		       display type: "string", "count", "average", or "concat".
+		       "fs" is the field separator for concat type.
+		    */
 		    { "field": "id",
 		      "type": "string",
 		      "label": "Pattern"},
@@ -47,16 +54,13 @@ class App extends Component {
 	    dataPanelConfig: {
 		nodeFields: [
 		    /*  Fields to display in the node summary data table. 
-			Each field is represented as an object within the nodeFields
-			array, and fields will be rendered in the order they are 
-			supplied. Field objects contain key:value pairs to configure
-			the source field, display types, etc.
-			Certain special keys are avaialble to display computed values 
-			based on data in the map. These are:
-		            nDisplayed: Number of modules currently displayed in the 
-			    selected node after all search filters are applied. (count
-			    type).
-			    ...
+			Each field is represented as an object in the array,
+			containing key:value pairs specifying the source field,
+			display type, and other options.
+		        "nDisplayed" is a special field key that can be used
+			with any dataset to show the number of modules
+			displayed in the selected node after all search
+			filters are applied.
 		    */
 		    { "field": "id",
 		      "type": "string",
@@ -76,69 +80,58 @@ class App extends Component {
 		],
 		dataFields: [
 		    /* 
-		       Fields to display in module-level data tables. Fields are
-		       specified as a list of objects containinn key:value pairs to
-		       specify source data and formatting. Tables are rendered in the 
-		       order in which they are supplied.
+		       Fields to display in the ModuleData tables, supplied
+		       as an array of objects containing key:value pairs to
+		       specify source data and formatting.
 
 		       Mandatory parameters:
 		       field: The name of the desired field.
-		       type: The type of value stored in the field: "string", "numeric,
-		       "array", or "object".
+		       type: The type of value stored in the field: "string",
+		       "numeric", "array", or "object".
 		       aggregate: <false/aggType> How to aggregate data: 
-		           "false": report raw row data for all diplayed modules
-			   "concat": Concatenate field values on a row-by-row basis
-			             for all displayed modules. Not availalbe for
-				     "string" and "numeric" data types.
-			   "count": Report the nuber of matching rows for each observed
-			            value in the given field.
-	                   "density": Report the fraction of displayed rows for each
-			              observed value in the given field.
-		           "average": Report the average value for the field calculated
-			              over all displayed rows. 
+		           "false": report raw data for all diplayed modules.
+			   "concat": Concatenate values row-by-row for all
+			       displayed modules. Not availalbe for "string"
+			       and "numeric" data types.
+			   "count": Report the nuber of rows for each observed
+			       value in the given field.
+	                   "density": Report the fraction of rows for each
+			       observed value in the given field.
+		           "average": Report the average value calculated over
+			       all displayed rows. 
 		         		      
-		           Note that not all aggregations are a good fit for all data
-			   types!
-
 		       Optional parameters:
-			   title: Title for results table. Defaults to the field name.
+			   title: Title for results table. Default: field name.
 			   fs: Field separator for value concatenation.
 
-			   TO DO: 
-			    - Add ability to append additional fields (strings and
-			      numerics only) to output rows.
-			    - groupBy: Group results by another data field before
-                              aggregation. Only one groupBy condition is allowed.
-
-
-			   
+		       TO DO: 
+		           - Add ability to append additional string and 
+			     numeric fields to output rows.
+			   - groupBy: Group results by the given field before
+                             aggregation.
 		    */
 		    {
                         "field": "cell",
                         "type": "string",
                         "aggregate": false,
-                        "from": "displayed",
                         "title": "Cells"
                     },
 		    {
                         "field": "cell",
 			"type": "string",
                         "aggregate": "count",
-                        "from": "displayed",
                         "title": "Cells (count)"
                     },
 		    {
                         "field": "cell",
                         "type": "string",
                         "aggregate": "density",
-                        "from": "displayed",
                         "title": "Cells"
                     },
 		    {
                         "field": "factors",
                         "type": "array",
                         "aggregate": "concat",
-                        "from": "displayed",
                         "title": "Factors",
 			"fs" : ","
                     },
@@ -146,31 +139,42 @@ class App extends Component {
                         "field": "factors",
                         "type": "array",
                         "aggregate": "count",
-                        "from": "displayed",
                         "title": "Factors (count)",
                     },
 		    {
                         "field": "factors",
                         "type": "array",
                         "aggregate": "density",
-                        "from": "displayed",
                         "title": "Factors (density)",
                     },
 		    {
                         "field": "maps_to",
                         "type": "object",
                         "aggregate": "concat",
-                        "from": "displayed",
                         "title": "Orthologous Location",
 			"fs": ", "
                     },
 		],
 	    },
 	    dataDownloadConfig: {
-		// Fields to include in BED output. "loc" is included by default.
-		// Format: { field: <fieldname>, type: <string|array|object>[, sep: <field separator>, format: [subField1, sep1, ..., sepN, subFieldN] ]}
-		// "format" for object types is an array that specfies an arrangement
-		// of fields and separators, from which a string will be built.
+		/* Fields to include in BED output. 
+		   Format: { field: <fieldname>,
+		             type: <string|array|object>,
+		             [sep: <field separator>,
+			      format: [subField1, sep1, ..., sepN, subFieldN]
+	                     ]}
+		   
+		   The first four columns will always follow the standard BED4
+		   formatting convention: "chrom", "start", "end", "name",
+		   populated based on values from the "loc" field, and the
+		   field supplied in the "nameField" property.
+
+		For "object" data types, the "format" property should be used 
+		to specify howto format output. Its value should be a list of
+		subfield names and separators which will be assembled into a
+		literal string.
+		*/
+		nameField: "id",
 		includeFields: [
 		    { "field": "cell",
 		      "type": "string"
@@ -192,8 +196,7 @@ class App extends Component {
 		     "type": "object",
 		     "format": ['chrom', ':', 'start', '-', 'end']
 		    }
-		],	    
-		nameField: "id"  // Field used as BED name (column 4)
+		],
 	    }
 	};
     }
@@ -217,9 +220,11 @@ class App extends Component {
 		  )
             .then(res => {
 		const data = JSON.parse(res.data.data);
+		const fields = this.getFieldsFromData(data);
 		this.setState({
 		    data: data,
-		})	
+		    moduleFields: fields
+		});
 	    })
 	    .then(res => {
                 this.loadIndex(this.state.data)
@@ -232,7 +237,9 @@ class App extends Component {
                   )
             .then(res => {
 		const nodeData = JSON.parse(res.data.data);
-                this.setState({ nodeData: nodeData });
+		const fields = this.getFieldsFromData(nodeData);
+                this.setState({ nodeData: nodeData,
+				nodeFields: fields });
 		this.transformNodeData(nodeData);
             });
 	axios.post(server.apiAddr + '/indexData',
@@ -279,7 +286,17 @@ class App extends Component {
             fileName: server.dataPath + "/indexData.json",
             index: indexData
         });
-        this.setState({ index: indexData });                                                                                         
+        this.setState({ index: indexData });                   
+    }
+
+    // Get fields from the first module record.
+    getFieldsFromData = (data) => {
+	const dat = data[Object.keys(data)[0]];
+	const fields = [];
+	Object.keys(dat).forEach( (key) => {
+	    fields.push(key);
+	});
+	return fields;
     }
 
     // Initial processing of node data to display on the map.
@@ -301,11 +318,12 @@ class App extends Component {
 	    return true;
 	}
 	this.setState({
-	    displayedNodeData: updatedData
+	    displayedNodeData: updatedData,
+	    mapChangeFlag: Math.random()
 	});
     };
 
-    // Update map data as needed.
+    // Update displayed module data as needed.
     handleDataChange = (updatedData) => {
         if (updatedData === null) {
 	    this.setState({ displayedData: this.state.data });
@@ -313,22 +331,23 @@ class App extends Component {
             return true;
         }
         this.setState({
-            displayedData: updatedData
+            displayedData: updatedData,
+	    dataChangeFlag: Math.random()
         });
     };
 	    
     // Update selected node module count when map data changes
     handleMapChange = selectedNodeModuleCount => {
-	this.setState({ selectedNodeModuleCount: selectedNodeModuleCount }, function() {
-	    this.forceUpdate(); // Because state isn't set before the rerender!
-	});
+	this.setState({ selectedNodeModuleCount: selectedNodeModuleCount },
+		      () => {
+			  this.forceUpdate();
+		      });
     }
 
     // Handle node clicks on the map.
     handleNodeClick = (selectedNode, moduleCount) => {
 	this.setState({ selectedNode: selectedNode,
-			selectedNodeModuleCount: moduleCount }, () => {
-			});
+			selectedNodeModuleCount: moduleCount });
     }
 
     // Keep track of elasticsearch promise fulfillments.
@@ -343,7 +362,6 @@ class App extends Component {
 
     // Handle settings icon clicks.
     handleSettingsClick = () => {
-	console.log("Settings click!");
 	this.setState({ settingsOpen: !this.state.settingsOpen });
     }
 
@@ -409,7 +427,37 @@ class App extends Component {
 
     // Handle state change requests from the settings dialog.
     updateStateSettings = (name, value) => {
-	this.setState({ [name]: value });
+	if (name === "dimRows") {
+	    let mapConfig = this.state.mapConfig;
+	    mapConfig.dim[1] = value;
+	    this.setState({ mapConfig: mapConfig,
+                            mapChangeFlag: Math.random() },
+			  this.forceUpdate());
+	} else if (name === "dimCols") {
+	    let	mapConfig = this.state.mapConfig;
+            mapConfig.dim[0] = value;
+	    this.setState({ mapConfig: mapConfig,
+                            mapChangeFlag: Math.random() },
+			  this.forceUpdate());
+	} else if (name === "toolTips") {
+	    let mapConfig = this.state.mapConfig;
+	    mapConfig.toolTips = value;
+	    this.setState({ mapConfig: mapConfig,
+			    mapChangeFlag: Math.random() },
+                          () => {
+			      this.forceUpdate();
+			  });
+	} else if (name === "moduleTables") {
+            let dataPanelConfig = this.state.dataPanelConfig;
+            dataPanelConfig.dataFields = value;
+            this.setState({ dataPanelConfig: dataPanelConfig,
+                            dataChangeFlag: Math.random() },
+                          () => {
+                              this.forceUpdate();
+                         });
+	} else {
+	    this.setState({ [name]: value });
+	}
     }
 
     // Render the UI.
@@ -437,6 +485,7 @@ class App extends Component {
                  onNodeClick={this.handleNodeClick}
                  onMapChange={this.handleMapChange}
 		 onDataDownload={this.handleDataDownload}
+		 changeFlag={this.state.mapChangeFlag}
                  /> :
                  (<span>Loading Data...</span>)}
 	    content={Object.keys(this.state.displayedData).length ?
@@ -449,6 +498,8 @@ class App extends Component {
                      index={this.state.index}
                      config={this.state.dataPanelConfig}
 		     dataIsLoaded={this.state.dataIsLoaded}
+		     dataChangeFlag={this.state.dataChangeFlag}
+		     mapChangeFlag={this.state.mapChangeFlag}
                      /> :
                      (<div id="dataPanel"><p>Click on a map node for more information.</p></div>)
                      : (<span></span>)
@@ -457,7 +508,7 @@ class App extends Component {
 		/>
 		<SettingsDialog
 	    onSettingsClick={this.handleSettingsClick}
-            open={this.state.settingsOpen}
+	    open={this.state.settingsOpen}
 	    parentState={this.state}
 	    updateParentState={this.updateStateSettings}
 		/>

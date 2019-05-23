@@ -56,10 +56,10 @@ function clearMap(svg) {
     d3.selectAll("#dataMap > *").remove();
 }
 
-function buildToolTip(tipFields, nodeData) {
+function buildToolTip(toolTips, nodeData) {
     /* Add a tooltip to the current pod */
     let components = [];
-    tipFields.forEach( (tipField) => {
+    toolTips.forEach( (tipField) => {
 	let valStr = "";
 	let field = tipField.field;
 	let label = field;
@@ -81,7 +81,6 @@ function buildToolTip(tipFields, nodeData) {
 		}
 		valStr = vals.join(tipField.fs);
 	    }
-	    
 	} else if (tipField.type === "count") {
 	    // Report the number of values in the given field.
 	    
@@ -146,12 +145,10 @@ class SvgModuleMap extends Component {
     }
     
     shouldComponentUpdate(nextProps, nextState) {
-	// Not the best way to tell if data changed! Really should be looking inside
-	// the object...	
-	if (Object.keys(this.props.data).length === Object.keys(nextProps.data).length &&
-	    this.state.displayType === nextState.displayType &&
+	if (this.state.displayType === nextState.displayType &&
 	    this.state.logTransform === nextState.logTransform &&
-	    this.state.dataMapDrawn === true) {
+	    this.state.dataMapDrawn === true &&
+	    this.props.changeFlag === nextProps.changeFlag) {
 	    return false;
 	} else {
 	    return true;
@@ -161,17 +158,13 @@ class SvgModuleMap extends Component {
     handleDisplayTypeChange = (displayType) => {
         this.setState({
             displayType: displayType
-        }, () => {
-	    //console.log(this.state.displayType);
-	});
+        });
     }
 
     handleLogSelect = (checked) => {
         this.setState({
             logTransform: checked
-        }, () => {
-	    //console.log(this.state.logTransform);
-	});
+        });
     }
 
     updateParentState = () => {
@@ -275,7 +268,7 @@ class SvgModuleMap extends Component {
 		    // This node is represented in the overall dataset, but not the
 		    // currently displayed data. Add a tooltip.
 		    let thisPod = d3.select("[name=pod-" + pod + "]");
-		    let thisTip = buildToolTip(this.props.config.tipFields, nodeData[pod]);
+		    let thisTip = buildToolTip(this.props.config.toolTips, nodeData[pod]);
 		    thisPod.attr("stroke", "#000000")
 			.attr("class", "activePod")
 			.datum({

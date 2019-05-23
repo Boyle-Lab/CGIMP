@@ -4,7 +4,7 @@ import EnhancedTable from './EnhancedTable';
 import { average, sum } from './HelperFunctions';
 
 /* TODO:
-   1) Switch single-row tables to SimpleTable (need to add title support to SimpleTable)
+   1) Switch single-row tables to SimpleTable (need title support in SimpleTable)
    2) Add ability to append additional columns for single-value fields to data tables.
    3) Add support for groupBy fields.
 */
@@ -14,7 +14,8 @@ class ModuleData extends Component {
     constructor(props) {
         super(props);
         this.state = {
-	    dataSlice: {}
+	    dataSlice: {},
+	    changeFlag: Math.random()
         }
     }
 
@@ -23,16 +24,15 @@ class ModuleData extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length) {
+        if (this.props.changeFlag !== prevProps.changeFlag) {
         }
 	if (this.props.selectedNode !== prevProps.selectedNode ||
-	    Object.keys(this.props.displayedData).length !== Object.keys(prevProps.displayedData).length) {
+	    this.props.changeFlag !== prevProps.changeFlag) {
 	    this.getDataSlice(this.props.index, this.props.displayedData);
         }
     }
 
     getDataSlice = (index, data) => {
-	//console.log(Object.keys(data).length);
 	const dataSlice = {};
 	index.search("node:" + this.props.selectedNode)
 	    .forEach( ({ ref, score, res }) => {
@@ -40,8 +40,8 @@ class ModuleData extends Component {
 		    dataSlice[ref] = data[ref];
 		}
 	    });
-	//console.log(Object.keys(dataSlice).length);
-	this.setState({ dataSlice: dataSlice }, function() {
+	this.setState({ dataSlice: dataSlice,
+			changeFlag: Math.random() }, () => {
 	    this.forceUpdate();
 	});
     }
@@ -50,7 +50,7 @@ class ModuleData extends Component {
 	return (
 	    <div>
 		{this.props.fields.map((field, index) => {
-		    return <ModuleDataTable key={index.toString()} data={this.state.dataSlice} config={field} />;
+		    return <ModuleDataTable key={index.toString()} data={this.state.dataSlice} config={field} changeFlag={this.state.changeFlag} />;
 		})}
 	    </div>
 	)
@@ -75,8 +75,7 @@ class ModuleDataTable extends Component {
     }
 
     componentDidUpdate(prevProps) {
-	// Need to compare full objects!
-	if (Object.keys(this.props.data).length !== Object.keys(prevProps.data).length ||
+	if (this.props.changeFlag !== prevProps.changeFlag ||
 	    this.props.config !== prevProps.config) {
 	    if (Object.keys(this.props.data).length) {
 		this.builder();
@@ -99,7 +98,7 @@ class ModuleDataTable extends Component {
 	}
 	let names = [];
         let values = [];
-	let label = this.props.config.title ?
+	let label = this.props.config.title && this.props.title !== "" ?
             this.props.config.title :
             this.props.config.field
 
