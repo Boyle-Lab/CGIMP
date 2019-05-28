@@ -25,19 +25,14 @@ RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/dow
     && rm /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu
 
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
 # We need to install conda and pybedtools packages to enable on-the-fly intersections.
 RUN apt-get update && apt-get -y --no-install-recommends install bedtools python-setuptools python-dev build-essential
 RUN easy_install pip
 RUN pip install --upgrade virtualenv
 RUN pip install pybedtools
-
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-
-# Intall emacs to enable in-place file editing
-RUN apt-get -y --no-install-recommends install emacs
 
 # Install and configure elasticsearch and dependencies
 RUN apt-get -y --no-install-recommends  install openjdk-8-jre
@@ -46,8 +41,3 @@ RUN apt-get install -y --no-install-recommends apt-transport-https
 RUN echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
 RUN sudo apt-get update && apt-get -y --no-install-recommends install elasticsearch
 RUN sudo update-rc.d elasticsearch defaults 95 10
-
-# Install packages and dependencies for the web app
-#RUN npm i -g create-react-app
-#RUN npm i -S axios mongoose express body-parser morgan concurrently
-#RUN npm install --save express-fileupload
