@@ -18,7 +18,7 @@ A unix-like system with the following prerequisites:
 $ cd CGIMP
 ```
 
-* Pre-process your node and module data	into JSON format. Example files	are located in CGIMP/data. To minimize configuration within the browser, you can replace the data in these files with your own while retaining the names. Example python scripts for data processing are also provided.
+* Pre-process your node and module data	into JSON format. Example files	are located in CGIMP/data (these need to be gunziped prior to use!). To minimize configuration within the browser, you can replace the data in these files with your own while retaining the names. Example python scripts for data processing are also provided.
 
 * Build the Docker container:
 ```
@@ -39,7 +39,7 @@ user@be51d9bd99b2:/$ cd client
 user@be51d9bd99b2:/$ npm start
 ```
 
-* Open a web browser and go to http://localhost:3000/
+* Open a web browser and go to http://localhost:3000/. Note that the browser will take more time to load the first time it is accessed because the data must be indexed for the search engine. Subsequent loads will be faster! 
 
 
 ## Motivation
