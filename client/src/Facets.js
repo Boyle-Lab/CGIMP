@@ -101,7 +101,7 @@ class FacetedSearch extends Component {
 	if (next && !next.query.match_all) {
 	    this.props.onNewSearchAction("loading");
 	    //console.log("Fetching all results for query:", next);
-	    next.size = 100000;
+	    //next.size = 100000;
 	    // initial url to obtain scroll id is different
 	    const initialResults = await this.fetchResults(next, initScrollUrl);
 	    // keep scrolling till hits are present
