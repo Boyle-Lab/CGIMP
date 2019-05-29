@@ -43,3 +43,4 @@ RUN apt-get install -y --no-install-recommends apt-transport-https
 RUN echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
 RUN sudo apt-get update && apt-get -y --no-install-recommends install elasticsearch
 RUN sudo update-rc.d elasticsearch defaults 95 10
+COPY elasticsearch.yml /etc/elasticsearch
