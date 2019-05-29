@@ -6,8 +6,8 @@ Full documentation can be found at ...
 
 ## System Requirements
 A unix-like system with the following prerequisites:
-- A functioning Docker instance
-- 
+* A functioning Docker instance
+* A running web server (we recommend nginx)
 
 ## Getting Started
 
@@ -27,8 +27,7 @@ $ docker build -t cgimp .
 
 * Run the Docker container with a mount to the working directory and appropriate port mappings:
 ```
-$ docker run -it --name cgimp -v $(pwd):/home/node/$(basename $(pwd)) -p 3\
-000:3000 -p 3001:3001 -p 9200:9200 -e LOCAL_USER_ID=`id -u $USER` -e LOCAL_GROUP_ID=`id -g $USER` -e LOCAL_USER_NAME=`id -un` -e LOCAL_GROUP_NAME=`id -gn` cgimp bash
+$ docker run -it --name cgimp -v $(pwd):/home/node/$(basename $(pwd)) -p 3000:3000 -p 3001:3001 -p 9200:9200 -e LOCAL_USER_ID=`id -u $USER` -e LOCAL_GROUP_ID=`id -g $USER` -e LOCAL_USER_NAME=`id -un` -e LOCAL_GROUP_NAME=`id -gn` cgimp bash
 ```
 
 * Log in to the docker container and fire up the browser
