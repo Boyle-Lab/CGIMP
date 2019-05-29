@@ -1,6 +1,8 @@
-# Sets up a full-stack MERN web app from the ground up. Include networking and connection to the current working directory by invoking with the following command:
-# docker run -it -v $(pwd):/host/$(basename $(pwd)) adadiehl/MERN_stack
-# The mongoDB component is cloud-based in this stack. See https://mlab.com/
+# Docker container to host CGIMP: Clustered Genomic Interval Mapping Platform
+# To build:
+# docker build -t cgimp .
+# To Run:
+# docker run -it --name somBrowser -v $(pwd):/home/node/$(basename $(pwd)) -p 3000:3000 -p 3001:3001 -p 9200:9200 -e LOCAL_USER_ID=`id -u $USER` -e LOCAL_GROUP_ID=`id -g $USER` -e LOCAL_USER_NAME=`id -un` -e LOCAL_GROUP_NAME=`id -gn` cgimp bash
 
 FROM node:11.12.0-stretch
 MAINTAINER Adam Diehl <adadiehl@umich.edu>
