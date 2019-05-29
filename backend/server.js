@@ -164,10 +164,11 @@ router.post("/indexData", (req, res) => {
 		"includeTypeName": true,
 		"type": typeName,
 		"body": JSON.parse(reqBody)
+	    }, (err) => {
+		if (err) {
+		    console.log(err);
+		}
 	    });
-	    client.indices.putSettings({
-                "index": indexName
-            });
 	});
     }
 
