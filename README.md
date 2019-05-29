@@ -13,7 +13,10 @@ A unix-like system with the following prerequisites:
 
 * Clone the repository
 
-* Pre-process your node and module data	into JSON format. Example files	are located in the data folder. To minimize configuration within the browser, you can replace the data in these files with your own while retaining the names.
+* Switch to the CGIMP directory
+>$ cd CGIMP
+
+* Pre-process your node and module data	into JSON format. Example files	are located in CGIMP/data. To minimize configuration within the browser, you can replace the data in these files with your own while retaining the names. Example python scripts for data processing are also provided.
 
 * Build the Docker container:
 >$ docker build -t cgimp .
