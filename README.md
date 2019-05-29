@@ -16,16 +16,16 @@ A unix-like system with the following prerequisites:
 * Pre-process your node and module data	into JSON format. Example files	are located in the data folder. To minimize configuration within the browser, you can replace the data in these files with your own while retaining the names.
 
 * Build the Docker container:
-`$ docker build -t cgimp .`
+>$ docker build -t cgimp .
 
 * Run the Docker container with a mount to the working directory and appropriate port mappings:
-`$ docker run -it --name cgimp -v $(pwd):/home/node/$(basename $(pwd)) -p 3\
-000:3000 -p 3001:3001 -p 9200:9200 -e LOCAL_USER_ID=`id -u $USER` -e LOCAL_GROUP_ID=`id -g $USER` -e LOCAL_USER_NAME=`id -un` -e LOCAL_GROUP_NAME=`id -gn` cgimp bash`
+>$ docker run -it --name cgimp -v $(pwd):/home/node/$(basename $(pwd)) -p 3\
+000:3000 -p 3001:3001 -p 9200:9200 -e LOCAL_USER_ID=`id -u $USER` -e LOCAL_GROUP_ID=`id -g $USER` -e LOCAL_USER_NAME=`id -un` -e LOCAL_GROUP_NAME=`id -gn` cgimp bash
 
 * Log in to the docker container and fire up the browser
-`$ docker exec -it cgimp gosu <your username> bash
-user@be51d9bd99b2:/$ cd home/node/
-user@be51d9bd99b2:/$ npm start`
+>$ docker exec -it cgimp gosu <your username> bash
+>user@be51d9bd99b2:/$ cd home/node/
+>user@be51d9bd99b2:/$ npm start
 
 * Open a web browser and go to http://localhost:3000/
 
