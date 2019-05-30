@@ -202,6 +202,7 @@ router.post("/indexData", (req, res) => {
 		    "body": {
 			"settings" : {
 			    "number_of_shards" : 3,  // This is arbitrary. No replica shards because data are easily reproduced.
+			    "max_result_window": 100000
 			}
 		    }
 		}, (err, response) => {
