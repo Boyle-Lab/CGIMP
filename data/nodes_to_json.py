@@ -60,7 +60,7 @@ if __name__ == "__main__":
         for rec in f:
             if not re.search('^#', rec):
                 x = parse_rec(rec.strip())
-                res[x["_id"]] = x
+                res[x["id"]] = x
 
     sys.stdout.write("{}\n".format(json.dumps(res)))
     
