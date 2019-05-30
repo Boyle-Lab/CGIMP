@@ -38,7 +38,7 @@ $ docker build -t cgimp .
 5. Run the Docker container with a mount to the working directory and appropriate port mappings. Ports are specified with '-p XXXX:YYYY', where XXXX is the host machine port and YYYY is the port on the docker container.
 ```
 $ docker run -it --name cgimp -v $(pwd):/home/node/$(basename $(pwd)) -p 3000:3000 -p 3001:3001 -p 9200:9200 -e LOCAL_USER_ID=`id -u $USER` -e LOCAL_GROUP_ID=`id -g $USER` -e LOCAL_USER_NAME=`id -un` -e LOCAL_GROUP_NAME=`id -gn` cgimp bash
-user@be51d9bd99b2:/$ exit
+root@be51d9bd99b2:/$ exit
 ```
 
 6. Log in to the docker container with your own user account to install node.js dependencies.
@@ -54,13 +54,13 @@ user@be51d9bd99b2:/$ exit
 ```
 
 $ docker exec -it cgimp bash
-user@be51d9bd99b2:/$ cd home/node/CGIMP
-user@be51d9bd99b2:/$ npm start
+root@be51d9bd99b2:/$ cd home/node/CGIMP
+root@be51d9bd99b2:/$ npm start
 ```
 
 8. Open a web browser and go to the address:port you configured in step 4. Note that the browser will take more time to load the first time it is accessed because the data must be indexed for the search engine. Subsequent loads will be faster.
 
-Note: If you run into browser errors (timeouts, etc.), waiting a few minutes and reloading the page usually fixes things. If errors persist, try restarting the server (step 7).
+Note: If you run into browser errors (timeouts, etc.), or if search facets fail to appear, waiting a few minutes and reloading the page usually fixes things. If errors persist, try restarting the server (step 7).
 
 
 ## Motivation
