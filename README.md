@@ -11,26 +11,28 @@ A unix-like system with the following prerequisites:
 
 ## Getting Started
 
-* Clone the repository
+1. Clone the repository
 
-* Switch to the CGIMP directory
+2. Switch to the CGIMP directory
 ```
 $ cd CGIMP
 ```
 
-* Pre-process your node and module data	into JSON format. Example files	are located in CGIMP/data (these need to be gunziped prior to use!). To minimize configuration within the browser, you can replace the data in these files with your own while retaining the names. Example python scripts for data processing are also provided.
+3. Pre-process your node and module data	into JSON format. Example files	are located in CGIMP/data (these need to be gunziped prior to use!). To minimize configuration within the browser, you can replace the data in these files with your own while retaining the names. Example python scripts for data processing are also provided.
 
-* Build the Docker container:
+4. Edit the addresses and port mappings in client/src/server_config.js to match your local network configuration. If you are only using the browser locally, you can leave these set to 'localhost'. Make sure port mappings match the outward-facing ports as they are set up in step 6.
+
+5. Build the Docker container:
 ```
 $ docker build -t cgimp .
 ```
 
-* Run the Docker container with a mount to the working directory and appropriate port mappings:
+6. Run the Docker container with a mount to the working directory and appropriate port mappings:
 ```
 $ docker run -it --name cgimp -v $(pwd):/home/node/$(basename $(pwd)) -p 3000:3000 -p 3001:3001 -p 9200:9200 -e LOCAL_USER_ID=`id -u $USER` -e LOCAL_GROUP_ID=`id -g $USER` -e LOCAL_USER_NAME=`id -un` -e LOCAL_GROUP_NAME=`id -gn` cgimp bash
 ```
 
-* Log in to the docker container, install dependencies, and fire up the browser
+7. Log in to the docker container, install dependencies, and fire up the browser
 ```
 $ docker exec -it cgimp gosu <your username> bash
 user@be51d9bd99b2:/$ cd home/node/CGIMP
@@ -39,7 +41,7 @@ user@be51d9bd99b2:/$ cd client
 user@be51d9bd99b2:/$ npm start
 ```
 
-* Open a web browser and go to http://localhost:3000/. Note that the browser will take more time to load the first time it is accessed because the data must be indexed for the search engine. Subsequent loads will be faster! 
+8. Open a web browser and go to http://localhost:3000/ (or whatever address:port you configured in step 4). Note that the browser will take more time to load the first time it is accessed because the data must be indexed for the search engine. Subsequent loads will be faster! 
 
 
 ## Motivation
