@@ -16,8 +16,8 @@ class App extends Component {
 	super(props);
 	this.state = {
 	    mainTitle: "Human-Mouse Self-Organizing Map Data",
-	    dataFile: 'dataMap.json',
-	    nodeDataFile: 'nodes.json',
+	    dataFile: server.moduleDataFile,
+	    nodeDataFile: server.nodeDataFile,
  	    data: [],            // Immutable copy of locus-level data.
 	    nodeData: [],        // Descriptive data for active map nodes.
 	    index: {},           // Lunr search index for client-side search.
