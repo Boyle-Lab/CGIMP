@@ -17,8 +17,8 @@ A unix-like system with the following prerequisites:
 ```
 $ cd CGIMP/data
 $ gunzip module_classifications.tsv.gz all_modules.tsv.gz
-$ nodes_to_json.py all_modules.tsv > dataMap.json
-$ modules_to_nodes.py module_classifications.json > nodes.json
+$ python nodes_to_json.py all_modules.tsv > dataMap.json
+$ python modules_to_nodes.py module_classifications.tsv > nodes.json
 $ cd ..
 ```
 
