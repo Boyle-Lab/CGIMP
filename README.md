@@ -50,7 +50,7 @@ user@be51d9bd99b2:/$ ./configure.sh
 user@be51d9bd99b2:/$ exit
 ```
 
-7. Log in ot the docker container as root and fire up the browser.
+7. Log in ot the docker container as root and fire up the server.
 ```
 
 $ docker exec -it cgimp bash
@@ -58,7 +58,9 @@ user@be51d9bd99b2:/$ cd home/node/CGIMP
 user@be51d9bd99b2:/$ npm start
 ```
 
-8. Open a web browser and go to the address:port you configured in step 4. Note that the browser will take more time to load the first time it is accessed because the data must be indexed for the search engine. Subsequent loads will be faster. If you run into browser errors (timeouts, etc.), waiting a few minutes and reloading the page usually fixes things!
+8. Open a web browser and go to the address:port you configured in step 4. Note that the browser will take more time to load the first time it is accessed because the data must be indexed for the search engine. Subsequent loads will be faster.
+
+Note: If you run into browser errors (timeouts, etc.), waiting a few minutes and reloading the page usually fixes things. If errors persist, try restarting the server (step 7).
 
 
 ## Motivation
