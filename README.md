@@ -2,7 +2,7 @@
 ## Clustered Genomic Interval Mapping Platform
 
 ## Note:
-Full documentation can be found [here](https://cgimp.readthedocs.io/en/latest/installation.html), or by navigating to https://cgimp.readthedocs.io/en/latest/installation.html. Documentation is made avaiable through [Read the Docs](https://docs.readthedocs.io).
+Full documentation can be found [here](https://cgimp.readthedocs.io), or by navigating to https://cgimp.readthedocs.io. Documentation is made avaiable through [Read the Docs](https://docs.readthedocs.io).
 
 ## System Requirements
 A unix-like system with the following prerequisites:
