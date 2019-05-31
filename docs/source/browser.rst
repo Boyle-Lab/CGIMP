@@ -27,7 +27,7 @@ The browser has five main components:
 
 3. Data Filters
 
-   Data Filters allow exploration of the dataset by successively applying/removing filters against specific data fields. The filters are data-driven, meaning that a filter will be available for every non-nested field found in the primary module documents. By default, selections are combined with 'AND', such that multiple selections succesively narrow the search results. Filters for numeric fields currently default to a range-slider format. Future versions will make configuration of individual filters possible for greater search flexibility.
+   Data Filters allow exploration of the dataset by successively applying/removing filters against specific data fields. The filters are data-driven, meaning that a filter will be available for every non-nested field found in the primary module documents. By default, selections are combined with 'AND', such that multiple selections succesively narrow the search results. Filters for numeric fields currently default to a range-slider format. Future versions will make configuration of individual filters possible for greater search flexibility. The data filters component can be collapsed by clicking the chevron icon if desired.
 
 4. Data Tables
 
