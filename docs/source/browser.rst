@@ -1,8 +1,6 @@
 Using the Browser
 =================
 
-Navigating the Browser
-^^^^^^^^^^^^^^^^^^^^^^
 The browser has five main components:
 
     1. Title bar
