@@ -1,2 +1,0 @@
-Intersecting with External Data
-===============================
