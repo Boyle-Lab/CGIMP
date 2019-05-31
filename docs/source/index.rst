@@ -11,13 +11,13 @@ This documentation is a work in progress, but should be sufficient to get you st
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-    installation
-    quickstart
-    filtering
-    intersecting
-    saving
-    settings
-    multiInstances
+       installation
+       quickstart
+       filtering
+       intersecting
+       saving
+       settings
+       multiInstances
    
 
 Indices and tables
