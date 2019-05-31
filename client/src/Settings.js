@@ -52,6 +52,7 @@ class SettingsDialog extends React.Component {
     constructor(props) {
 	super(props);
 	this.state = {
+	    dataPath: this.props.parentState.dataPath,
 	    dataFile: this.props.parentState.dataFile,
 	    nodeDataFile: this.props.parentState.nodeDataFile,
 	    mainTitle: this.props.parentState.mainTitle,
@@ -198,7 +199,18 @@ class SettingsDialog extends React.Component {
                 Source Data
             </Typography>		
 		</ListItem>
-		
+
+	    <ListItem key={Math.random().toString()}>
+                <TextField
+            value={this.state.dataPath}
+            onChange={this.handleChange('dataPath')}
+            margin="dense"
+            id="dataPath"
+            label="Data Path"
+            fullWidth
+		/>
+                </ListItem>
+	    
                 <ListItem key={Math.random().toString()}>
 		<TextField
 	    value={this.state.dataFile}

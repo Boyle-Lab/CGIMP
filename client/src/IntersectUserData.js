@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import server from './server_config';
+import browser from './browser_config';
 import axios from "axios";
 import FileUploader from './FileUploader';
 
@@ -20,7 +20,7 @@ class IntersectUserData extends Component {
 	// However, this currently isn't working because unmount events don't appear to be triggered.
         /*this.state.files.forEach(function (file) {
             console.log(file);
-            axios.delete(server.apiAddr + '/delete',
+            axios.delete(browser.apiAddr + '/delete',
                          {params: { serverId: file.serverId }}
                         );
         });*/
@@ -58,7 +58,7 @@ class IntersectUserData extends Component {
 	// Since there should only be one file in the filepond,
 	// we will assume files[0] is the desired user file.
 	//console.log(this.state.files[0].filename);
-	axios.post(server.apiAddr + "/intersectData",
+	axios.post(browser.apiAddr + "/intersectData",
                    { serverId: this.state.files[0].serverId,
 		     filename: this.state.files[0].filename,
                      data: JSON.stringify(this.props.data),

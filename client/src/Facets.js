@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import server from './server_config';
+import browser from './browser_config';
 import { ReactiveBase, MultiList, SelectedFilters, DynamicRangeSlider, ReactiveList } from '@appbaseio/reactivesearch';
 //import DataSearch from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 
-const initScrollUrl = server.elasticAddr + '/browser/modules/_search?scroll=1m';
-const url = server.elasticAddr + '/browser/modules/_search';
-const scrollUrl = server.elasticAddr + '/_search/scroll';
+const initScrollUrl = browser.elasticAddr + '/browser/modules/_search?scroll=1m';
+const url = browser.elasticAddr + '/browser/modules/_search';
+const scrollUrl = browser.elasticAddr + '/_search/scroll';
 
 class FacetedSearch extends Component {
     constructor(props) {
@@ -27,7 +27,7 @@ class FacetedSearch extends Component {
 
     getFacetsFromElasticsearch = () => {
 	const client = new Client({
-            host: server.elasticAddr
+            host: browser.elasticAddr
         })
         const facets = [];
 	client.get({index: "browser",
@@ -154,7 +154,7 @@ class FacetedSearch extends Component {
                     </div>
 		    <ReactiveBase
 		app="browser"
-		url={server.elasticAddr}
+		url={browser.elasticAddr}
 		type="modules"
 		    >
 		    

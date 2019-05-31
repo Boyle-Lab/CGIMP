@@ -1,6 +1,6 @@
 // /client/App.js
 import React, { Component } from "react";
-import server from './server_config';
+import browser from './browser_config';
 import axios from "axios";
 import lunr from "lunr";
 
@@ -16,8 +16,9 @@ class App extends Component {
 	super(props);
 	this.state = {
 	    mainTitle: "Human-Mouse Self-Organizing Map Data",
-	    dataFile: server.moduleDataFile,
-	    nodeDataFile: server.nodeDataFile,
+	    dataPath: browser.dataPath,
+	    dataFile: browser.moduleDataFile,
+	    nodeDataFile: browser.nodeDataFile,
  	    data: [],            // Immutable copy of locus-level data.
 	    nodeData: [],        // Descriptive data for active map nodes.
 	    index: {},           // Lunr search index for client-side search.
@@ -34,7 +35,7 @@ class App extends Component {
 	    mapChangeFlag: 0,     // Direct observable to flag map changes.
 	    dataChangeFlag: 0,    // Direct observable to flag data changes.
 	    mapConfig: {
-		dim: [47, 34],       // Map dimensions: [nCols, nRows]
+		dim: browser.mapDim,       // Map dimensions: [nCols, nRows]
 		toolTips: [
 		    /* Data fields used in SVG tooltips: an array of objects
 		       containing key:value pairs specifying source data and
@@ -113,20 +114,14 @@ class App extends Component {
 		    {
                         "field": "cell",
                         "type": "string",
-                        "aggregate": false,
-                        "title": "Cells"
-                    },
-		    {
-                        "field": "cell",
-			"type": "string",
                         "aggregate": "count",
                         "title": "Cells (count)"
                     },
 		    {
                         "field": "cell",
-                        "type": "string",
-                        "aggregate": "density",
-                        "title": "Cells"
+			"type": "string",
+                        "aggregate": false,
+                        "title": "Cell"
                     },
 		    {
                         "field": "factors",
@@ -134,12 +129,6 @@ class App extends Component {
                         "aggregate": "concat",
                         "title": "Factors",
 			"fs" : ","
-                    },
-		    {
-                        "field": "factors",
-                        "type": "array",
-                        "aggregate": "count",
-                        "title": "Factors (count)",
                     },
 		    {
                         "field": "factors",
@@ -213,8 +202,8 @@ class App extends Component {
     // Initialize data stores to be represented on map and
     // to enable search functionality.
     initDataStores = () => {
-	axios.post(server.apiAddr + "/getFile",
-		   { fileName: server.dataPath + '/' + this.state.dataFile,
+	axios.post(browser.apiAddr + "/getFile",
+		   { fileName: this.state.dataPath + '/' + this.state.dataFile,
 		     contentType: "application/json",
 		     encodingType: "utf8" }
 		  )
@@ -230,8 +219,8 @@ class App extends Component {
                 this.loadIndex(this.state.data)
 	    })
 	    .then(res => { this.setState({ displayedData: this.state.data }) });
-	axios.post(server.apiAddr + "/getFile",
-                   { fileName: server.dataPath + '/' + this.state.nodeDataFile,
+	axios.post(browser.apiAddr + "/getFile",
+                   { fileName: this.state.dataPath + '/' + this.state.nodeDataFile,
                      contentType: "application/json",
                      encodingType: "utf8" }
                   )
@@ -242,8 +231,8 @@ class App extends Component {
 				nodeFields: fields });
 		this.transformNodeData(nodeData);
             });
-	axios.post(server.apiAddr + '/indexData',
-		   { fileName: server.dataPath + '/' + this.state.dataFile,
+	axios.post(browser.apiAddr + '/indexData',
+		   { fileName: this.state.dataPath + '/' + this.state.dataFile,
 		     indexName: "browser",
 		     typeName: "modules",
                      contentType: "application/json",
@@ -254,8 +243,8 @@ class App extends Component {
     // Load a precomputed lunr search engine from a file.
     // If this fails, build it from scratch.
     loadIndex = () => {
-        axios.post(server.apiAddr + "/getFile",
-                   { fileName: server.dataPath + "/indexData.json",
+        axios.post(browser.apiAddr + "/getFile",
+                   { fileName: this.state.dataPath + "/indexData.json",
                      contentType: "application/json",
                      encodingType: "utf8" }
                   )
@@ -282,8 +271,8 @@ class App extends Component {
             }, this)
         });
         // Cache index to file.
-        axios.post(server.apiAddr + "/writeJson", {
-            fileName: server.dataPath + "/indexData.json",
+        axios.post(browser.apiAddr + "/writeJson", {
+            fileName: this.state.dataPath + "/indexData.json",
             index: indexData
         });
         this.setState({ index: indexData });                   
