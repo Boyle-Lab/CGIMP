@@ -5,8 +5,8 @@ System Requirements
 ^^^^^^^^^^^^^^^^^^^
 A unix-like system with the following prerequisites:
 
-   A functioning Docker instance
-   A running web server (we recommend nginx)
+   - A functioning Docker instance
+   - A running web server (we recommend nginx)
 
 Installation Process
 ^^^^^^^^^^^^^^^^^^^^
