@@ -22,10 +22,10 @@ $ python modules_to_nodes.py module_classifications.tsv > nodes.json
 $ cd ..
 ```
 
-3. Navigate to CGIMP/client/src and edit server_config.js to reflect your local network configuration and data file locations/names. Make sure port mappings match the host ports set up in step 5!
+3. Navigate to CGIMP/client/src and edit browser_config.js to reflect your local network configuration and data file locations/names, following the directions within the file on which fields to edit. Make sure port mappings match the host ports set up in step 5!
 ```
 $ cd CGIMP/client/src
-$ vim server_config.js
+$ vim browser_config.js
 # ...
 $ cd ../../
 ```
