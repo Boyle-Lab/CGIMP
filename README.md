@@ -13,7 +13,7 @@ A unix-like system with the following prerequisites:
 
 1. Clone the repository
 
-2. Pre-process your node and module data into JSON format. Example files are provided in CGIMP/data to show the proper format. Only "id" and "loc" fields are required in the JSON. Example source data (*.tsv.gz) and data processing scripts (*.py) are also provided. Feel free to replace the files in this directory with your own to simplify configuration in step 3! Example data were prepared as follows:
+2. Pre-process your node and module data into JSON format. Example files are provided in CGIMP/data to show the proper format. Only "id", "node", and "loc" fields are required, but you can include any additional fields your data require. Example source data (*.tsv.gz) and data processing scripts (*.py) are also provided. Feel free to replace the files in this directory with your own to simplify configuration in step 3! Example data were prepared as follows:
 ```
 $ cd CGIMP/data
 $ gunzip module_classifications.tsv.gz all_modules.tsv.gz
@@ -22,7 +22,7 @@ $ python modules_to_nodes.py module_classifications.tsv > nodes.json
 $ cd ..
 ```
 
-3. Navigate to CGIMP/client/src and edit browser_config.js to reflect your local network configuration and data file locations/names, following the directions within the file on which fields to edit. Make sure port mappings match the host ports set up in step 5!
+3. Navigate to CGIMP/client/src and edit browser_config.js to reflect your local network configuration, data file locations/names, and map dimensions, following the directions within the file on which fields to edit. Make sure port mappings match the host ports set up in step 5!
 ```
 $ cd CGIMP/client/src
 $ vim browser_config.js
@@ -65,7 +65,16 @@ Note: If you run into browser errors (timeouts, etc.), or if search facets fail 
 
 ## Motivation
 
-Dimensionality-reduction methods are widley used in computational genomics to break down complex datasets into more manageable subsets. An advantage of many of these methods is that their results can be represented as graphical maps where the two-dimensional distance between clusters is correlated with similarity in their underlying sets of observed variables. A common follow-up analysis is to project covariate data onto these maps to visually assess the properties of the dataset and facilitate further inference into underlying mechanisms and functions. However, while many tools are available to perform dimensionality-reduction and visualize their results, the resulting maps are static, making post-analysis a slow and cumbersome process, since new maps must be rendered for every combination of variables we want to investigate. Likewise, projecting additional annotations onto the map topology generally requires multiple steps outside the core visualization package, followed by rerendering the map image. (C)lustered (G)enomic (Interval) (M)apping (P)latform (CGIMP) is a web-based application that addresses these limitations by enabling realtime analysis of such datasets. CGIMP includes a dynamically-drawn graphical rendering of the map topology alongside a data-driven faceted search which can be used to apply successive filters and instantaneously see the effects on the map image. Map images are interactive and clicking individual map nodes provides access to the underlying genomic data, with a variety of aggregations and display options available. CGIMP also allows direct visualization of intersections with genomic covariates in BED format through a file upload section. CGIMP is fully-configurable, with all datasets, map parameters, and output sections specified through a simple settings panel. Map images can be saved as SVG images and datasets can be saved in BED and JSON format with the click of a button.
+Dimensionality-reduction methods are widely used to break down complex datasets into more manageable subunits. For example, self-organizing maps (SOMs), a type of neural network, are capable of projecting high-dimensional data onto a two-dimensional grid topography that facilitates further analysis. In particular, projecting covariates onto these mappings can yield insights into how and why modules cluster together, giving clues to their underlying properties and potential functions within the system from which they were drawn. For example, SOMs have been used in computational genomics to distill co-occurence data for large sets of DNA binding proteins into common co-binding patterns . Projecting various genomic annotations onto these mappings has yielded insights into the biological processes and mechanisms associated with different co-binding patterns.
 
+However, while multiple tools exist to produce SOMs and graphically render their results, none are designed for real-time data exploration and projection of covariate data, which generally requires additional steps outside the core software package. Furthermore, mapped outputs are static and non-interactive. Drilling down into the dataset generally requires manually obtaining slices of the data frame through a scripting language or API. Finally, making comparisons between maps is cumbersome, requiring preparation of multiple individual images through the same text-based interface.
 
-In our own research, we have investigated the cobinding patterns of 26 transcription factors (TFs) across four cell types, utilizing self-organizing maps to reduce the complexity of the dataset from >67 million posible TF combinations to 780 significant co-binding patterns. In order to facilitate inquiries into the properties and potential functions of these patterns, we used CGIMP to...
+(C)lustered (G)enomic (I)nterval (M)apping (P)latform (CGIMP) is a web application that addresses these limitations by enabling real-time analysis of self-organizing maps for genomics datasets. CGIMP takes two inputs: a JSON file describing the modules from a genomic dataset that has been classified and labeled by an SOM algorithm, and a separate JSON with descriptive data for each node in the map grid. Given these inputs, it will automatically render an interactive map image to the screen and provide a set of data-driven search facets that allow direct exploration of the intrinsic properties of the dataset. It also provides the ability to directly intersect the underlying data with covariate datasets uploaded to the server as BED files. These are intersected with the dataset through a python adapter to the popular BEDTools suite.
+
+## Citation
+
+If you use CGIMP in your work, please cite ...
+
+## Community Guidelines
+
+Bug reports and requests for improvements, optimizations, and additional features are welcomed! Please feel free to make a post to CGIMP's [Issue Tracker](https://github.com/Boyle-Lab/CGIMP/issues) on github or follow the guidelines in the [CONTRIBUTING](https://github.com/Boyle-Lab/CGIMP/CONTRIBUTING.md) document.
