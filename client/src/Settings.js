@@ -185,7 +185,7 @@ class SettingsDialog extends React.Component {
     }
 
     render() {
-	const { classes } = this.props;	
+	const { classes } = this.props;
 	return (
 		<div>
 		<Dialog
@@ -219,7 +219,7 @@ class SettingsDialog extends React.Component {
             </Typography>		
 		</ListItem>
 
-	    <ListItem key={Math.random().toString()}>
+	    <ListItem key='dataPath'>
                 <TextField
             value={this.state.dataPath}
             onChange={this.handleChange('dataPath')}
@@ -230,7 +230,7 @@ class SettingsDialog extends React.Component {
 		/>
                 </ListItem>
 	    
-                <ListItem key={Math.random().toString()}>
+                <ListItem key='dataFile'>
 		<TextField
 	    value={this.state.dataFile}
 	    onChange={this.handleChange('dataFile')}
@@ -241,7 +241,7 @@ class SettingsDialog extends React.Component {
 		/>
 		</ListItem>
 
-		<ListItem key={Math.random().toString()}>		
+		<ListItem key='nodeDataFile'>		
 		<TextField
             value={this.state.nodeDataFile}
 	    onChange={this.handleChange('nodeDataFile')}
@@ -252,7 +252,7 @@ class SettingsDialog extends React.Component {
 		/>
 		</ListItem >
 		
-                <ListItem key={Math.random().toString()}>
+                <ListItem key='mainTitle'>
 		<TextField
             value={this.state.mainTitle}
 	    onChange={this.handleChange('mainTitle')}
@@ -270,7 +270,7 @@ class SettingsDialog extends React.Component {
             </Typography>
 		</ListItem>
 		
-		<ListItem key={Math.random().toString()}>
+		<ListItem key='dimRows'>
 		<TextField
             value={this.state.mapConfig.dim[1]}
             onChange={this.handleChange('dimRows')}
@@ -281,7 +281,7 @@ class SettingsDialog extends React.Component {
 		/>
 		</ListItem>
 		
-                <ListItem key={Math.random().toString()}>
+                <ListItem key='dimCols'>
 		<TextField
             value={this.state.mapConfig.dim[0]}
             onChange={this.handleChange('dimCols')}
@@ -304,7 +304,7 @@ class SettingsDialog extends React.Component {
 		
 	    {this.state.toolTips.map( (tipField, index) => {
 		return (
-			<ListItem key={Math.random().toString()}>
+			<ListItem key={'tip' + index.toString()}>
 			<ToolTipPane
 		    key={index.toString()}
 		    classes={classes}
@@ -322,7 +322,7 @@ class SettingsDialog extends React.Component {
 		)
 	    })}
 
-                <ListItem key={Math.random().toString()}>
+                <ListItem key={'addTip'}>
 		<IconButton className={classes.button} aria-label="Add ToolTip" color="inherit" onClick={this.addToolTip}>
 		<AddIcon/>
 		</IconButton>
@@ -351,7 +351,7 @@ class SettingsDialog extends React.Component {
 
 	    {this.state.moduleTables.map( (tipField, index) => {
                 return (
-			<ListItem key={Math.random().toString()}>
+			<ListItem key={'modTable' + index.toString()}>
 		        <ModuleDataTable
                     key={index.toString()}
                     classes={classes}
