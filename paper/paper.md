@@ -7,7 +7,7 @@ tags:
   - data visualization
   - Python
   - Javascript
-autors:
+authors:
   - name: Adam G. Diehl
      orcid: 0000-0002-0915-4570
      affiliation: 1
