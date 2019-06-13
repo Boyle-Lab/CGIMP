@@ -13,7 +13,7 @@ authors:
     affiliation: 1
   - name: Alan P. Boyle
     orcid: 0000-0002-2081-1105
-    affiliations: "1, 2" #
+    affiliation: "1, 2"
 affiliations:
   - name: Department of Computational Medicine and Bioinformatics, University of Michigan
     index: 1
