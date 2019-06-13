@@ -9,11 +9,11 @@ tags:
   - Javascript
 authors:
   - name: Adam G. Diehl
-     orcid: 0000-0002-0915-4570
-     affiliation: 1
+    orcid: 0000-0002-0915-4570
+    affiliation: 1
   - name: Alan P. Boyle
-     orcid: 0000-0002-2081-1105
-     affiliations: "1, 2"
+    orcid: 0000-0002-2081-1105
+    affiliations: "1, 2"
 affiliations:
   - name: Department of Computational Medicine and Bioinformatics, University of Michigan
     index: 1
