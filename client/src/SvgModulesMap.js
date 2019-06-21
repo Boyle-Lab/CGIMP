@@ -3,7 +3,8 @@ import React, { Component } from "react";
 import './index.css';
 import * as d3 from "d3";
 import { isDict, average, round } from './HelperFunctions';
-import { View } from "react-native";
+import { Text, View } from "react-native";
+import ColorSwatch from './ColorPicker';
 
 /*
 This code is part of the CGIMP distribution
@@ -24,7 +25,7 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
-function drawKey(svg, x, y, dataRange, title, precision) {
+function drawKey(svg, x, y, dataRange, title, precision, color) {
     /* Draw a shading key for the specified range */
     let xPos = x;
     let yPos = y - 20;
@@ -42,7 +43,7 @@ function drawKey(svg, x, y, dataRange, title, precision) {
         svg.append("rect")
             .attr("width", 20)
             .attr("height", 20)
-            .attr("fill", "#0000FF")
+            .attr("fill", color)
             .attr("fill-opacity", opacity)
             .attr("transform", "translate(" + xPos + ", " + yPos  + ")");
         yPos = (yPos - 20);
@@ -146,7 +147,8 @@ class SvgModuleMap extends Component {
 	    rowOffset: 15,
 	    displayType: "Count",
 	    logTransform: false,
-	    dataMapDrawn: false
+	    dataMapDrawn: false,
+	    fillColor: "#0000FF"
 	};
 	this.d3DrawGrid = this.d3DrawGrid.bind(this);
 	this.handleClick = this.handleClick.bind(this);
@@ -167,7 +169,8 @@ class SvgModuleMap extends Component {
 	if (this.state.displayType === nextState.displayType &&
 	    this.state.logTransform === nextState.logTransform &&
 	    this.state.dataMapDrawn === true &&
-	    this.props.changeFlag === nextProps.changeFlag) {
+	    this.props.changeFlag === nextProps.changeFlag &&
+	    this.state.fillColor === nextState.fillColor) {
 	    return false;
 	} else {
 	    return true;
@@ -191,6 +194,13 @@ class SvgModuleMap extends Component {
 	    let thisPod = d3.select("[name=pod-" + this.props.selectedNode + "]");
 	    this.props.onMapChange(thisPod.attr("moduleCount"));
 	}	
+    }
+
+    updateState = (target, value) => {
+	this.setState({ [target]: value },
+		      () => {
+			  //console.log(this.state[target]);
+		      })
     }
 
     handleClick = (data) => {
@@ -221,7 +231,7 @@ class SvgModuleMap extends Component {
 	});
 	return(ret);
     }
-
+    
     getDataRange = (moduleCounts) => {
 	// Return a range with the minimum, maximum, and sum of values in moduleCounts.
 	let dataRange = [];
@@ -277,7 +287,7 @@ class SvgModuleMap extends Component {
                     .attr("stroke", "#FFFFFF")
                     .attr("stroke-width", 0.25)
                     .attr("fill", "#000000")
-                    .attr("fill-opacity", "0.15")
+                    .attr("fill-opacity", "0.05")
                     .attr("id", pod)
                     .attr("points", "0,10 9,5 9,-5 0,-10 -9,-5, -9,5")
                     .attr("transform", "translate(" + xPos + ", " + yPos  + ")")
@@ -289,6 +299,7 @@ class SvgModuleMap extends Component {
 		    let thisPod = d3.select("[name=pod-" + pod + "]");
 		    let thisTip = buildToolTip(this.props.config.toolTips, nodeData[pod]);
 		    thisPod.attr("stroke", "#000000")
+			.attr("fill-opacity", "0.15")
 			.attr("class", "activePod")
 			.datum({
 			    'id' : thisPod.attr("id"),
@@ -304,7 +315,7 @@ class SvgModuleMap extends Component {
 		    let thisPod = d3.select("[name=pod-" + pod + "]");
 		    thisPod.attr("stroke", "#000000")
 			.attr("stroke-width", 0.5)
-			.attr("fill", "#0000FF")
+			.attr("fill", this.state.fillColor)
 			.attr("fill-opacity", opacity)
 			.attr("moduleCount", moduleCounts[pod])
 			.datum({
@@ -334,7 +345,11 @@ class SvgModuleMap extends Component {
 	}
 	drawKey(svg,
 		(podWidth * dim[0] + (podWidth * 2)),
-		(xAxisTranslate - (svgHeight / 2)), mapRange, title, precision);
+		(xAxisTranslate - (svgHeight / 2)),
+		mapRange,
+		title,
+		precision,
+		this.state.fillColor);
 	// This is a hack to make sure the download SVG button works by forcing
 	// an update once we know the ref binding is no longer null.
 	this.setState({ dataMapDrawn: true });
@@ -345,12 +360,14 @@ class SvgModuleMap extends Component {
 		<div>
 		<svg id="dataMap" ref={this.dataMap} width={this.state.svgWidth} height={this.state.svgHeight}></svg>
 		<View style={{flex: 1, flexDirection: 'row', width: "100%", padding: 0}}>
-		<View style={{ width: "50%", alignItems: "flex-start" }}>
+		<View style={{ width: "70%", alignItems: "flex-start" }}>
 		<DisplayConfig
 	    onDisplayTypeChange={this.handleDisplayTypeChange}
-	    onLogSelect={this.handleLogSelect} />
+	    onLogSelect={this.handleLogSelect}
+	    updateParentState={this.updateState}
+		/>
 		</View>
-		<View style={{ width: "50%", alignItems: "flex-end" }}>
+		<View style={{ width: "30%", alignItems: "flex-end" }}>
 		<Downloader
 	    dataMap={this.dataMap.current}
 	    onDataDownload={this.props.onDataDownload} />
@@ -415,11 +432,20 @@ class DisplayConfig extends Component {
 	    this.props.onLogSelect(this.state.logTransform);
 	});
     }
+
+    handleFillColorChange = (color) => {
+        this.setState({ fillColor: color }, () => {
+            //console.log(this.state.fillColor);
+            this.props.updateParentState("fillColor", this.state.fillColor);
+        });
+    }
     
     render() {
 	return (
 		<div>
-		<form>	
+		<View style={{flex: 1, flexDirection: 'row', width: 400, padding: 0}}>
+                <View style={{ width: "70%", alignItems: "flex-start" }}>
+		<form>
 		<label>
 		<input
 	    type="radio"
@@ -444,8 +470,14 @@ class DisplayConfig extends Component {
 	    checked={this.state.logTransform}
 	    onChange={this.handleLogTransformClick} />
 		Log2 Transform
-	    </label>
+	    </label>		
 		</form>
+		</View>
+		<View style={{ width: "30%", alignItems: "flex-start" }}>
+		<Text>Fill Color</Text>
+		<ColorSwatch handleChange={this.handleFillColorChange} />
+		</View>
+		</View>
 		</div>
 	);
     }
