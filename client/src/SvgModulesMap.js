@@ -148,7 +148,8 @@ class SvgModuleMap extends Component {
 	    displayType: "Count",
 	    logTransform: false,
 	    dataMapDrawn: false,
-	    fillColor: "#0000FF"
+	    fillColor: "#0000FF",
+	    fixedScale: false
 	};
 	this.d3DrawGrid = this.d3DrawGrid.bind(this);
 	this.handleClick = this.handleClick.bind(this);
@@ -168,6 +169,7 @@ class SvgModuleMap extends Component {
     shouldComponentUpdate(nextProps, nextState) {
 	if (this.state.displayType === nextState.displayType &&
 	    this.state.logTransform === nextState.logTransform &&
+	    this.state.fixedScale === nextState.fixedScale &&
 	    this.state.dataMapDrawn === true &&
 	    this.props.changeFlag === nextProps.changeFlag &&
 	    this.state.fillColor === nextState.fillColor) {
@@ -241,6 +243,10 @@ class SvgModuleMap extends Component {
 	if (dataRange[0] === dataRange[1]) {
 	    dataRange[0] = 0;
 	}
+	if (this.state.fixedScale &&
+	   this.state.displayType === "Density") {
+	    dataRange[1] = 1;
+	}
 	return(dataRange);
     }    
 
@@ -311,7 +317,15 @@ class SvgModuleMap extends Component {
 			.text(thisTip);		    
 		}
 		if (pod in mapData) {
-		    let opacity = (mapData[pod] - mapRange[0]) / (mapRange[1] - mapRange[0]);
+		    let opacity;
+		    if (this.state.fixedScale &&
+			this.state.displayType === "Density") {
+			opacity = mapData[pod];
+		    } else {
+			opacity = (mapData[pod] - mapRange[0]) /
+			    (mapRange[1] - mapRange[0]);
+		    }
+		    
 		    let thisPod = d3.select("[name=pod-" + pod + "]");
 		    thisPod.attr("stroke", "#000000")
 			.attr("stroke-width", 0.5)
@@ -414,7 +428,8 @@ class DisplayConfig extends Component {
 	super(props);
 	this.state = {
 	    selectedOption: 'Count',
-	    logTransform: false
+	    logTransform: false,
+	    fixedScale: false
 	}
     }
 
@@ -431,6 +446,12 @@ class DisplayConfig extends Component {
 	    //console.log(this.state.logTransform);
 	    this.props.onLogSelect(this.state.logTransform);
 	});
+    }
+
+    handleFixScaleClick = (event) => {
+	this.setState({ fixedScale: !this.state.fixedScale }, () => {
+            this.props.updateParentState("fixedScale", this.state.fixedScale);
+        });
     }
 
     handleFillColorChange = (color) => {
@@ -470,7 +491,14 @@ class DisplayConfig extends Component {
 	    checked={this.state.logTransform}
 	    onChange={this.handleLogTransformClick} />
 		Log2 Transform
-	    </label>		
+	    </label>
+		<label>
+                <input
+            type="checkbox"
+            checked={this.state.fixedScale}
+            onChange={this.handleFixScaleClick} />
+                Fix Scale
+            </label>
 		</form>
 		</View>
 		<View style={{ width: "30%", alignItems: "flex-start" }}>
