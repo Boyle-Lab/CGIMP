@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import browser from './browser_config';
-import { ReactiveBase, MultiList, SelectedFilters, DynamicRangeSlider, ReactiveList } from '@appbaseio/reactivesearch';
+import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 
 /*
@@ -25,6 +25,9 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 const initScrollUrl = browser.elasticAddr + '/browser/modules/_search?scroll=1m';
 const url = browser.elasticAddr + '/browser/modules/_search';
 const scrollUrl = browser.elasticAddr + '/_search/scroll';
+const client = new Client({
+    host: browser.elasticAddr
+})
 
 class FacetedSearch extends Component {
     constructor(props) {
@@ -32,6 +35,7 @@ class FacetedSearch extends Component {
 	this.state = {
 	    facets: {},
 	    facetsSet: false,
+	    numericRanges: {}
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
@@ -44,9 +48,6 @@ class FacetedSearch extends Component {
     }
 
     getFacetsFromElasticsearch = () => {
-	const client = new Client({
-            host: browser.elasticAddr
-        })
         const facets = [];
 	client.get({index: "browser",
                     type: "modules",
@@ -80,14 +81,63 @@ class FacetedSearch extends Component {
                            });
                            this.setState({
 			       facets: facets,
-			       facetsSet: true
+			       //facetsSet: true
 			   }, () => {
 			       //console.log(this.state)
 			   });
+			   this.getNumericRangesFromElasticSearch(facets);
                        }
                    });
     }
-    
+
+    getNumericRangesFromElasticSearch = async (facets) => {
+	const ranges = {};
+	const numericFields = [];
+	
+	Object.keys(facets).forEach( (key, index) => {
+	    const facet = this.state.facets[key];
+            if (facet.dataType === "numeric") {
+		numericFields.push(facet);
+	    }
+	});
+
+	let i = 1;
+	numericFields.forEach( (facet, index) => {
+	    client.search({
+		index: 'browser',
+		type: 'modules',
+		body: {
+		    aggs: {
+			"max": { "max" : { "field": facet.title } },
+			"min": { "min" : { "field": facet.title } },
+		    },
+		    query: {
+			match_all: {}
+		    }
+		}
+	    },
+			  (err, res) => {
+			      if (err) {
+				  console.log(err);
+			      } else {
+				  ranges[facet.title] = {
+				      min: res.aggregations.min.value,
+				      max: res.aggregations.max.value
+				  };
+			      }
+			      if (i === numericFields.length ) {
+				  this.setState({ numericRanges: ranges,
+						  facetsSet: true },
+						() => {
+						    //console.log(this.state.numericRanges);
+						});
+			      }
+			      i++;
+			  });	    
+	});
+    }
+				 
+	
     fetchResults = (query, api) => {
 	return fetch(api, {
 	    method: "POST",
@@ -239,11 +289,15 @@ class FacetedSearch extends Component {
 				}}
 				/>);
 		    } else if (facet.dataType === "numeric") {
-			return (<DynamicRangeSlider
+			return (<RangeInput
 				key={index}
 				componentId={facet.componentId}
 				dataField={facet.dataField}
 				title={facet.title}
+				range={{
+				    "start": this.state.numericRanges[facet.title].min,
+				    "end": this.state.numericRanges[facet.title].max
+				}}
 				/>);
 		    }
 		    return(<div/>);
