@@ -29,7 +29,7 @@ class DataPanel extends Component {
 		<NodeData fields={this.props.config.nodeFields} nodeData={this.props.nodeData} nDisplayed={this.props.nDisplayed} displayedData={this.props.displayedData} changeFlag={this.props.mapChangeFlag} />
 		{this.props.dataIsLoaded ?
 		 <ModuleData fields={this.props.config.dataFields} displayedData={this.props.displayedData} selectedNode={this.props.nodeData.id} index={this.props.index} changeFlag={this.props.dataChangeFlag}/> :
-		 "Loading..."
+		 <p>Loading Data...</p>
 		}
 	    </div>
 	);

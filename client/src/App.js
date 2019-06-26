@@ -9,6 +9,7 @@ import MapControls from './MapControls';
 import DataPanel from './DataPanel';
 import Dashboard from './Dashboard';
 import SettingsDialog from './Settings';
+import LoadAlertDialog from './LoadAlert';
 
 /*
 This code is part of the CGIMP distribution
@@ -272,7 +273,7 @@ class App extends Component {
                 this.setState({ index: indexData });                                                                                 
             })
             .catch(error => {
-                console.log(error.response);
+                //console.log(error.response);
                 this.buildIndex(this.state.data);
             });
     }
@@ -313,7 +314,8 @@ class App extends Component {
 	Object.keys(nodeData).forEach( (key) => {
 	    displayedNodeData[key] = nodeData[key].modules.length;
 	});
-	this.setState({ displayedNodeData: displayedNodeData });
+	this.setState({ displayedNodeData: displayedNodeData,
+			mapChangeFlag: Math.random() });
     }
     
     // Update map data as needed.
@@ -321,7 +323,8 @@ class App extends Component {
 	if (updatedData === null) {
 	    // reset the display when null data are passed
 	    //console.log("null data passed");
-	    this.setState({ displayedData: this.state.data });
+	    this.setState({ displayedData: this.state.data,
+			    dataChangeFlag: Math.random() });
 	    this.transformNodeData(this.state.nodeData);
 	    return true;
 	}
@@ -334,7 +337,8 @@ class App extends Component {
     // Update displayed module data as needed.
     handleDataChange = (updatedData) => {
         if (updatedData === null) {
-	    this.setState({ displayedData: this.state.data });
+	    this.setState({ displayedData: this.state.data,
+			    dataChangeFlag: Math.random() });
             this.transformNodeData(this.state.nodeData);
             return true;
         }
@@ -473,52 +477,56 @@ class App extends Component {
 	return (
 		<div>
 		<Dashboard
-	    title={this.state.mainTitle}
-	    controls={Object.keys(this.state.displayedData).length ?
-                      <MapControls
-                      data={this.state.data}
-                      displayedData={this.state.displayedData}
-                      onMapDataChange={this.handleMapDataChange}
-		      onDataChange={this.handleDataChange}
-		      onNewSearchAction={this.handleNewElasticsearchPromise}
-		      dataIsLoaded={this.state.dataIsLoaded}
-                      /> :
-                      (<div></div>)}
-	    map={Object.keys(this.state.displayedData).length ?
-                 <SvgModuleMap
-                 data={this.state.displayedNodeData}
-                 nodeData={this.state.nodeData}
-                 selectedNode={this.state.selectedNode}
-                 config={this.state.mapConfig}
-                 onNodeClick={this.handleNodeClick}
-                 onMapChange={this.handleMapChange}
-		 onDataDownload={this.handleDataDownload}
-		 changeFlag={this.state.mapChangeFlag}
-                 /> :
-                 (<span>Loading Data...</span>)}
-	    content={Object.keys(this.state.displayedData).length ?
-                     this.state.selectedNode ?
-                     <DataPanel
-                     data={this.state.data}
-                     displayedData={this.state.displayedData}
-                     nDisplayed={this.state.selectedNodeModuleCount}
-                     nodeData={this.state.nodeData[this.state.selectedNode]}
-                     index={this.state.index}
-                     config={this.state.dataPanelConfig}
-		     dataIsLoaded={this.state.dataIsLoaded}
-		     dataChangeFlag={this.state.dataChangeFlag}
-		     mapChangeFlag={this.state.mapChangeFlag}
-                     /> :
-                     (<div id="dataPanel"><p>Click on a map node for more information.</p></div>)
-                     : (<span></span>)
+	            title={this.state.mainTitle}
+	            controls={Object.keys(this.state.displayedData).length ?
+                        <MapControls
+                            data={this.state.data}
+                            displayedData={this.state.displayedData}
+                            onMapDataChange={this.handleMapDataChange}
+		            onDataChange={this.handleDataChange}
+		            onNewSearchAction={this.handleNewElasticsearchPromise}
+		            dataIsLoaded={this.state.dataIsLoaded}
+			    updateParentState={this.updateStateSettings}  
+                        /> :
+                        (<div></div>)}
+	            map={Object.keys(this.state.displayedData).length ?
+                        <SvgModuleMap
+                            data={this.state.displayedNodeData}
+                            nodeData={this.state.nodeData}
+                            selectedNode={this.state.selectedNode}
+                            config={this.state.mapConfig}
+                            onNodeClick={this.handleNodeClick}
+                            onMapChange={this.handleMapChange}
+		            onDataDownload={this.handleDataDownload}
+		            changeFlag={this.state.mapChangeFlag}
+                        /> :
+                        (<span>Loading Data...</span>)}
+	            content={Object.keys(this.state.displayedData).length ?
+                        this.state.selectedNode ?
+                            <DataPanel
+                                data={this.state.data}
+                                displayedData={this.state.displayedData}
+                                nDisplayed={this.state.selectedNodeModuleCount}
+                                nodeData={this.state.nodeData[this.state.selectedNode]}
+                                index={this.state.index}
+                                config={this.state.dataPanelConfig}
+		                dataIsLoaded={this.state.dataIsLoaded}
+		                dataChangeFlag={this.state.dataChangeFlag}
+		                mapChangeFlag={this.state.mapChangeFlag}
+                            /> :
+                            (<div id="dataPanel"><p>Click on a map node for more information.</p></div>)
+                        : (<span></span>)
                     }
-	    onSettingsClick={this.handleSettingsClick}
+	            onSettingsClick={this.handleSettingsClick}
+		/>
+		<LoadAlertDialog
+	            open={!this.state.dataIsLoaded}
 		/>
 		<SettingsDialog
-	    onSettingsClick={this.handleSettingsClick}
-	    open={this.state.settingsOpen}
-	    parentState={this.state}
-	    updateParentState={this.updateStateSettings}
+	            onSettingsClick={this.handleSettingsClick}
+	            open={this.state.settingsOpen}
+	            parentState={this.state}
+	            updateParentState={this.updateStateSettings}
 		/>
 		</div>
 	);

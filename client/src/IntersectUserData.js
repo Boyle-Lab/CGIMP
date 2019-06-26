@@ -73,6 +73,7 @@ class IntersectUserData extends Component {
     // This is where we call pybedtools to do the intersection.
     intersectData = (event) => {
 	//console.log(event);
+	this.props.updateParentState("dataIsLoaded", false)
 	this.setState({ working: true });
 	// Since there should only be one file in the filepond,
 	// we will assume files[0] is the desired user file.
@@ -88,6 +89,7 @@ class IntersectUserData extends Component {
 		this.props.onMapDataChange(this.convertToNodeData(intersectingData));
 		this.props.onDataChange(intersectingData);
 		this.setState({ working: false });
+		this.props.updateParentState("dataIsLoaded", true);
             })
             .catch(error => {
                 console.log(error.response);
