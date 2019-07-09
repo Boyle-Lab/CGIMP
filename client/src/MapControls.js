@@ -29,7 +29,9 @@ class MapControls extends Component {
 		<FacetedSearch
 	            onDataChange={this.props.onDataChange}
 	            onMapDataChange={this.props.onMapDataChange}
-	            onNewSearchAction={this.props.onNewSearchAction} />
+	            onNewSearchAction={this.props.onNewSearchAction}
+	            updateParentState={this.props.updateParentState}
+		/>
 		<IntersectUserData
 	            data={this.props.displayedData}
 	            onDataChange={this.props.onDataChange}

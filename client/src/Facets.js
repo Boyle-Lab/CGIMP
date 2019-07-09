@@ -130,6 +130,7 @@ class FacetedSearch extends Component {
 						  facetsSet: true },
 						() => {
 						    //console.log(this.state.numericRanges);
+						    //this.props.updateParentState("dataIsLoaded", "true");
 						});
 			      }
 			      i++;
@@ -268,7 +269,7 @@ class FacetedSearch extends Component {
 		    
 		    if (facet.dataType === "text") {
 			return (<MultiList
-				key={index}
+				key={key}
 				componentId={facet.componentId}
 				dataField={facet.dataField}
 				title={facet.title}
@@ -290,7 +291,7 @@ class FacetedSearch extends Component {
 				/>);
 		    } else if (facet.dataType === "numeric") {
 			return (<RangeInput
-				key={index}
+				key={key}
 				componentId={facet.componentId}
 				dataField={facet.dataField}
 				title={facet.title}
@@ -299,8 +300,9 @@ class FacetedSearch extends Component {
 				    "end": this.state.numericRanges[facet.title].max
 				}}
 				/>);
+			//return (<div key={key} />);
 		    }
-		    return(<div/>);
+		    return(<div key={index}/>);
 		})}
 		
 		</ReactiveBase>
