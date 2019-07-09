@@ -1,4 +1,6 @@
 [![status](http://joss.theoj.org/papers/e9e7eb0708270dcaae9a2f322d346ff5/status.svg)](http://joss.theoj.org/papers/e9e7eb0708270dcaae9a2f322d346ff5)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3276069.svg)](https://doi.org/10.5281/zenodo.3276069)
+
 
 # CGIMP
 ## Clustered Genomic Interval Mapping Platform
