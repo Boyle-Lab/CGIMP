@@ -1,4 +1,4 @@
-[![status](http://joss.theoj.org/papers/e9e7eb0708270dcaae9a2f322d346ff5/status.svg)](http://joss.theoj.org/papers/e9e7eb0708270dcaae9a2f322d346ff5)
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.01520/status.svg)](https://doi.org/10.21105/joss.01520)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3276069.svg)](https://doi.org/10.5281/zenodo.3276069)
 
 
@@ -77,7 +77,9 @@ However, while multiple tools exist to produce SOMs and graphically render their
 
 ## Citation
 
-If you use CGIMP in your work, please cite ...
+If you use CGIMP in your work, please use the following citation:
+
+Diehl et al., (2019). CGIMP: Real-time exploration and covariate projection for self-organizing map datasets. Journal of Open Source Software, 4(39), 1520, https://doi.org/10.21105/joss.01520
 
 ## Community Guidelines
 
