@@ -1,4 +1,4 @@
-[![status](http://joss.theoj.org/papers/e9e7eb0708270dcaae9a2f322d346ff5/status.svg)](http://joss.theoj.org/papers/e9e7eb0708270dcaae9a2f322d346ff5)
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.01520/status.svg)](https://doi.org/10.21105/joss.01520)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3276069.svg)](https://doi.org/10.5281/zenodo.3276069)
 
 
