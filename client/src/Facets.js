@@ -169,7 +169,7 @@ class FacetedSearch extends Component {
     getAllDisplayedData = async (prev, next) => {
 	if (next && !next.query.match_all) {
 	    this.props.onNewSearchAction("loading");
-	    //console.log("Fetching all results for query:", next);
+	    console.log("Fetching all results for query:", next);
 	    next.size = 100000;
 	    // initial url to obtain scroll id is different
 	    const initialResults = await this.fetchResults(next, initScrollUrl);
@@ -188,13 +188,13 @@ class FacetedSearch extends Component {
             });
 	    this.props.onDataChange(allResults);
 	    this.props.onNewSearchAction("loaded");
-	    //console.log(`${Object.keys(allResults).length} results found:`, allResults);
+	    console.log(`${Object.keys(allResults).length} results found:`, allResults);
 	}
     };
 
     handleQueryChange = async (prev, next) => {
         if (next && !next.query.match_all) {
-            //console.log("Fetching aggregate results for query:", next);
+            console.log("Fetching aggregate results for query:", next);
             const initialResults = await this.fetchResults(next, url);
             const allResults = {};
             initialResults.aggregations.nodes.buckets.forEach( (hit) => {
