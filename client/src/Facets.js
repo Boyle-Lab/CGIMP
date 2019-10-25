@@ -35,12 +35,16 @@ class FacetedSearch extends Component {
 	this.state = {
 	    facets: {},
 	    facetsSet: false,
-	    numericRanges: {}
+        numericRanges: {},
+        //for testing
+        showCountOption: true
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
 	this.handleQueryChange = this.handleQueryChange.bind(this);
 	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
+    //for testing
+    this.changeShowCount = this.changeShowCount.bind(this);
     }
 
     componentDidMount() {
@@ -93,7 +97,7 @@ class FacetedSearch extends Component {
     getNumericRangesFromElasticSearch = async (facets) => {
 	const ranges = {};
 	const numericFields = [];
-	
+
 	Object.keys(facets).forEach( (key, index) => {
 	    const facet = this.state.facets[key];
             if (facet.dataType === "numeric") {
@@ -134,11 +138,11 @@ class FacetedSearch extends Component {
 						});
 			      }
 			      i++;
-			  });	    
+			  });
 	});
     }
-				 
-	
+
+
     fetchResults = (query, api) => {
 	return fetch(api, {
 	    method: "POST",
@@ -150,7 +154,7 @@ class FacetedSearch extends Component {
 	    .then(res => res.json())
 	    .catch(err => console.error(err));
     };
-    
+
     fetchScrollResults = async query => {
 	const res = await this.fetchResults(query, scrollUrl);
 	const { hits } = res.hits;
@@ -165,7 +169,7 @@ class FacetedSearch extends Component {
 	}
 	return [];
     };
-    
+
     getAllDisplayedData = async (prev, next) => {
 	if (next && !next.query.match_all) {
 	    this.props.onNewSearchAction("loading");
@@ -205,6 +209,11 @@ class FacetedSearch extends Component {
         }
     };
 
+
+    ChangeShowCount = (e) => {
+        e = !e;
+    }
+
     render () {
 	if (!this.state.facetsSet) {
 	    return (<div/>)
@@ -215,8 +224,8 @@ class FacetedSearch extends Component {
 	    Object.keys(this.state.facets).forEach( (key) => {
 		dataFields.push(this.state.facets[key].dataField);
 	    });
-	    
-	    return (		
+
+	    return (
 		    <div>
 		    <div>
                     Filter Data
@@ -226,7 +235,7 @@ class FacetedSearch extends Component {
 		url={browser.elasticAddr}
 		type="modules"
 		    >
-		    
+
 		{/*<DataSearch
 		componentId="mainSearch"
 		dataField={dataFields}
@@ -234,9 +243,9 @@ class FacetedSearch extends Component {
 		queryFormat="and"
 		placeholder="Search the dataset..."
 		/>*/}
-		    
+
 		    <SelectedFilters showClearAll={true} clearAllLabel="Clear filters"/>
-		    
+
 		    <ReactiveList
 		componentId="resultsList"
 		dataField="id"
@@ -258,57 +267,81 @@ class FacetedSearch extends Component {
 			<div/>
 		)}
 		resultStats={false}
-		renderResultStats={props => 
+		renderResultStats={props =>
 				   <div/>
 				  }
 		onQueryChange={this.handleQueryChange}
-		    />		
-		    
+		    />
+
 		{Object.keys(this.state.facets).map( (key, index) => {
 		    const facet = this.state.facets[key];
-		    
-		    if (facet.dataType === "text") {
-			return (<MultiList
-				key={key}
-				componentId={facet.componentId}
-				dataField={facet.dataField}
-				title={facet.title}
-				queryFormat="and"
-				selectAllLabel={facet.selectAllLabel}
-				showCheckbox={true}
-				showCount={true}
-				showSearch={false}
-				react={{
-				    and: keys
-				}}
-				showFilter={true}
-				filterLabel={facet.filterLabel}
-				URLParams={false}
-				innerClass={{
-				    label: "list-item",
-				    input: "list-input"
-				}}
-				/>);
-		    } else if (facet.dataType === "numeric") {
-			return (<RangeInput
-				key={key}
-				componentId={facet.componentId}
-				dataField={facet.dataField}
-				title={facet.title}
-				range={{
-				    "start": this.state.numericRanges[facet.title].min,
-				    "end": this.state.numericRanges[facet.title].max
-				}}
-				/>);
-			//return (<div key={key} />);
-		    }
-		    return(<div key={index}/>);
-		})}
-		
-		</ReactiveBase>
-		    </div>
-	    );
-	}
+
+            if (facet.dataType === "text") {
+                return (
+                    <div>
+                        <SettingsDialogue value={this.state.showCountOption} option={this.changeShowCount}/>
+                        <MultiList
+                            key={key}
+                            componentId={facet.componentId}
+                            dataField={facet.dataField}
+                            title={facet.title}
+                            queryFormat="and"
+                            selectAllLabel={facet.selectAllLabel}
+                            showCheckbox={true}
+                            showCount={this.state.showCountOption}
+                            showSearch={false}
+                            react={{
+                                and: keys
+                            }}
+                            showFilter={true}
+                            filterLabel={facet.filterLabel}
+                            URLParams={false}
+                            innerClass={{
+                                label: "list-item",
+                                input: "list-input"
+                            }}
+                        />
+                        </div>
+                    );
+            } else if (facet.dataType === "numeric") {
+                return (
+                    <RangeInput
+                        key={key}
+                        componentId={facet.componentId}
+                        dataField={facet.dataField}
+                        title={facet.title}
+                        range={{
+                            "start": this.state.numericRanges[facet.title].min,
+                            "end": this.state.numericRanges[facet.title].max
+                        }}
+                    />);
+                    //return (<div key={key} />);
+            }
+            return(<div key={index}/>);
+        })}
+
+    </ReactiveBase>
+</div>
+        );
+    }
+    }
+}
+
+class SettingsDialogue extends Component{
+    constructor(props){
+        super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick(){
+        console.log(this.props);
+        //this.props.changeShowCount = !this.props.changeShowCount;
+    }
+
+    render(){
+        return(
+            <button onClick={this.handleClick} > show/hide count</button>
+        );
     }
 }
 

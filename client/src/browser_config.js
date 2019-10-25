@@ -6,9 +6,9 @@ Configuration:
 4) Edit the mapDim field to reflect the shape of your input data. This dictates the number of columns and rows in the map display. Format is [NCOLS,NROWS]
 */
 const browser = {
-    webAddr: "http://172.17.8.53:3000",
-    apiAddr: "http://172.17.8.53:3001/api",
-    elasticAddr: "http://172.17.8.53:9200",
+    webAddr: "http://localhost:3000",
+    apiAddr: "http://localhost:3001/api",
+    elasticAddr: "http://localhost:9200",
     dataPath: "../data",
     moduleDataFile: "dataMap.json",
     nodeDataFile: "nodes.json",
