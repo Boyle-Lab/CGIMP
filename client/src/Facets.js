@@ -35,16 +35,12 @@ class FacetedSearch extends Component {
 	this.state = {
 	    facets: {},
 	    facetsSet: false,
-        numericRanges: {},
-        //for testing
-        showCountOption: true
+	    numericRanges: {}
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
 	this.handleQueryChange = this.handleQueryChange.bind(this);
 	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
-    //for testing
-    this.changeShowCount = this.changeShowCount.bind(this);
     }
 
     componentDidMount() {
@@ -209,15 +205,11 @@ class FacetedSearch extends Component {
         }
     };
 
-
-    ChangeShowCount = (e) => {
-        e = !e;
-    }
-
     render () {
 	if (!this.state.facetsSet) {
 	    return (<div/>)
-	} else {
+    } 
+    else {
 	    const keys = Object.keys(this.state.facets);
 	    keys.push("mainSearch", "resultsList");
 	    const dataFields = [];
@@ -277,9 +269,10 @@ class FacetedSearch extends Component {
 		    const facet = this.state.facets[key];
 
             if (facet.dataType === "text") {
+                let showCountOption = true;
                 return (
                     <div>
-                        <SettingsDialogue value={this.state.showCountOption} option={this.changeShowCount}/>
+                        <SettingsDialogue changeShowCount={showCountOption}/>
                         <MultiList
                             key={key}
                             componentId={facet.componentId}
@@ -288,7 +281,7 @@ class FacetedSearch extends Component {
                             queryFormat="and"
                             selectAllLabel={facet.selectAllLabel}
                             showCheckbox={true}
-                            showCount={this.state.showCountOption}
+                            showCount={true}
                             showSearch={false}
                             react={{
                                 and: keys
@@ -319,14 +312,9 @@ class FacetedSearch extends Component {
             }
             return(<div key={index}/>);
         })}
-
-    </ReactiveBase>
-</div>
-        );
-    }
     }
 }
-
+} // end of class
 class SettingsDialogue extends Component{
     constructor(props){
         super(props);
@@ -334,8 +322,7 @@ class SettingsDialogue extends Component{
     }
 
     handleClick(){
-        console.log(this.props);
-        //this.props.changeShowCount = !this.props.changeShowCount;
+        console.log(this.props.changeShowCount);
     }
 
     render(){
