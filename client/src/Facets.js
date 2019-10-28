@@ -37,7 +37,7 @@ class FacetedSearch extends Component {
 	    facetsSet: false,
         numericRanges: {},
         //for testing
-        showCountOption: true
+        //showCountOption: true
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
@@ -49,6 +49,13 @@ class FacetedSearch extends Component {
 
     componentDidMount() {
 	this.getFacetsFromElasticsearch();
+    }
+
+    changeShowCount = ( facet ) => {
+        facet.showCountOption = !facet.showCountOption;
+        //this.setState({
+        //    showCountOption: !this.state.showCountOption,
+        //});
     }
 
     getFacetsFromElasticsearch = () => {
@@ -67,7 +74,10 @@ class FacetedSearch extends Component {
                                    dataField: "",
                                    title: "",
                                    selectAllLabel:"",
-                                   filterLabel: ""
+                                   filterLabel: "",
+                                   // for settings
+                                   // facetType: "",
+                                   showCountOption: true,
                                }
                                if (key !== "id" && key !== "node") {
                                    facetParams.componentId = key + 'List';
@@ -279,7 +289,8 @@ class FacetedSearch extends Component {
             if (facet.dataType === "text") {
                 return (
                     <div>
-                        <SettingsDialogue value={this.state.showCountOption} option={this.changeShowCount}/>
+                        {/* <SettingsDialogue value={this.state.showCountOption} option={this.changeShowCount}/> */}
+                        <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/>
                         <MultiList
                             key={key}
                             componentId={facet.componentId}
@@ -288,7 +299,8 @@ class FacetedSearch extends Component {
                             queryFormat="and"
                             selectAllLabel={facet.selectAllLabel}
                             showCheckbox={true}
-                            showCount={this.state.showCountOption}
+                            //showCount={this.state.showCountOption}
+                            showCount={facet.showCountOption}
                             showSearch={false}
                             react={{
                                 and: keys
@@ -334,7 +346,9 @@ class SettingsDialogue extends Component{
     }
 
     handleClick(){
+        console.log("settings dialogue");
         console.log(this.props);
+        //this.props.option();
         //this.props.changeShowCount = !this.props.changeShowCount;
     }
 
