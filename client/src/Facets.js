@@ -271,8 +271,8 @@ class FacetedSearch extends Component {
             if (facet.dataType === "text") {
                 let showCountOption = true;
                 return (
-                    <div>
-                        <SettingsDialogue changeShowCount={showCountOption}/>
+                    //<div>
+                    //    <SettingsDialogue changeShowCount={showCountOption}/>
                         <MultiList
                             key={key}
                             componentId={facet.componentId}
@@ -294,7 +294,7 @@ class FacetedSearch extends Component {
                                 input: "list-input"
                             }}
                         />
-                        </div>
+                        //    </div>
                     );
             } else if (facet.dataType === "numeric") {
                 return (
@@ -310,26 +310,10 @@ class FacetedSearch extends Component {
                     />);
                     //return (<div key={key} />);
             }
-            return(<div key={index}/>);
+            return(<div key={index}></div> );
         })}
     }
 }
 } // end of class
-class SettingsDialogue extends Component{
-    constructor(props){
-        super(props);
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick(){
-        console.log(this.props.changeShowCount);
-    }
-
-    render(){
-        return(
-            <button onClick={this.handleClick} > show/hide count</button>
-        );
-    }
-}
 
 export default FacetedSearch;
