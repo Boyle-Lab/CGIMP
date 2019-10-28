@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import browser from './browser_config';
 import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
+import { Dialog, DialogTitle } from '@material-ui/core';
 
 /*
 This code is part of the CGIMP distribution
@@ -44,19 +45,19 @@ class FacetedSearch extends Component {
 	this.handleQueryChange = this.handleQueryChange.bind(this);
 	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
     //for testing
-    this.changeShowCount = this.changeShowCount.bind(this);
+    // this.changeShowCount = this.changeShowCount.bind(this);
     }
 
     componentDidMount() {
 	this.getFacetsFromElasticsearch();
     }
 
-    changeShowCount = ( facet ) => {
-        facet.showCountOption = !facet.showCountOption;
-        //this.setState({
-        //    showCountOption: !this.state.showCountOption,
-        //});
-    }
+    //changeShowCount = ( facet ) => {
+    //    facet.showCountOption = !facet.showCountOption;
+    //    //this.setState({
+    //    //    showCountOption: !this.state.showCountOption,
+    //    //});
+    //}
 
     getFacetsFromElasticsearch = () => {
         const facets = [];
@@ -76,8 +77,8 @@ class FacetedSearch extends Component {
                                    selectAllLabel:"",
                                    filterLabel: "",
                                    // for settings
-                                   // facetType: "",
-                                   showCountOption: true,
+                                   facetType: "",
+                                   //showCountOption: true,
                                }
                                if (key !== "id" && key !== "node") {
                                    facetParams.componentId = key + 'List';
@@ -289,8 +290,8 @@ class FacetedSearch extends Component {
             if (facet.dataType === "text") {
                 return (
                     <div>
-                        {/* <SettingsDialogue value={this.state.showCountOption} option={this.changeShowCount}/> */}
-                        <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/>
+                        <SettingsDialogue/>
+                        {/* <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/> */}
                         <MultiList
                             key={key}
                             componentId={facet.componentId}
@@ -300,7 +301,7 @@ class FacetedSearch extends Component {
                             selectAllLabel={facet.selectAllLabel}
                             showCheckbox={true}
                             //showCount={this.state.showCountOption}
-                            showCount={facet.showCountOption}
+                            showCount={true}
                             showSearch={false}
                             react={{
                                 and: keys
