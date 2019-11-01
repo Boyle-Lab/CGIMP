@@ -67,9 +67,10 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-class SettingsDialog extends React.Component {
+class FacetedSettings extends React.Component {
     constructor(props) {
         super(props);
+        console.log(props);
     }
 
     componentDidMount() {
@@ -111,6 +112,10 @@ class SettingsDialog extends React.Component {
                         </AppBar>
 
                         <List>
+                            <ListItem key={'test'}>
+                                test setting
+                            </ListItem>
+                            {/*
                             {this.state.toolTips.map( (tipField, index) => {
                                 return (
                                     <ListItem key={'tip' + index.toString()}>
@@ -130,6 +135,7 @@ class SettingsDialog extends React.Component {
                                     </ListItem>
                                 )
                             })}
+                            */}
                         </List>
 
                     </form>
@@ -139,7 +145,7 @@ class SettingsDialog extends React.Component {
     }
 }
 
-SettingsDialog.propTypes = {
+FacetedSettings.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
@@ -299,4 +305,4 @@ const ModuleDataTable = ({classes, fields, selectedField, types, selectedType, a
     );
 }
 
-export default withStyles(styles)(SettingsDialog);
+export default withStyles(styles)(FacetedSettings);

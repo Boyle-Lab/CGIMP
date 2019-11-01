@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import browser from './browser_config';
 import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
-// import { Dialog, DialogTitle } from '@material-ui/core';
+import FacetedSettings from './FacetedSettings';
+import SettingsIcon from '@material-ui/icons/Settings';
+import IconButton from '@material-ui/core/IconButton';
 
 /*
 This code is part of the CGIMP distribution
@@ -37,6 +39,8 @@ class FacetedSearch extends Component {
 	    facets: {},
 	    facetsSet: false,
         numericRanges: {},
+        settingsOpen: false,    // Settings dialog display state
+
         //for testing
         //showCountOption: true
 	}
@@ -58,6 +62,10 @@ class FacetedSearch extends Component {
     //    //    showCountOption: !this.state.showCountOption,
     //    //});
     //}
+
+    handleSettingsClick = () => {
+	this.setState({ settingsOpen: !this.state.settingsOpen });
+    }
 
     getFacetsFromElasticsearch = () => {
         const facets = [];
@@ -229,6 +237,7 @@ class FacetedSearch extends Component {
 	if (!this.state.facetsSet) {
 	    return (<div/>)
 	} else {
+        console.log(this.state.facets);
 	    const keys = Object.keys(this.state.facets);
 	    keys.push("mainSearch", "resultsList");
 	    const dataFields = [];
@@ -286,12 +295,21 @@ class FacetedSearch extends Component {
 
 		{Object.keys(this.state.facets).map( (key, index) => {
 		    const facet = this.state.facets[key];
+            console.log( facet );
 
             if (facet.dataType === "text") {
                 return (
                     <div>
-                        {/* <SettingsDialogue/> */}
                         {/* <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/> */}
+                        <IconButton color="inherit" onClick={this.handleSettingsClick} >
+                            <SettingsIcon/>
+                        </IconButton>
+                        <FacetedSettings
+                            onSettingsClick={this.handleSettingsClick}
+                            open={this.state.settingsOpen}
+                            parentState={this.state}
+                            // updateParentState={this.updateStateSettings}
+                        />
                         <MultiList
                             key={key}
                             componentId={facet.componentId}
