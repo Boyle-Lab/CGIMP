@@ -237,7 +237,7 @@ class FacetedSearch extends Component {
 	if (!this.state.facetsSet) {
 	    return (<div/>)
 	} else {
-        console.log(this.state.facets);
+        // console.log(this.state.facets);
 	    const keys = Object.keys(this.state.facets);
 	    keys.push("mainSearch", "resultsList");
 	    const dataFields = [];
@@ -295,7 +295,7 @@ class FacetedSearch extends Component {
 
 		{Object.keys(this.state.facets).map( (key, index) => {
 		    const facet = this.state.facets[key];
-            console.log( facet );
+            // console.log( facet );
 
             if (facet.dataType === "text") {
                 return (
@@ -308,7 +308,7 @@ class FacetedSearch extends Component {
                             onSettingsClick={this.handleSettingsClick}
                             open={this.state.settingsOpen}
                             parentState={this.state}
-                            // updateParentState={this.updateStateSettings}
+                            facet={facet}
                         />
                         <MultiList
                             key={key}

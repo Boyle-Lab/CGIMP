@@ -38,6 +38,7 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 const nodeTypes = ["string", "count", "average", "concat"];
 const moduleTypes = ["string", "numeric", "array", "object"];
 const aggTypes = [false, "concat", "count", "density", "average"];
+const listTypes = ["MultiList", "RangeInput"];
 
 const styles = theme => ({
     appBar: {
@@ -70,7 +71,8 @@ function Transition(props) {
 class FacetedSettings extends React.Component {
     constructor(props) {
         super(props);
-        console.log(props);
+        // console.log(props);
+        console.log(this.props.facet);
     }
 
     componentDidMount() {
@@ -87,6 +89,7 @@ class FacetedSettings extends React.Component {
 
     render() {
         const { classes } = this.props;
+        console.log(classes);
         return (
             <div>
                 <Dialog
@@ -112,9 +115,32 @@ class FacetedSettings extends React.Component {
                         </AppBar>
 
                         <List>
-                            <ListItem key={'test'}>
-                                test setting
+                            <ListItem key={'listType'}>
+                                <TextField
+                                    select
+                                    label="Choose List Type"
+                                    className={classes.textField}
+                                    value={listTypes}
+                                    // onChange={handleChange('field', index)}
+                                    SelectProps={{
+                                        native: true,
+                                        MenuProps: {
+                                            className: classes.menu,
+                                        },
+                                    }}
+                                        margin="normal"
+                                    >
+                                        {listTypes.map(option => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </TextField>
                             </ListItem>
+
+                            {/* <ListItem key={'ListType'}> */}
+                            {/*     test setting */}
+                            {/* </ListItem> */}
                             {/*
                             {this.state.toolTips.map( (tipField, index) => {
                                 return (
@@ -154,6 +180,8 @@ const ToolTipPane = ({classes, fields, selectedField, types, selectedType, label
 
     return (
         <div>
+            <TextField>
+            </TextField>
             <TextField
                 id={"tipFieldSelect" + index}
                 select
