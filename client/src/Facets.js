@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import browser from './browser_config';
 import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
-import { Dialog, DialogTitle } from '@material-ui/core';
+// import { Dialog, DialogTitle } from '@material-ui/core';
 
 /*
 This code is part of the CGIMP distribution
@@ -290,7 +290,7 @@ class FacetedSearch extends Component {
             if (facet.dataType === "text") {
                 return (
                     <div>
-                        <SettingsDialogue/>
+                        {/* <SettingsDialogue/> */}
                         {/* <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/> */}
                         <MultiList
                             key={key}
@@ -340,24 +340,24 @@ class FacetedSearch extends Component {
     }
 }
 
-class SettingsDialogue extends Component{
-    constructor(props){
-        super(props);
-        this.handleClick = this.handleClick.bind(this);
-    }
+//class SettingsDialogue extends Component{
+//    constructor(props){
+//        super(props);
+//        this.handleClick = this.handleClick.bind(this);
+//    }
 
-    handleClick(){
-        console.log("settings dialogue");
-        console.log(this.props);
-        //this.props.option();
-        //this.props.changeShowCount = !this.props.changeShowCount;
-    }
+//    handleClick(){
+//        console.log("settings dialogue");
+//        console.log(this.props);
+//        //this.props.option();
+//        //this.props.changeShowCount = !this.props.changeShowCount;
+//    }
 
-    render(){
-        return(
-            <button onClick={this.handleClick} > show/hide count</button>
-        );
-    }
-}
+//    render(){
+//        return(
+//            <button onClick={this.handleClick} > show/hide count</button>
+//        );
+//    }
+//}
 
 export default FacetedSearch;
