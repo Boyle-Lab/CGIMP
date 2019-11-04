@@ -15,6 +15,7 @@ import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
+import SingleList from '@appbaseio/reactivesearch';
 
 /*
 This code is part of the CGIMP distribution
@@ -38,7 +39,6 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 const nodeTypes = ["string", "count", "average", "concat"];
 const moduleTypes = ["string", "numeric", "array", "object"];
 const aggTypes = [false, "concat", "count", "density", "average"];
-const listTypes = ["MultiList", "RangeInput"];
 
 const styles = theme => ({
     appBar: {
@@ -71,6 +71,9 @@ function Transition(props) {
 class FacetedSettings extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            listTypes: ["MultiList", "RangeInput"],
+        }
         // console.log(props);
         console.log(this.props.facet);
     }
@@ -87,9 +90,18 @@ class FacetedSettings extends React.Component {
         this.props.updateParentState(name, event.target.value);
     };
 
+    onListTypeChange = (field, index) => event => {
+        const listTypes = [...this.state.listTypes];
+        listTypes[index][field] = event.target.value;	
+        this.setState({ listTypes: listTypes });
+        this.props.updateParentState("listTypes", listTypes);
+    }
+
     render() {
         const { classes } = this.props;
-        console.log(classes);
+        console.log(this.props);
+        console.log(this.props.facet);
+        console.log(this.props.parentState);
         return (
             <div>
                 <Dialog
@@ -115,53 +127,69 @@ class FacetedSettings extends React.Component {
                         </AppBar>
 
                         <List>
-                            <ListItem key={'listType'}>
-                                <TextField
-                                    select
-                                    label="Choose List Type"
-                                    className={classes.textField}
-                                    value={listTypes}
-                                    // onChange={handleChange('field', index)}
-                                    SelectProps={{
-                                        native: true,
-                                        MenuProps: {
-                                            className: classes.menu,
-                                        },
-                                    }}
-                                        margin="normal"
-                                    >
-                                        {listTypes.map(option => (
-                                            <option key={option} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </TextField>
-                            </ListItem>
-
-                            {/* <ListItem key={'ListType'}> */}
-                            {/*     test setting */}
+                            {/* <ListItem key={'listType'}> */}
+                            {/*     <TextField */}
+                            {/*         select */}
+                            {/*         label="Choose List Type" */}
+                            {/*         className={classes.textField} */}
+                            {/*         value={this.state.listTypes} */}
+                            {/*         onChange={handleChange('listType', index)} */}
+                            {/*         SelectProps={{ */}
+                            {/*             native: true, */}
+                            {/*             MenuProps: { */}
+                            {/*                 className: classes.menu, */}
+                            {/*             }, */}
+                            {/*         }} */}
+                            {/*             margin="normal" */}
+                            {/*         > */}
+                            {/*             {this.state.listTypes.map(option => ( */}
+                            {/*                 <option key={option} value={option}> */}
+                            {/*                     {option} */}
+                            {/*                 </option> */}
+                            {/*             ))} */}
+                            {/*     </TextField> */}
                             {/* </ListItem> */}
-                            {/*
-                            {this.state.toolTips.map( (tipField, index) => {
+
+                            {this.state.listTypes.map( (tipField, index) => {
                                 return (
                                     <ListItem key={'tip' + index.toString()}>
-                                        <ToolTipPane
-                                            key={index.toString()}
-                                            classes={classes}
-                                            fields={this.props.parentState.nodeFields}
-                                            selectedField={this.state.toolTips[index].field}
-                                            types={nodeTypes}
-                                            selectedType={this.state.toolTips[index].type}
-                                            label={this.state.toolTips[index].label}
-                                            fs={this.state.toolTips[index].fs}
-                                            index={index}
-                                            handleChange={this.onToolTipChange}
-                                            remove={this.removeEl}
-                                        />
+                                        <TextField
+                                            select
+                                            label="Choose List Type"
+                                            className={classes.textField}
+                                            value={this.state.listTypes}
+                                            // onChange={handleChange('listType', index)}
+                                            SelectProps={{
+                                                native: true,
+                                                MenuProps: {
+                                                    className: classes.menu,
+                                                },
+                                            }}
+                                                margin="normal"
+                                            >
+                                                {this.state.listTypes.map(option => (
+                                                    <option key={option} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                        </TextField>
+
+                                        {/* <FacetPane */}
+                                        {/*     key={index.toString()} */}
+                                        {/*     classes={classes} */}
+                                        {/*     fields={this.props.parentState.nodeFields} */}
+                                        {/*     selectedField={this.state.listTypes[index].field} */}
+                                        {/*     types={nodeTypes} */}
+                                        {/*     selectedType={this.state.listTypes[index].type} */}
+                                        {/*     label={this.state.listTypes[index].label} */}
+                                        {/*     fs={this.state.listTypes[index].fs} */}
+                                        {/*     index={index} */}
+                                        {/*     handleChange={this.onListTypeChange} */}
+                                        {/*     remove={this.removeEl} */}
+                                        {/* /> */}
                                     </ListItem>
                                 )
                             })}
-                            */}
                         </List>
 
                     </form>
@@ -174,6 +202,72 @@ class FacetedSettings extends React.Component {
 FacetedSettings.propTypes = {
     classes: PropTypes.object.isRequired,
 };
+
+// return settings for each search component
+const FacetPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
+
+    return (
+        <div>
+            <TextField
+                id={"FacetedSelect" + index}
+                select
+                label="Choose List Type"
+                className={classes.textField}
+                value={selectedField}
+                onChange={handleChange('field', index)}
+                SelectProps={{
+                    native: true,
+                    MenuProps: {
+                        className: classes.menu,
+                    },
+                }}
+                    margin="normal"
+                >
+                    {fields.map(option => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </TextField>
+                {/* <TextField */}
+                {/*     id={"tipFieldType" + index} */}
+                {/*     select */}
+                {/*     label="Data Type" */}
+                {/*     className={classes.textField} */}
+                {/*     value={selectedType} */}
+                {/*     onChange={handleChange('type', index)} */}
+                {/*     SelectProps={{ */}
+                {/*         native: true, */}
+                {/*         MenuProps: { */}
+                {/*             className: classes.menu, */}
+                {/*         }, */}
+                {/*     }} */}
+                {/*         margin="normal" */}
+                {/*     > */}
+                {/*         {types.map(option => ( */}
+                {/*             <option key={option} value={option}> */}
+                {/*                 {option} */}
+                {/*             </option> */}
+                {/*         ))} */}	
+                {/*         </TextField> */}
+                {/*         <TextField */}
+                {/*             value={label} */}
+                {/*             onChange={handleChange('label', index)} */}
+                {/*             margin="normal" */}
+                {/*             id={"label" + index} */}
+                {/*             label="Label" */}
+                {/*         /> */}
+                {/*         <TextField */}
+                {/*             value={fs} */}
+                {/*             onChange={handleChange('fs', index)} */}
+                {/*             margin="normal" */}
+                {/*             id={"tipFs" + index} */}
+                {/*             label="Field Separator" */}
+                {/*         /> */}
+                    </div>
+    );
+
+}
 
 // prototype for individual search facet
 const ToolTipPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {

@@ -48,6 +48,7 @@ class FacetedSearch extends Component {
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
 	this.handleQueryChange = this.handleQueryChange.bind(this);
 	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
+    this.updateStateSettings = this.updateStateSettings.bind(this);
     //for testing
     // this.changeShowCount = this.changeShowCount.bind(this);
     }
@@ -228,9 +229,8 @@ class FacetedSearch extends Component {
         }
     };
 
+    updateStateSettings = (name, value) => {
 
-    ChangeShowCount = (e) => {
-        e = !e;
     }
 
     render () {
