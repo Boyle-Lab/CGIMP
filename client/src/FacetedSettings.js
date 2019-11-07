@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
-import AddIcon from '@material-ui/icons/Add';
+// import AddIcon from '@material-ui/icons/Add';
 import Dialog from '@material-ui/core/Dialog';
-import Divider from '@material-ui/core/Divider';
+// import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -15,9 +15,7 @@ import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
-import SingleList from '@appbaseio/reactivesearch';
 
-import MenuItem from '@material-ui/core/MenuItem';
 
 /*
 This code is part of the CGIMP distribution
@@ -38,10 +36,9 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
-const nodeTypes = ["string", "count", "average", "concat"];
-const moduleTypes = ["string", "numeric", "array", "object"];
-const aggTypes = [false, "concat", "count", "density", "average"];
-// const listTypes = ["MultiList", "RangeInput"];
+// const nodeTypes = ["string", "count", "average", "concat"];
+// const moduleTypes = ["string", "numeric", "array", "object"];
+// const aggTypes = [false, "concat", "count", "density", "average"];
 
 const styles = theme => ({
     appBar: {
@@ -76,10 +73,7 @@ class FacetedSettings extends React.Component {
         super(props);
         this.state = {
             listTypes:  ["MultiList", "RangeInput"],
-            // listValue: "",
         }
-        // console.log(props);
-        // console.log(this.props.facet);
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -90,35 +84,15 @@ class FacetedSettings extends React.Component {
         this.props.onSettingsClick();
     };
 
-    // handleChange = name => event => {
-    //     this.setState({ [name]: event.target.value });
-    //     this.props.updateParentState(name, event.target.value);
-    // };
-
     handleChange = name => event => {
-        console.log(event.target.value);
-        console.log(name);
+        console.log(this.props);
         this.setState({ [name]: event.target.value });
         // setType(event.target.value);
-        // this.props.updateParentState(name, event.target.value);
+        this.props.updateParentState(this.props.key, name, event.target.value);
     };
-
-
-    onListTypeChange = (field, index) => event => {
-        const listTypes = [...this.state.listTypes];
-        listTypes[index][field] = event.target.value;	
-        this.setState({ listTypes: listTypes });
-        this.props.updateParentState("listTypes", listTypes);
-    }
 
     render() {
         const { classes } = this.props;
-        // const [type, setType] = React.useState('');
-        // console.log(this.props);
-        // console.log("facet");
-        // console.log(this.props.facet);
-        // console.log("parentState");
-        // console.log(this.props.parentState);
         return (
             <div>
                 <Dialog
@@ -126,7 +100,6 @@ class FacetedSettings extends React.Component {
                     onClose={this.handleClose}
                     TransitionComponent={Transition}
                 >
-
                     <form className={classes.container} noValidate autoComplete="off">
 
                         <AppBar className={classes.appBar}>
@@ -144,8 +117,6 @@ class FacetedSettings extends React.Component {
                         </AppBar>
 
                         <List>
-                                
-
                             <ListItem key={'listType'}>
                                 <TextField
                                     select
@@ -161,9 +132,6 @@ class FacetedSettings extends React.Component {
                                     }}
                                         margin="normal"
                                     >
-                                        {/* <MenuItem value={"MultiList"}>MultiList</MenuItem> */}
-                                        {/* <MenuItem value={"RangeInput"}>RangeInput</MenuItem> */}
-
                                         {this.state.listTypes.map(option => (
                                             <option key={option} value={option}>
                                                 {option}
@@ -171,49 +139,7 @@ class FacetedSettings extends React.Component {
                                         ))}
                                 </TextField>
                             </ListItem>
-
-                            {/* {this.state.listTypes.map( (tipField, index) => { */}
-                            {/*     return ( */}
-                            {/*         <ListItem key={'tip' + index.toString()}> */}
-                            {/*             <TextField */}
-                            {/*                 select */}
-                            {/*                 label="Choose List Type" */}
-                            {/*                 className={classes.textField} */}
-                            {/*                 value={this.state.listTypes} */}
-                            {/*                 // onChange={handleChange('listType', index)} */}
-                            {/*                 SelectProps={{ */}
-                            {/*                     native: true, */}
-                            {/*                     MenuProps: { */}
-                            {/*                         className: classes.menu, */}
-                            {/*                     }, */}
-                            {/*                 }} */}
-                            {/*                     margin="normal" */}
-                            {/*                 > */}
-                            {/*                     {this.state.listTypes.map(option => ( */}
-                            {/*                         <option key={option} value={option}> */}
-                            {/*                             {option} */}
-                            {/*                         </option> */}
-                            {/*                     ))} */}
-                            {/*             </TextField> */}
-
-                                        {/* <FacetPane */}
-                                        {/*     key={index.toString()} */}
-                                        {/*     classes={classes} */}
-                                        {/*     fields={this.props.parentState.nodeFields} */}
-                                        {/*     selectedField={this.state.listTypes[index].field} */}
-                                        {/*     types={nodeTypes} */}
-                                        {/*     selectedType={this.state.listTypes[index].type} */}
-                                        {/*     label={this.state.listTypes[index].label} */}
-                                        {/*     fs={this.state.listTypes[index].fs} */}
-                                        {/*     index={index} */}
-                                        {/*     handleChange={this.onListTypeChange} */}
-                                        {/*     remove={this.removeEl} */}
-                                        {/* /> */}
-                                    {/* </ListItem> */}
-                                {/* ) */}
-                            {/* })} */}
                         </List>
-
                     </form>
                 </Dialog>
             </div>
@@ -225,9 +151,7 @@ FacetedSettings.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-// return settings for each search component
 const FacetPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
-
     return (
         <div>
             <TextField

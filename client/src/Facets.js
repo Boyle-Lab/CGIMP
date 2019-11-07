@@ -40,32 +40,20 @@ class FacetedSearch extends Component {
 	    facetsSet: false,
         numericRanges: {},
         settingsOpen: false,    // Settings dialog display state
-
-        //for testing
-        //showCountOption: true
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
 	this.handleQueryChange = this.handleQueryChange.bind(this);
 	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
-    this.updateStateSettings = this.updateStateSettings.bind(this);
-    //for testing
-    // this.changeShowCount = this.changeShowCount.bind(this);
+    this.updateListType = this.updateListType.bind(this);
     }
 
     componentDidMount() {
 	this.getFacetsFromElasticsearch();
     }
 
-    //changeShowCount = ( facet ) => {
-    //    facet.showCountOption = !facet.showCountOption;
-    //    //this.setState({
-    //    //    showCountOption: !this.state.showCountOption,
-    //    //});
-    //}
-
     handleSettingsClick = () => {
-	this.setState({ settingsOpen: !this.state.settingsOpen });
+        this.setState({ settingsOpen: !this.state.settingsOpen });
     }
 
     getFacetsFromElasticsearch = () => {
@@ -86,8 +74,7 @@ class FacetedSearch extends Component {
                                     selectAllLabel:"",
                                     filterLabel: "",
                                     // for settings
-                                    facetType: "",
-                                    //showCountOption: true,
+                                    facetListType: "",
                                 }
                                 if (key !== "id" && key !== "node") {
                                     facetParams.componentId = key + 'List';
@@ -229,7 +216,12 @@ class FacetedSearch extends Component {
         }
     };
 
-    updateStateSettings = (name, value) => {
+    updateListType = (key, name, value) => {
+        console.log("updateListType");
+        console.log("key " + key);
+        console.log("name " + name);
+        console.log("value " + value);
+        // if (name === "listValue")
 
     }
 
@@ -295,12 +287,22 @@ class FacetedSearch extends Component {
 
 		{Object.keys(this.state.facets).map( (key, index) => {
 		    const facet = this.state.facets[key];
-            // console.log( facet );
+            // <div>
+            //     <IconButton color="inherit" onClick={this.handleSettingsClick} >
+            //         <SettingsIcon/>
+            //     </IconButton>
+            //     <FacetedSettings
+            //         onSettingsClick={this.handleSettingsClick}
+            //         open={this.state.settingsOpen}
+            //         parentState={this.state}
+            //         facet={facet}
+            //     />
+            // </div>
 
             if (facet.dataType === "text") {
+                console.log("key1 " + key)
                 return (
                     <div>
-                        {/* <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/> */}
                         <IconButton color="inherit" onClick={this.handleSettingsClick} >
                             <SettingsIcon/>
                         </IconButton>
@@ -308,7 +310,9 @@ class FacetedSearch extends Component {
                             onSettingsClick={this.handleSettingsClick}
                             open={this.state.settingsOpen}
                             parentState={this.state}
-                            facet={facet}
+                            // facet={this.state.facets[key]}
+                            key={key}
+                            updateParentState={this.updateListType}
                         />
                         <MultiList
                             key={key}
