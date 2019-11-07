@@ -73,45 +73,45 @@ class FacetedSearch extends Component {
 	client.get({index: "browser",
                     type: "modules",
                     id: 1},
-                   (err, res) => {
-                       if (err) {
-                           console.log(err);
-		       } else {
-                           Object.keys(res._source).forEach( (key) => {
-                               let facetParams = {
-                                   dataType: "numeric",
-                                   componentId: "",
-                                   dataField: "",
-                                   title: "",
-                                   selectAllLabel:"",
-                                   filterLabel: "",
-                                   // for settings
-                                   facetType: "",
-                                   //showCountOption: true,
-                               }
-                               if (key !== "id" && key !== "node") {
-                                   facetParams.componentId = key + 'List';
-                                   facetParams.title = key;
-                                   facetParams.selectAllLabel = 'All ' + key;
-                                   facetParams.filterLabel = key;
-                                   if (isNaN(res._source[key])) {
-                                       facetParams.dataField = key + '.keyword';
-                                       facetParams.dataType = "text";
-                                   } else {
-                                       facetParams.dataField = key;
-                                   }
-                                   facets[key + 'List'] = facetParams;
-                               }
-                           });
-                           this.setState({
-			       facets: facets,
-			       //facetsSet: true
-			   }, () => {
-			       //console.log(this.state)
-			   });
-			   this.getNumericRangesFromElasticSearch(facets);
-                       }
-                   });
+                    (err, res) => {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            Object.keys(res._source).forEach( (key) => {
+                                let facetParams = {
+                                    dataType: "numeric",
+                                    componentId: "",
+                                    dataField: "",
+                                    title: "",
+                                    selectAllLabel:"",
+                                    filterLabel: "",
+                                    // for settings
+                                    facetType: "",
+                                    //showCountOption: true,
+                                }
+                                if (key !== "id" && key !== "node") {
+                                    facetParams.componentId = key + 'List';
+                                    facetParams.title = key;
+                                    facetParams.selectAllLabel = 'All ' + key;
+                                    facetParams.filterLabel = key;
+                                    if (isNaN(res._source[key])) {
+                                        facetParams.dataField = key + '.keyword';
+                                        facetParams.dataType = "text";
+                                    } else {
+                                        facetParams.dataField = key;
+                                    }
+                                    facets[key + 'List'] = facetParams;
+                                }
+                            });
+                            this.setState({
+                                facets: facets,
+                                //facetsSet: true
+                            }, () => {
+                                //console.log(this.state)
+                            });
+                            this.getNumericRangesFromElasticSearch(facets);
+                        }
+                    });
     }
 
     getNumericRangesFromElasticSearch = async (facets) => {

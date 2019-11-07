@@ -17,6 +17,8 @@ import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 import SingleList from '@appbaseio/reactivesearch';
 
+import MenuItem from '@material-ui/core/MenuItem';
+
 /*
 This code is part of the CGIMP distribution
 (https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
@@ -39,6 +41,7 @@ CONTACT: Adam Diehl, adadiehl@umich.edu
 const nodeTypes = ["string", "count", "average", "concat"];
 const moduleTypes = ["string", "numeric", "array", "object"];
 const aggTypes = [false, "concat", "count", "density", "average"];
+// const listTypes = ["MultiList", "RangeInput"];
 
 const styles = theme => ({
     appBar: {
@@ -72,10 +75,12 @@ class FacetedSettings extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            listTypes: ["MultiList", "RangeInput"],
+            listTypes:  ["MultiList", "RangeInput"],
+            // listValue: "",
         }
         // console.log(props);
-        console.log(this.props.facet);
+        // console.log(this.props.facet);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     componentDidMount() {
@@ -85,10 +90,19 @@ class FacetedSettings extends React.Component {
         this.props.onSettingsClick();
     };
 
+    // handleChange = name => event => {
+    //     this.setState({ [name]: event.target.value });
+    //     this.props.updateParentState(name, event.target.value);
+    // };
+
     handleChange = name => event => {
+        console.log(event.target.value);
+        console.log(name);
         this.setState({ [name]: event.target.value });
-        this.props.updateParentState(name, event.target.value);
+        // setType(event.target.value);
+        // this.props.updateParentState(name, event.target.value);
     };
+
 
     onListTypeChange = (field, index) => event => {
         const listTypes = [...this.state.listTypes];
@@ -99,9 +113,12 @@ class FacetedSettings extends React.Component {
 
     render() {
         const { classes } = this.props;
-        console.log(this.props);
-        console.log(this.props.facet);
-        console.log(this.props.parentState);
+        // const [type, setType] = React.useState('');
+        // console.log(this.props);
+        // console.log("facet");
+        // console.log(this.props.facet);
+        // console.log("parentState");
+        // console.log(this.props.parentState);
         return (
             <div>
                 <Dialog
@@ -127,52 +144,57 @@ class FacetedSettings extends React.Component {
                         </AppBar>
 
                         <List>
-                            {/* <ListItem key={'listType'}> */}
-                            {/*     <TextField */}
-                            {/*         select */}
-                            {/*         label="Choose List Type" */}
-                            {/*         className={classes.textField} */}
-                            {/*         value={this.state.listTypes} */}
-                            {/*         onChange={handleChange('listType', index)} */}
-                            {/*         SelectProps={{ */}
-                            {/*             native: true, */}
-                            {/*             MenuProps: { */}
-                            {/*                 className: classes.menu, */}
-                            {/*             }, */}
-                            {/*         }} */}
-                            {/*             margin="normal" */}
-                            {/*         > */}
-                            {/*             {this.state.listTypes.map(option => ( */}
-                            {/*                 <option key={option} value={option}> */}
-                            {/*                     {option} */}
-                            {/*                 </option> */}
-                            {/*             ))} */}
-                            {/*     </TextField> */}
-                            {/* </ListItem> */}
+                                
 
-                            {this.state.listTypes.map( (tipField, index) => {
-                                return (
-                                    <ListItem key={'tip' + index.toString()}>
-                                        <TextField
-                                            select
-                                            label="Choose List Type"
-                                            className={classes.textField}
-                                            value={this.state.listTypes}
-                                            // onChange={handleChange('listType', index)}
-                                            SelectProps={{
-                                                native: true,
-                                                MenuProps: {
-                                                    className: classes.menu,
-                                                },
-                                            }}
-                                                margin="normal"
-                                            >
-                                                {this.state.listTypes.map(option => (
-                                                    <option key={option} value={option}>
-                                                        {option}
-                                                    </option>
-                                                ))}
-                                        </TextField>
+                            <ListItem key={'listType'}>
+                                <TextField
+                                    select
+                                    label="Choose List Type"
+                                    className={classes.textField}
+                                    value={this.state.listValue}
+                                    onChange={this.handleChange("listValue")}
+                                    SelectProps={{
+                                        native: true,
+                                        MenuProps: {
+                                            className: classes.menu,
+                                        },
+                                    }}
+                                        margin="normal"
+                                    >
+                                        {/* <MenuItem value={"MultiList"}>MultiList</MenuItem> */}
+                                        {/* <MenuItem value={"RangeInput"}>RangeInput</MenuItem> */}
+
+                                        {this.state.listTypes.map(option => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                </TextField>
+                            </ListItem>
+
+                            {/* {this.state.listTypes.map( (tipField, index) => { */}
+                            {/*     return ( */}
+                            {/*         <ListItem key={'tip' + index.toString()}> */}
+                            {/*             <TextField */}
+                            {/*                 select */}
+                            {/*                 label="Choose List Type" */}
+                            {/*                 className={classes.textField} */}
+                            {/*                 value={this.state.listTypes} */}
+                            {/*                 // onChange={handleChange('listType', index)} */}
+                            {/*                 SelectProps={{ */}
+                            {/*                     native: true, */}
+                            {/*                     MenuProps: { */}
+                            {/*                         className: classes.menu, */}
+                            {/*                     }, */}
+                            {/*                 }} */}
+                            {/*                     margin="normal" */}
+                            {/*                 > */}
+                            {/*                     {this.state.listTypes.map(option => ( */}
+                            {/*                         <option key={option} value={option}> */}
+                            {/*                             {option} */}
+                            {/*                         </option> */}
+                            {/*                     ))} */}
+                            {/*             </TextField> */}
 
                                         {/* <FacetPane */}
                                         {/*     key={index.toString()} */}
@@ -187,9 +209,9 @@ class FacetedSettings extends React.Component {
                                         {/*     handleChange={this.onListTypeChange} */}
                                         {/*     remove={this.removeEl} */}
                                         {/* /> */}
-                                    </ListItem>
-                                )
-                            })}
+                                    {/* </ListItem> */}
+                                {/* ) */}
+                            {/* })} */}
                         </List>
 
                     </form>
