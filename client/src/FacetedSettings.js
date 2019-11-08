@@ -15,6 +15,7 @@ import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 
 /*
@@ -73,31 +74,45 @@ class FacetedSettings extends React.Component {
         super(props);
         this.state = {
             listTypes:  ["MultiList", "RangeInput"],
+            // facetName: this.props.key,
+            settingsOpen: false,    // Settings dialog display state
         }
         this.handleChange = this.handleChange.bind(this);
+        this.handleSettingsClick = this.handleSettingsClick.bind(this);
     }
 
     componentDidMount() {
+        // console.log(this.props);
+    }
+
+    handleSettingsClick = () => {
+        this.setState({ settingsOpen: !this.state.settingsOpen });
     }
 
     handleClose = () => {
-        this.props.onSettingsClick();
+        this.handleSettingsClick();
     };
 
     handleChange = name => event => {
-        console.log(this.props);
+        // console.log(this.props);
+        // console.log("key " + key);
+        // console.log("name " + name);
+        // console.log("value " + value);
         this.setState({ [name]: event.target.value });
-        // setType(event.target.value);
         this.props.updateParentState(this.props.key, name, event.target.value);
     };
 
     render() {
         const { classes } = this.props;
+        // console.log(this.props);
         return (
             <div>
+                <IconButton color="inherit" onClick={this.handleSettingsClick} >
+                    <SettingsIcon/>
+                </IconButton>
                 <Dialog
-                    open={this.props.open}
-                    onClose={this.handleClose}
+                    open={this.state.settingsOpen}
+                    onClose={this.handleSettingsClick}
                     TransitionComponent={Transition}
                 >
                     <form className={classes.container} noValidate autoComplete="off">

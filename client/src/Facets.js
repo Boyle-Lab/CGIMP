@@ -3,7 +3,6 @@ import browser from './browser_config';
 import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 import FacetedSettings from './FacetedSettings';
-import SettingsIcon from '@material-ui/icons/Settings';
 import IconButton from '@material-ui/core/IconButton';
 
 /*
@@ -39,7 +38,6 @@ class FacetedSearch extends Component {
 	    facets: {},
 	    facetsSet: false,
         numericRanges: {},
-        settingsOpen: false,    // Settings dialog display state
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
@@ -52,9 +50,6 @@ class FacetedSearch extends Component {
 	this.getFacetsFromElasticsearch();
     }
 
-    handleSettingsClick = () => {
-        this.setState({ settingsOpen: !this.state.settingsOpen });
-    }
 
     getFacetsFromElasticsearch = () => {
         const facets = [];
@@ -73,8 +68,9 @@ class FacetedSearch extends Component {
                                     title: "",
                                     selectAllLabel:"",
                                     filterLabel: "",
-                                    // for settings
+
                                     facetListType: "",
+                                    // facetName: key,
                                 }
                                 if (key !== "id" && key !== "node") {
                                     facetParams.componentId = key + 'List';
@@ -218,9 +214,9 @@ class FacetedSearch extends Component {
 
     updateListType = (key, name, value) => {
         console.log("updateListType");
-        console.log("key " + key);
-        console.log("name " + name);
-        console.log("value " + value);
+        // console.log("key " + key);
+        // console.log("name " + name);
+        // console.log("value " + value);
         // if (name === "listValue")
 
     }
@@ -287,6 +283,7 @@ class FacetedSearch extends Component {
 
 		{Object.keys(this.state.facets).map( (key, index) => {
 		    const facet = this.state.facets[key];
+            // const facetName = key;
             // <div>
             //     <IconButton color="inherit" onClick={this.handleSettingsClick} >
             //         <SettingsIcon/>
@@ -299,30 +296,28 @@ class FacetedSearch extends Component {
             //     />
             // </div>
 
+            // console.log("key "  + key);
             if (facet.dataType === "text") {
-                console.log("key1 " + key)
                 return (
                     <div>
-                        <IconButton color="inherit" onClick={this.handleSettingsClick} >
-                            <SettingsIcon/>
-                        </IconButton>
                         <FacetedSettings
-                            onSettingsClick={this.handleSettingsClick}
-                            open={this.state.settingsOpen}
+                            // key={key}
+                            componentId={facet.componentId}
+                            // onSettingsClick={this.handleSettingsClick}
+                            // open={this.state.settingsOpen}
                             parentState={this.state}
                             // facet={this.state.facets[key]}
-                            key={key}
                             updateParentState={this.updateListType}
                         />
                         <MultiList
                             key={key}
                             componentId={facet.componentId}
                             dataField={facet.dataField}
-                            title={facet.title}
+                            // title={facet.title}
+                            title={facet.componentId}
                             queryFormat="and"
                             selectAllLabel={facet.selectAllLabel}
                             showCheckbox={true}
-                            //showCount={this.state.showCountOption}
                             showCount={true}
                             showSearch={false}
                             react={{
