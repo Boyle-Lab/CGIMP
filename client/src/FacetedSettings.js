@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import DeleteIcon from '@material-ui/icons/Delete';
+// import DeleteIcon from '@material-ui/icons/Delete';
 // import AddIcon from '@material-ui/icons/Add';
 import Dialog from '@material-ui/core/Dialog';
 // import Divider from '@material-ui/core/Divider';
@@ -94,12 +94,10 @@ class FacetedSettings extends React.Component {
     };
 
     handleChange = name => event => {
-        // console.log(this.props);
-        // console.log("key " + key);
-        // console.log("name " + name);
-        // console.log("value " + value);
+        // console.log(this.props.componentId);
+        const id = this.props.componentId;
         this.setState({ [name]: event.target.value });
-        this.props.updateParentState(this.props.key, name, event.target.value);
+        this.props.updateParentState(id, name, event.target.value);
     };
 
     render() {
@@ -132,7 +130,7 @@ class FacetedSettings extends React.Component {
                         </AppBar>
 
                         <List>
-                            <ListItem key={'listType'}>
+                            <ListItem key={this.props.componentId + 'listType'}>
                                 <TextField
                                     select
                                     label="Choose List Type"
@@ -166,226 +164,226 @@ FacetedSettings.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-const FacetPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
-    return (
-        <div>
-            <TextField
-                id={"FacetedSelect" + index}
-                select
-                label="Choose List Type"
-                className={classes.textField}
-                value={selectedField}
-                onChange={handleChange('field', index)}
-                SelectProps={{
-                    native: true,
-                    MenuProps: {
-                        className: classes.menu,
-                    },
-                }}
-                    margin="normal"
-                >
-                    {fields.map(option => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </TextField>
-                {/* <TextField */}
-                {/*     id={"tipFieldType" + index} */}
-                {/*     select */}
-                {/*     label="Data Type" */}
-                {/*     className={classes.textField} */}
-                {/*     value={selectedType} */}
-                {/*     onChange={handleChange('type', index)} */}
-                {/*     SelectProps={{ */}
-                {/*         native: true, */}
-                {/*         MenuProps: { */}
-                {/*             className: classes.menu, */}
-                {/*         }, */}
-                {/*     }} */}
-                {/*         margin="normal" */}
-                {/*     > */}
-                {/*         {types.map(option => ( */}
-                {/*             <option key={option} value={option}> */}
-                {/*                 {option} */}
-                {/*             </option> */}
-                {/*         ))} */}	
-                {/*         </TextField> */}
-                {/*         <TextField */}
-                {/*             value={label} */}
-                {/*             onChange={handleChange('label', index)} */}
-                {/*             margin="normal" */}
-                {/*             id={"label" + index} */}
-                {/*             label="Label" */}
-                {/*         /> */}
-                {/*         <TextField */}
-                {/*             value={fs} */}
-                {/*             onChange={handleChange('fs', index)} */}
-                {/*             margin="normal" */}
-                {/*             id={"tipFs" + index} */}
-                {/*             label="Field Separator" */}
-                {/*         /> */}
-                    </div>
-    );
+// const FacetPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
+//     return (
+//         <div>
+//             <TextField
+//                 id={"FacetedSelect" + index}
+//                 select
+//                 label="Choose List Type"
+//                 className={classes.textField}
+//                 value={selectedField}
+//                 onChange={handleChange('field', index)}
+//                 SelectProps={{
+//                     native: true,
+//                     MenuProps: {
+//                         className: classes.menu,
+//                     },
+//                 }}
+//                     margin="normal"
+//                 >
+//                     {fields.map(option => (
+//                         <option key={option} value={option}>
+//                             {option}
+//                         </option>
+//                     ))}
+//                 </TextField>
+//                 {/* <TextField */}
+//                 {/*     id={"tipFieldType" + index} */}
+//                 {/*     select */}
+//                 {/*     label="Data Type" */}
+//                 {/*     className={classes.textField} */}
+//                 {/*     value={selectedType} */}
+//                 {/*     onChange={handleChange('type', index)} */}
+//                 {/*     SelectProps={{ */}
+//                 {/*         native: true, */}
+//                 {/*         MenuProps: { */}
+//                 {/*             className: classes.menu, */}
+//                 {/*         }, */}
+//                 {/*     }} */}
+//                 {/*         margin="normal" */}
+//                 {/*     > */}
+//                 {/*         {types.map(option => ( */}
+//                 {/*             <option key={option} value={option}> */}
+//                 {/*                 {option} */}
+//                 {/*             </option> */}
+//                 {/*         ))} */}	
+//                 {/*         </TextField> */}
+//                 {/*         <TextField */}
+//                 {/*             value={label} */}
+//                 {/*             onChange={handleChange('label', index)} */}
+//                 {/*             margin="normal" */}
+//                 {/*             id={"label" + index} */}
+//                 {/*             label="Label" */}
+//                 {/*         /> */}
+//                 {/*         <TextField */}
+//                 {/*             value={fs} */}
+//                 {/*             onChange={handleChange('fs', index)} */}
+//                 {/*             margin="normal" */}
+//                 {/*             id={"tipFs" + index} */}
+//                 {/*             label="Field Separator" */}
+//                 {/*         /> */}
+//                     </div>
+//     );
 
-}
+// }
 
-// prototype for individual search facet
-const ToolTipPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
+// // prototype for individual search facet
+// const ToolTipPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
 
-    return (
-        <div>
-            <TextField>
-            </TextField>
-            <TextField
-                id={"tipFieldSelect" + index}
-                select
-                label="Field"
-                className={classes.textField}
-                value={selectedField}
-                onChange={handleChange('field', index)}
-                SelectProps={{
-                    native: true,
-                    MenuProps: {
-                        className: classes.menu,
-                    },
-                }}
-                    margin="normal"
-                >
-                    {fields.map(option => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </TextField>
-                <TextField
-                    id={"tipFieldType" + index}
-                    select
-                    label="Data Type"
-                    className={classes.textField}
-                    value={selectedType}
-                    onChange={handleChange('type', index)}
-                    SelectProps={{
-                        native: true,
-                        MenuProps: {
-                            className: classes.menu,
-                        },
-                    }}
-                        margin="normal"
-                    >
-                        {types.map(option => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}	
-                        </TextField>
-                        <TextField
-                            value={label}
-                            onChange={handleChange('label', index)}
-                            margin="normal"
-                            id={"label" + index}
-                            label="Label"
-                        />
-                        <TextField
-                            value={fs}
-                            onChange={handleChange('fs', index)}
-                            margin="normal"
-                            id={"tipFs" + index}
-                            label="Field Separator"
-                        />
-                        <IconButton className={classes.button} aria-label="Delete ToolTip" color="inherit" onClick={remove("toolTips", index)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </div>
-    );
-}
+//     return (
+//         <div>
+//             <TextField>
+//             </TextField>
+//             <TextField
+//                 id={"tipFieldSelect" + index}
+//                 select
+//                 label="Field"
+//                 className={classes.textField}
+//                 value={selectedField}
+//                 onChange={handleChange('field', index)}
+//                 SelectProps={{
+//                     native: true,
+//                     MenuProps: {
+//                         className: classes.menu,
+//                     },
+//                 }}
+//                     margin="normal"
+//                 >
+//                     {fields.map(option => (
+//                         <option key={option} value={option}>
+//                             {option}
+//                         </option>
+//                     ))}
+//                 </TextField>
+//                 <TextField
+//                     id={"tipFieldType" + index}
+//                     select
+//                     label="Data Type"
+//                     className={classes.textField}
+//                     value={selectedType}
+//                     onChange={handleChange('type', index)}
+//                     SelectProps={{
+//                         native: true,
+//                         MenuProps: {
+//                             className: classes.menu,
+//                         },
+//                     }}
+//                         margin="normal"
+//                     >
+//                         {types.map(option => (
+//                             <option key={option} value={option}>
+//                                 {option}
+//                             </option>
+//                         ))}	
+//                         </TextField>
+//                         <TextField
+//                             value={label}
+//                             onChange={handleChange('label', index)}
+//                             margin="normal"
+//                             id={"label" + index}
+//                             label="Label"
+//                         />
+//                         <TextField
+//                             value={fs}
+//                             onChange={handleChange('fs', index)}
+//                             margin="normal"
+//                             id={"tipFs" + index}
+//                             label="Field Separator"
+//                         />
+//                         <IconButton className={classes.button} aria-label="Delete ToolTip" color="inherit" onClick={remove("toolTips", index)}>
+//                             <DeleteIcon />
+//                         </IconButton>
+//                     </div>
+//     );
+// }
 
-const ModuleDataTable = ({classes, fields, selectedField, types, selectedType, aggTypes, selectedAggType, title, fs, index, handleChange, remove}) => {
+// const ModuleDataTable = ({classes, fields, selectedField, types, selectedType, aggTypes, selectedAggType, title, fs, index, handleChange, remove}) => {
 
-    return (
-        <div>
-            <TextField
-                id={"moduleFieldSelect" + index}
-                select
-                label="Field"
-                className={classes.textField}
-                value={selectedField}
-                onChange={handleChange('moduleTables', 'field', index)}
-                SelectProps={{
-                    native: true,
-                    MenuProps: {
-                        className: classes.menu,
-                    },
-                }}
-                    margin="normal"
-                >
-                    {fields.map(option => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </TextField>
-                <TextField
-                    id={"moduleFieldType" + index}
-                    select
-                    label="Data Type"
-                    className={classes.textField}
-                    value={selectedType}
-                    onChange={handleChange('moduleTables', 'type', index)}
-                    SelectProps={{
-                        native: true,
-                        MenuProps: {
-                            className: classes.menu,
-                        },
-                    }}
-                        margin="normal"
-                    >
-                        {types.map(option => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </TextField>
-                    <TextField
-                        id={"aggFieldType" + index}
-                        select
-                        label="Aggregation Type"
-                        className={classes.textField}
-                        value={selectedAggType}
-                        onChange={handleChange('moduleTables', 'aggregate', index)}
-                        SelectProps={{
-                            native: true,
-                            MenuProps: {
-                                className: classes.menu,
-                            },
-                        }}
-                            margin="normal"
-                        >
-                            {aggTypes.map(option => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </TextField>
-                        <TextField
-                            value={title}
-                            onChange={handleChange('moduleTables', 'title', index)}
-                            margin="normal"
-                            id={"title" + index}
-                            label="Title"
-                        />
-                        <TextField
-                            value={fs}
-                            onChange={handleChange('moduleTables', 'fs', index)}
-                            margin="normal"
-                            id={"moduleFs" + index}
-                            label="Field Separator"
-                        />
-                        <IconButton className={classes.button} aria-label="Delete Module Table" color="inherit" onClick={remove("moduleTables", index)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </div>
-    );
-}
+//     return (
+//         <div>
+//             <TextField
+//                 id={"moduleFieldSelect" + index}
+//                 select
+//                 label="Field"
+//                 className={classes.textField}
+//                 value={selectedField}
+//                 onChange={handleChange('moduleTables', 'field', index)}
+//                 SelectProps={{
+//                     native: true,
+//                     MenuProps: {
+//                         className: classes.menu,
+//                     },
+//                 }}
+//                     margin="normal"
+//                 >
+//                     {fields.map(option => (
+//                         <option key={option} value={option}>
+//                             {option}
+//                         </option>
+//                     ))}
+//                 </TextField>
+//                 <TextField
+//                     id={"moduleFieldType" + index}
+//                     select
+//                     label="Data Type"
+//                     className={classes.textField}
+//                     value={selectedType}
+//                     onChange={handleChange('moduleTables', 'type', index)}
+//                     SelectProps={{
+//                         native: true,
+//                         MenuProps: {
+//                             className: classes.menu,
+//                         },
+//                     }}
+//                         margin="normal"
+//                     >
+//                         {types.map(option => (
+//                             <option key={option} value={option}>
+//                                 {option}
+//                             </option>
+//                         ))}
+//                     </TextField>
+//                     <TextField
+//                         id={"aggFieldType" + index}
+//                         select
+//                         label="Aggregation Type"
+//                         className={classes.textField}
+//                         value={selectedAggType}
+//                         onChange={handleChange('moduleTables', 'aggregate', index)}
+//                         SelectProps={{
+//                             native: true,
+//                             MenuProps: {
+//                                 className: classes.menu,
+//                             },
+//                         }}
+//                             margin="normal"
+//                         >
+//                             {aggTypes.map(option => (
+//                                 <option key={option} value={option}>
+//                                     {option}
+//                                 </option>
+//                             ))}
+//                         </TextField>
+//                         <TextField
+//                             value={title}
+//                             onChange={handleChange('moduleTables', 'title', index)}
+//                             margin="normal"
+//                             id={"title" + index}
+//                             label="Title"
+//                         />
+//                         <TextField
+//                             value={fs}
+//                             onChange={handleChange('moduleTables', 'fs', index)}
+//                             margin="normal"
+//                             id={"moduleFs" + index}
+//                             label="Field Separator"
+//                         />
+//                         <IconButton className={classes.button} aria-label="Delete Module Table" color="inherit" onClick={remove("moduleTables", index)}>
+//                             <DeleteIcon />
+//                         </IconButton>
+//                     </div>
+//     );
+// }
 
 export default withStyles(styles)(FacetedSettings);

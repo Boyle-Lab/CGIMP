@@ -3,7 +3,6 @@ import browser from './browser_config';
 import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 import FacetedSettings from './FacetedSettings';
-import IconButton from '@material-ui/core/IconButton';
 
 /*
 This code is part of the CGIMP distribution
@@ -212,12 +211,39 @@ class FacetedSearch extends Component {
         }
     };
 
-    updateListType = (key, name, value) => {
-        console.log("updateListType");
-        // console.log("key " + key);
+    updateListType = (componentId, name, value) => {
+        // console.log("updateListType");
+        // console.log("componentId " + componentId);
         // console.log("name " + name);
-        // console.log("value " + value);
-        // if (name === "listValue")
+        console.log("value " + value);
+        if (name === "listValue") {
+            let updateListType = this.state.facets;
+            updateListType[componentId].facetListType = value;
+            this.setState(
+            { 
+                facets: updateListType,
+            },
+                this.forceUpdate(),
+                console.log( this.state.facets[componentId] )
+            );
+
+            // console.log( this.state.facets[componentId] );
+            // const updateListType = this.state.facets;
+            // updateListType[componentId].facetListType = value;
+
+            // console.log(updateListType);
+            // this.setState(
+            // {
+            //     facets: updateListType,
+            // },  
+            //     console.log( this.state.facets[componentId] )
+            // );
+
+            // this.state.facets[componentId].facetListType = value;
+            // this.setState({
+            //     facets[componentId].facetListType : value,
+            // })
+        }
 
     }
 
@@ -301,16 +327,13 @@ class FacetedSearch extends Component {
                 return (
                     <div>
                         <FacetedSettings
-                            // key={key}
+                            key={key + "settings"}
                             componentId={facet.componentId}
-                            // onSettingsClick={this.handleSettingsClick}
-                            // open={this.state.settingsOpen}
                             parentState={this.state}
-                            // facet={this.state.facets[key]}
                             updateParentState={this.updateListType}
                         />
                         <MultiList
-                            key={key}
+                            key={key + "list"}
                             componentId={facet.componentId}
                             dataField={facet.dataField}
                             // title={facet.title}
