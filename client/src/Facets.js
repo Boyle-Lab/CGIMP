@@ -309,22 +309,7 @@ class FacetedSearch extends Component {
 
 		{Object.keys(this.state.facets).map( (key, index) => {
 		    const facet = this.state.facets[key];
-            // const facetName = key;
-            // <div>
-            //     <IconButton color="inherit" onClick={this.handleSettingsClick} >
-            //         <SettingsIcon/>
-            //     </IconButton>
-            //     <FacetedSettings
-            //         onSettingsClick={this.handleSettingsClick}
-            //         open={this.state.settingsOpen}
-            //         parentState={this.state}
-            //         facet={facet}
-            //     />
-            // </div>
-
-            // console.log("key "  + key);
-            if (facet.dataType === "text") {
-                return (
+            return (
                     <div>
                         <FacetedSettings
                             key={key + "settings"}
@@ -332,45 +317,65 @@ class FacetedSearch extends Component {
                             parentState={this.state}
                             updateParentState={this.updateListType}
                         />
-                        <MultiList
+                        <FacetList
                             key={key + "list"}
-                            componentId={facet.componentId}
-                            dataField={facet.dataField}
-                            // title={facet.title}
-                            title={facet.componentId}
-                            queryFormat="and"
-                            selectAllLabel={facet.selectAllLabel}
-                            showCheckbox={true}
-                            showCount={true}
-                            showSearch={false}
-                            react={{
-                                and: keys
-                            }}
-                            showFilter={true}
-                            filterLabel={facet.filterLabel}
-                            URLParams={false}
-                            innerClass={{
-                                label: "list-item",
-                                input: "list-input"
-                            }}
+                            keyProp={key + "list"}
+                            keys={keys}
+                            index={index}
+                            facet={this.state.facets[key]}
+                            numericRanges={this.state.numericRanges}
                         />
-                        </div>
-                    );
-            } else if (facet.dataType === "numeric") {
-                return (
-                    <RangeInput
-                        key={key}
-                        componentId={facet.componentId}
-                        dataField={facet.dataField}
-                        title={facet.title}
-                        range={{
-                            "start": this.state.numericRanges[facet.title].min,
-                            "end": this.state.numericRanges[facet.title].max
-                        }}
-                    />);
-                    //return (<div key={key} />);
-            }
-            return(<div key={index}/>);
+                    </div>
+            );
+            // console.log("key "  + key);
+            //if (facet.dataType === "text") {
+            //    return (
+            //        <div>
+            //            <FacetedSettings
+            //                key={key + "settings"}
+            //                componentId={facet.componentId}
+            //                parentState={this.state}
+            //                updateParentState={this.updateListType}
+            //            />
+            //            <MultiList
+            //                key={key + "list"}
+            //                componentId={facet.componentId}
+            //                dataField={facet.dataField}
+            //                // title={facet.title}
+            //                title={facet.componentId}
+            //                queryFormat="and"
+            //                selectAllLabel={facet.selectAllLabel}
+            //                showCheckbox={true}
+            //                showCount={true}
+            //                showSearch={false}
+            //                react={{
+            //                    and: keys
+            //                }}
+            //                showFilter={true}
+            //                filterLabel={facet.filterLabel}
+            //                URLParams={false}
+            //                innerClass={{
+            //                    label: "list-item",
+            //                    input: "list-input"
+            //                }}
+            //            />
+            //            </div>
+            //        );
+            //} else if (facet.dataType === "numeric") {
+            //    return (
+            //        <RangeInput
+            //            key={key}
+            //            componentId={facet.componentId}
+            //            dataField={facet.dataField}
+            //            title={facet.title}
+            //            range={{
+            //                "start": this.state.numericRanges[facet.title].min,
+            //                "end": this.state.numericRanges[facet.title].max
+            //            }}
+            //        />);
+            //        //return (<div key={key} />);
+            //}
+            //return(<div key={index}/>);
         })}
 
     </ReactiveBase>
@@ -380,24 +385,59 @@ class FacetedSearch extends Component {
     }
 }
 
-//class SettingsDialogue extends Component{
-//    constructor(props){
-//        super(props);
-//        this.handleClick = this.handleClick.bind(this);
-//    }
+class FacetList extends Component {
+    constructor(props){
+        super(props);
+        console.log(this.props);
+    }
 
-//    handleClick(){
-//        console.log("settings dialogue");
-//        console.log(this.props);
-//        //this.props.option();
-//        //this.props.changeShowCount = !this.props.changeShowCount;
-//    }
+    render() {
+        // if (this.props.facet.facetListType === "MultiList") {
+        if (this.props.facet.dataType === "text") {
+            return (
+                <div>
+                    <MultiList
+                        key={this.props.keyProp}
+                        componentId={this.props.facet.componentId}
+                        dataField={this.props.facet.dataField}
+                        // title={facet.title}
+                        title={this.props.facet.componentId}
+                        queryFormat="and"
+                        selectAllLabel={this.props.facet.selectAllLabel}
+                        showCheckbox={true}
+                        showCount={true}
+                        showSearch={false}
+                        react={{
+                            and: this.props.keys
+                        }}
+                        showFilter={true}
+                        filterLabel={this.props.facet.filterLabel}
+                        URLParams={false}
+                        innerClass={{
+                            label: "list-item",
+                            input: "list-input"
+                        }}
+                    />
+                    </div>
+                );
+        // } else if (this.props.facet.facetListType === "RangeInput") {
+        } else if (this.props.facet.dataType === "numeric") {
+            return (
+                <RangeInput
+                    key={this.props.keyProp}
+                    componentId={this.props.facet.componentId}
+                    dataField={this.props.facet.dataField}
+                    title={this.props.facet.title}
+                    range={{
+                        "start": this.props.numericRanges[this.props.facet.title].min,
+                        "end": this.props.numericRanges[this.props.facet.title].max
+                    }}
+                />);
+                //return (<div key={key} />);
+        }
+        return(<div key={this.props.index}/>);
+    }
 
-//    render(){
-//        return(
-//            <button onClick={this.handleClick} > show/hide count</button>
-//        );
-//    }
-//}
+}
 
 export default FacetedSearch;

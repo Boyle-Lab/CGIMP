@@ -17,7 +17,6 @@ import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 import SettingsIcon from '@material-ui/icons/Settings';
 
-
 /*
 This code is part of the CGIMP distribution
 (https://github.com/Boyle-Lab/CGIMP) and is governed by its license.
@@ -105,17 +104,18 @@ class FacetedSettings extends React.Component {
         // console.log(this.props);
         return (
             <div>
-                <IconButton color="inherit" onClick={this.handleSettingsClick} >
+                <IconButton key={this.props.componentId + "IconButton"} color="inherit" onClick={this.handleSettingsClick} >
                     <SettingsIcon/>
                 </IconButton>
                 <Dialog
+                    key={this.props.componentId + "Dialog"}
                     open={this.state.settingsOpen}
                     onClose={this.handleSettingsClick}
                     TransitionComponent={Transition}
                 >
                     <form className={classes.container} noValidate autoComplete="off">
 
-                        <AppBar className={classes.appBar}>
+                        <AppBar key={this.props.componentId + "AppBar"} className={classes.appBar}>
                             <Toolbar>
                                 <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
                                     <CloseIcon />
@@ -132,6 +132,7 @@ class FacetedSettings extends React.Component {
                         <List>
                             <ListItem key={this.props.componentId + 'listType'}>
                                 <TextField
+                                    key={this.props.componentId + "TextField"}
                                     select
                                     label="Choose List Type"
                                     className={classes.textField}
@@ -145,8 +146,8 @@ class FacetedSettings extends React.Component {
                                     }}
                                         margin="normal"
                                     >
-                                        {this.state.listTypes.map(option => (
-                                            <option key={option} value={option}>
+                                        {this.state.listTypes.map((option, index) => (
+                                            <option key={index} value={option}>
                                                 {option}
                                             </option>
                                         ))}
