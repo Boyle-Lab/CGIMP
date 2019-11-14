@@ -390,7 +390,7 @@ class FacetedSearch extends Component {
 class FacetList extends Component {
     constructor(props){
         super(props);
-        console.log(this.props);
+        // console.log(this.props);
     }
 
     render() {
@@ -420,6 +420,7 @@ class FacetList extends Component {
                 />
                 );
         } else if (this.props.facet.facetListType === "TagCloud") {
+            console.log(this.props.facet.dataField);
             return (
                 <TagCloud
                     key={this.props.keyProp}
