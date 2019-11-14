@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import browser from './browser_config';
-import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
+import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList, TagCloud } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 import FacetedSettings from './FacetedSettings';
 
@@ -79,8 +79,10 @@ class FacetedSearch extends Component {
                                     if (isNaN(res._source[key])) {
                                         facetParams.dataField = key + '.keyword';
                                         facetParams.dataType = "text";
+                                        facetParams.facetListType = "MultiList";
                                     } else {
                                         facetParams.dataField = key;
+                                        facetParams.facetListType = "RangeInput";
                                     }
                                     facets[key + 'List'] = facetParams;
                                 }
@@ -392,36 +394,54 @@ class FacetList extends Component {
     }
 
     render() {
-        // if (this.props.facet.facetListType === "MultiList") {
-        if (this.props.facet.dataType === "text") {
+        if (this.props.facet.facetListType === "MultiList") {
             return (
-                <div>
-                    <MultiList
-                        key={this.props.keyProp}
-                        componentId={this.props.facet.componentId}
-                        dataField={this.props.facet.dataField}
-                        // title={facet.title}
-                        title={this.props.facet.componentId}
-                        queryFormat="and"
-                        selectAllLabel={this.props.facet.selectAllLabel}
-                        showCheckbox={true}
-                        showCount={true}
-                        showSearch={false}
-                        react={{
-                            and: this.props.keys
-                        }}
-                        showFilter={true}
-                        filterLabel={this.props.facet.filterLabel}
-                        URLParams={false}
-                        innerClass={{
-                            label: "list-item",
-                            input: "list-input"
-                        }}
-                    />
-                    </div>
+                <MultiList
+                    key={this.props.keyProp}
+                    componentId={this.props.facet.componentId}
+                    dataField={this.props.facet.dataField}
+                    // title={facet.title}
+                    title={this.props.facet.componentId}
+                    queryFormat="and"
+                    selectAllLabel={this.props.facet.selectAllLabel}
+                    showCheckbox={true}
+                    showCount={true}
+                    showSearch={false}
+                    react={{
+                        and: this.props.keys
+                    }}
+                    showFilter={true}
+                    filterLabel={this.props.facet.filterLabel}
+                    URLParams={false}
+                    innerClass={{
+                        label: "list-item",
+                        input: "list-input"
+                    }}
+                />
                 );
-        // } else if (this.props.facet.facetListType === "RangeInput") {
-        } else if (this.props.facet.dataType === "numeric") {
+        } else if (this.props.facet.facetListType === "TagCloud") {
+            return (
+                <TagCloud
+                    key={this.props.keyProp}
+                    componentId={this.props.facet.componentId}
+                    dataField={this.props.facet.dataField}
+                    // title={this.props.facet.componentId}
+                    // queryFormat="and"
+                    // showCount={true}
+                    // multiSelect={true}
+                    // react={{
+                    //     and: this.props.keys
+                    // }}
+                    // showFilter={true}
+                    // filterLabel={this.props.facet.filterLabel}
+                    // URLParams={false}
+                    // innerClass={{
+                    //     label: "list-item",
+                    //     input: "list-input"
+                    // }}
+                />
+            );
+        } else if (this.props.facet.facetListType === "RangeInput") {
             return (
                 <RangeInput
                     key={this.props.keyProp}

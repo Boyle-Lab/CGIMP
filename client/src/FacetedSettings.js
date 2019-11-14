@@ -72,7 +72,11 @@ class FacetedSettings extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            listTypes:  ["MultiList", "RangeInput"],
+            listTypes: { 
+                "text" : [ "MultiList", "TagCloud" ],
+                "numeric" : [ "RangeInput" ],
+            },
+            // sortOrder: ["Count", "Ascending", "Descending"],
             // facetName: this.props.key,
             settingsOpen: false,    // Settings dialog display state
         }
@@ -101,38 +105,48 @@ class FacetedSettings extends React.Component {
 
     render() {
         const { classes } = this.props;
-        // console.log(this.props);
+        // console.log(this.props.parentState.facets[this.props.componentId]);
+        const dataType = this.props.parentState.facets[this.props.componentId].dataType;
+        // console.log(dataType);
+
         return (
             <div>
-                <IconButton key={this.props.componentId + "IconButton"} color="inherit" onClick={this.handleSettingsClick} >
-                    <SettingsIcon/>
+                <IconButton color="inherit" onClick={this.handleSettingsClick} >
+                    <SettingsIcon />
                 </IconButton>
                 <Dialog
-                    key={this.props.componentId + "Dialog"}
                     open={this.state.settingsOpen}
                     onClose={this.handleSettingsClick}
                     TransitionComponent={Transition}
                 >
                     <form className={classes.container} noValidate autoComplete="off">
 
-                        <AppBar key={this.props.componentId + "AppBar"} className={classes.appBar}>
-                            <Toolbar>
-                                <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
+                        <AppBar className={classes.appBar}>
+                            <Toolbar> 
+                                <IconButton 
+                                    color="inherit" 
+                                    onClick={this.handleClose} 
+                                    aria-label="Close"
+                                >
                                     <CloseIcon />
                                 </IconButton>
-                                <Typography variant="h6" color="inherit" className={classes.flex}>
+                                <Typography 
+                                    variant="h6" 
+                                    color="inherit" 
+                                    className={classes.flex}>
                                     Settings
                                 </Typography>
-                                <Button color="inherit" onClick={this.handleClose}>
+                                <Button 
+                                    color="inherit" 
+                                    onClick={this.handleClose}>
                                     save
                                 </Button>
                             </Toolbar>
                         </AppBar>
 
                         <List>
-                            <ListItem key={this.props.componentId + 'listType'}>
+                            <ListItem> 
                                 <TextField
-                                    key={this.props.componentId + "TextField"}
                                     select
                                     label="Choose List Type"
                                     className={classes.textField}
@@ -146,8 +160,8 @@ class FacetedSettings extends React.Component {
                                     }}
                                         margin="normal"
                                     >
-                                        {this.state.listTypes.map((option, index) => (
-                                            <option key={index} value={option}>
+                                        {this.state.listTypes[ dataType ].map((option, index) => (
+                                            <option key={this.props.componentId + index} value={option}>
                                                 {option}
                                             </option>
                                         ))}
@@ -164,227 +178,5 @@ class FacetedSettings extends React.Component {
 FacetedSettings.propTypes = {
     classes: PropTypes.object.isRequired,
 };
-
-// const FacetPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
-//     return (
-//         <div>
-//             <TextField
-//                 id={"FacetedSelect" + index}
-//                 select
-//                 label="Choose List Type"
-//                 className={classes.textField}
-//                 value={selectedField}
-//                 onChange={handleChange('field', index)}
-//                 SelectProps={{
-//                     native: true,
-//                     MenuProps: {
-//                         className: classes.menu,
-//                     },
-//                 }}
-//                     margin="normal"
-//                 >
-//                     {fields.map(option => (
-//                         <option key={option} value={option}>
-//                             {option}
-//                         </option>
-//                     ))}
-//                 </TextField>
-//                 {/* <TextField */}
-//                 {/*     id={"tipFieldType" + index} */}
-//                 {/*     select */}
-//                 {/*     label="Data Type" */}
-//                 {/*     className={classes.textField} */}
-//                 {/*     value={selectedType} */}
-//                 {/*     onChange={handleChange('type', index)} */}
-//                 {/*     SelectProps={{ */}
-//                 {/*         native: true, */}
-//                 {/*         MenuProps: { */}
-//                 {/*             className: classes.menu, */}
-//                 {/*         }, */}
-//                 {/*     }} */}
-//                 {/*         margin="normal" */}
-//                 {/*     > */}
-//                 {/*         {types.map(option => ( */}
-//                 {/*             <option key={option} value={option}> */}
-//                 {/*                 {option} */}
-//                 {/*             </option> */}
-//                 {/*         ))} */}	
-//                 {/*         </TextField> */}
-//                 {/*         <TextField */}
-//                 {/*             value={label} */}
-//                 {/*             onChange={handleChange('label', index)} */}
-//                 {/*             margin="normal" */}
-//                 {/*             id={"label" + index} */}
-//                 {/*             label="Label" */}
-//                 {/*         /> */}
-//                 {/*         <TextField */}
-//                 {/*             value={fs} */}
-//                 {/*             onChange={handleChange('fs', index)} */}
-//                 {/*             margin="normal" */}
-//                 {/*             id={"tipFs" + index} */}
-//                 {/*             label="Field Separator" */}
-//                 {/*         /> */}
-//                     </div>
-//     );
-
-// }
-
-// // prototype for individual search facet
-// const ToolTipPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
-
-//     return (
-//         <div>
-//             <TextField>
-//             </TextField>
-//             <TextField
-//                 id={"tipFieldSelect" + index}
-//                 select
-//                 label="Field"
-//                 className={classes.textField}
-//                 value={selectedField}
-//                 onChange={handleChange('field', index)}
-//                 SelectProps={{
-//                     native: true,
-//                     MenuProps: {
-//                         className: classes.menu,
-//                     },
-//                 }}
-//                     margin="normal"
-//                 >
-//                     {fields.map(option => (
-//                         <option key={option} value={option}>
-//                             {option}
-//                         </option>
-//                     ))}
-//                 </TextField>
-//                 <TextField
-//                     id={"tipFieldType" + index}
-//                     select
-//                     label="Data Type"
-//                     className={classes.textField}
-//                     value={selectedType}
-//                     onChange={handleChange('type', index)}
-//                     SelectProps={{
-//                         native: true,
-//                         MenuProps: {
-//                             className: classes.menu,
-//                         },
-//                     }}
-//                         margin="normal"
-//                     >
-//                         {types.map(option => (
-//                             <option key={option} value={option}>
-//                                 {option}
-//                             </option>
-//                         ))}	
-//                         </TextField>
-//                         <TextField
-//                             value={label}
-//                             onChange={handleChange('label', index)}
-//                             margin="normal"
-//                             id={"label" + index}
-//                             label="Label"
-//                         />
-//                         <TextField
-//                             value={fs}
-//                             onChange={handleChange('fs', index)}
-//                             margin="normal"
-//                             id={"tipFs" + index}
-//                             label="Field Separator"
-//                         />
-//                         <IconButton className={classes.button} aria-label="Delete ToolTip" color="inherit" onClick={remove("toolTips", index)}>
-//                             <DeleteIcon />
-//                         </IconButton>
-//                     </div>
-//     );
-// }
-
-// const ModuleDataTable = ({classes, fields, selectedField, types, selectedType, aggTypes, selectedAggType, title, fs, index, handleChange, remove}) => {
-
-//     return (
-//         <div>
-//             <TextField
-//                 id={"moduleFieldSelect" + index}
-//                 select
-//                 label="Field"
-//                 className={classes.textField}
-//                 value={selectedField}
-//                 onChange={handleChange('moduleTables', 'field', index)}
-//                 SelectProps={{
-//                     native: true,
-//                     MenuProps: {
-//                         className: classes.menu,
-//                     },
-//                 }}
-//                     margin="normal"
-//                 >
-//                     {fields.map(option => (
-//                         <option key={option} value={option}>
-//                             {option}
-//                         </option>
-//                     ))}
-//                 </TextField>
-//                 <TextField
-//                     id={"moduleFieldType" + index}
-//                     select
-//                     label="Data Type"
-//                     className={classes.textField}
-//                     value={selectedType}
-//                     onChange={handleChange('moduleTables', 'type', index)}
-//                     SelectProps={{
-//                         native: true,
-//                         MenuProps: {
-//                             className: classes.menu,
-//                         },
-//                     }}
-//                         margin="normal"
-//                     >
-//                         {types.map(option => (
-//                             <option key={option} value={option}>
-//                                 {option}
-//                             </option>
-//                         ))}
-//                     </TextField>
-//                     <TextField
-//                         id={"aggFieldType" + index}
-//                         select
-//                         label="Aggregation Type"
-//                         className={classes.textField}
-//                         value={selectedAggType}
-//                         onChange={handleChange('moduleTables', 'aggregate', index)}
-//                         SelectProps={{
-//                             native: true,
-//                             MenuProps: {
-//                                 className: classes.menu,
-//                             },
-//                         }}
-//                             margin="normal"
-//                         >
-//                             {aggTypes.map(option => (
-//                                 <option key={option} value={option}>
-//                                     {option}
-//                                 </option>
-//                             ))}
-//                         </TextField>
-//                         <TextField
-//                             value={title}
-//                             onChange={handleChange('moduleTables', 'title', index)}
-//                             margin="normal"
-//                             id={"title" + index}
-//                             label="Title"
-//                         />
-//                         <TextField
-//                             value={fs}
-//                             onChange={handleChange('moduleTables', 'fs', index)}
-//                             margin="normal"
-//                             id={"moduleFs" + index}
-//                             label="Field Separator"
-//                         />
-//                         <IconButton className={classes.button} aria-label="Delete Module Table" color="inherit" onClick={remove("moduleTables", index)}>
-//                             <DeleteIcon />
-//                         </IconButton>
-//                     </div>
-//     );
-// }
 
 export default withStyles(styles)(FacetedSettings);
