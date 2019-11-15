@@ -73,7 +73,7 @@ class FacetedSettings extends React.Component {
         super(props);
         this.state = {
             listTypes: { 
-                "text" : [ "MultiList", "TagCloud" ],
+                "text" : [ "MultiList", "SingleList", "TagCloud" ],
                 "numeric" : [ "RangeInput" ],
             },
             // sortOrder: ["Count", "Ascending", "Descending"],

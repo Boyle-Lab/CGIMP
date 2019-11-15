@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import browser from './browser_config';
-import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList, TagCloud } from '@appbaseio/reactivesearch';
+import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList, TagCloud, SingleList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 import FacetedSettings from './FacetedSettings';
 
@@ -37,6 +37,7 @@ class FacetedSearch extends Component {
 	    facets: {},
 	    facetsSet: false,
         numericRanges: {},
+        keys: [],
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
@@ -257,8 +258,11 @@ class FacetedSearch extends Component {
 	    const keys = Object.keys(this.state.facets);
 	    keys.push("mainSearch", "resultsList");
 	    const dataFields = [];
+        // console.log(keys);
+        // console.log(this.state.facets);
 	    Object.keys(this.state.facets).forEach( (key) => {
 		dataFields.push(this.state.facets[key].dataField);
+            console.log(dataFields);
 	    });
 
 	    return (
@@ -311,6 +315,7 @@ class FacetedSearch extends Component {
 
 		{Object.keys(this.state.facets).map( (key, index) => {
 		    const facet = this.state.facets[key];
+            console.log(facet);
             return (
                     <div>
                         <FacetedSettings
@@ -394,11 +399,12 @@ class FacetList extends Component {
     }
 
     render() {
+        console.log(this.props.facet.componentId);
         if (this.props.facet.facetListType === "MultiList") {
             return (
                 <MultiList
-                    key={this.props.keyProp}
-                    componentId={this.props.facet.componentId}
+                    key={this.props.keyProp + "MultiList"}
+                    componentId={this.props.facet.componentId + "MultiList"}
                     dataField={this.props.facet.dataField}
                     // title={facet.title}
                     title={this.props.facet.componentId}
@@ -418,28 +424,57 @@ class FacetList extends Component {
                         input: "list-input"
                     }}
                 />
-                );
+            );
+        } else if (this.props.facet.facetListType === "SingleList") {
+            return (
+                <SingleList
+                    key={this.props.keyProp + "SingleList"}
+                    // componentId={this.props.facet.componentId}
+                    componentId={this.props.facet.componentId + "SingleList"}
+                    dataField={this.props.facet.dataField}
+                    // title={facet.title}
+                    title={this.props.facet.componentId}
+                    queryFormat="and"
+                    selectAllLabel={this.props.facet.selectAllLabel}
+                    showCheckbox={true}
+                    showCount={true}
+                    showSearch={false}
+                    react={{
+                        and: this.props.keys
+                    }}
+                    showFilter={true}
+                    filterLabel={this.props.facet.filterLabel}
+                    URLParams={false}
+                    innerClass={{
+                        label: "list-item",
+                        input: "list-input"
+                    }}
+                />
+            );
         } else if (this.props.facet.facetListType === "TagCloud") {
-            console.log(this.props.facet.dataField);
+            // const dataField_in = this.props.facet.dataField.split(".")[0];
+            console.log(this.props.facet);
             return (
                 <TagCloud
-                    key={this.props.keyProp}
-                    componentId={this.props.facet.componentId}
+                    key={this.props.keyProp + "TagCloud"}
+                    // componentId={this.props.facet.componentId}
+                    componentId={this.props.facet.componentId + "TagCloud"}
                     dataField={this.props.facet.dataField}
-                    // title={this.props.facet.componentId}
-                    // queryFormat="and"
-                    // showCount={true}
-                    // multiSelect={true}
-                    // react={{
-                    //     and: this.props.keys
-                    // }}
-                    // showFilter={true}
-                    // filterLabel={this.props.facet.filterLabel}
-                    // URLParams={false}
-                    // innerClass={{
-                    //     label: "list-item",
-                    //     input: "list-input"
-                    // }}
+                    // dataField={dataField_in}
+                    title={this.props.facet.componentId}
+                    queryFormat="and"
+                    showCount={true}
+                    multiSelect={true}
+                    react={{
+                        and: this.props.keys
+                    }}
+                    showFilter={true}
+                    filterLabel={this.props.facet.filterLabel}
+                    URLParams={false}
+                    innerClass={{
+                        label: "list-item",
+                        input: "list-input"
+                    }}
                 />
             );
         } else if (this.props.facet.facetListType === "RangeInput") {
