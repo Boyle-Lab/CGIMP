@@ -37,7 +37,7 @@ class FacetedSearch extends Component {
 	    facets: {},
 	    facetsSet: false,
         numericRanges: {},
-        keys: [],
+        keys: {},
 	}
 	this.fetchResults = this.fetchResults.bind(this);
 	this.fetchScrollResults = this.fetchScrollResults.bind(this);
@@ -92,7 +92,7 @@ class FacetedSearch extends Component {
                                 facets: facets,
                                 //facetsSet: true
                             }, () => {
-                                //console.log(this.state)
+                                console.log( Object.keys(facets) );
                             });
                             this.getNumericRangesFromElasticSearch(facets);
                         }
@@ -258,11 +258,11 @@ class FacetedSearch extends Component {
 	    const keys = Object.keys(this.state.facets);
 	    keys.push("mainSearch", "resultsList");
 	    const dataFields = [];
-        // console.log(keys);
+        console.log(keys);
         // console.log(this.state.facets);
 	    Object.keys(this.state.facets).forEach( (key) => {
 		dataFields.push(this.state.facets[key].dataField);
-            console.log(dataFields);
+            // console.log(dataFields);
 	    });
 
 	    return (
