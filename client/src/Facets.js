@@ -88,13 +88,24 @@ class FacetedSearch extends Component {
                                     facets[key + 'List'] = facetParams;
                                 }
                             });
-                            this.setState({
-                                facets: facets,
-                                //facetsSet: true
-                            }, () => {
-                                console.log( Object.keys(facets) );
-                            });
+                            this.setState(
+                                {
+                                    facets: facets,
+                                    //facetsSet: true
+                                }, 
+                                () => {
+                                    // console.log( Object.keys(facets) );
+                                    Object.keys(facets).forEach( (key) => {
+                                        let updateKey = this.state.keys;
+                                        updateKey[key] = key;
+                                        this.setState({
+                                            keys: updateKey,
+                                        })
+                                    })
+                                }
+                            );
                             this.getNumericRangesFromElasticSearch(facets);
+                            // console.log(Object.values(this.state.keys));
                         }
                     });
     }
@@ -215,37 +226,20 @@ class FacetedSearch extends Component {
     };
 
     updateListType = (componentId, name, value) => {
-        // console.log("updateListType");
-        // console.log("componentId " + componentId);
-        // console.log("name " + name);
+        console.log("updateListType");
+        console.log("componentId " + componentId);
+        console.log("name " + name);
         console.log("value " + value);
         if (name === "listValue") {
             let updateListType = this.state.facets;
             updateListType[componentId].facetListType = value;
             this.setState(
-            { 
-                facets: updateListType,
-            },
-                this.forceUpdate(),
-                console.log( this.state.facets[componentId] )
+                { 
+                    facets: updateListType,
+               },
+                    this.forceUpdate(),
+                    console.log( this.state.facets[componentId] )
             );
-
-            // console.log( this.state.facets[componentId] );
-            // const updateListType = this.state.facets;
-            // updateListType[componentId].facetListType = value;
-
-            // console.log(updateListType);
-            // this.setState(
-            // {
-            //     facets: updateListType,
-            // },  
-            //     console.log( this.state.facets[componentId] )
-            // );
-
-            // this.state.facets[componentId].facetListType = value;
-            // this.setState({
-            //     facets[componentId].facetListType : value,
-            // })
         }
 
     }
@@ -258,7 +252,7 @@ class FacetedSearch extends Component {
 	    const keys = Object.keys(this.state.facets);
 	    keys.push("mainSearch", "resultsList");
 	    const dataFields = [];
-        console.log(keys);
+        // console.log(keys);
         // console.log(this.state.facets);
 	    Object.keys(this.state.facets).forEach( (key) => {
 		dataFields.push(this.state.facets[key].dataField);
@@ -315,25 +309,150 @@ class FacetedSearch extends Component {
 
 		{Object.keys(this.state.facets).map( (key, index) => {
 		    const facet = this.state.facets[key];
-            console.log(facet);
-            return (
-                    <div>
+
+            if (facet.facetListType === "MultiList") {
+                return (
+                    <div key={key}>
                         <FacetedSettings
                             key={key + "settings"}
                             componentId={facet.componentId}
                             parentState={this.state}
                             updateParentState={this.updateListType}
                         />
-                        <FacetList
-                            key={key + "list"}
-                            keyProp={key + "list"}
-                            keys={keys}
-                            index={index}
-                            facet={this.state.facets[key]}
-                            numericRanges={this.state.numericRanges}
+                        <MultiList
+                            key={key + "MultiList"}
+                            // componentId={facet.componentId + "MultiList"}
+                            componentId={facet.componentId}
+                            dataField={facet.dataField}
+                            title={facet.componentId}
+                            queryFormat="and"
+                            selectAllLabel={facet.selectAllLabel}
+                            showCheckbox={true}
+                            showCount={true}
+                            showSearch={false}
+                            react={{
+                                and: keys
+                            }}
+                            showFilter={true}
+                            filterLabel={facet.filterLabel}
+                            URLParams={false}
+                            innerClass={{
+                                label: "list-item",
+                                input: "list-input"
+                            }}
                         />
                     </div>
-            );
+                );
+            } else if (facet.facetListType === "SingleList") {
+                return (
+                    <div key={key}>
+                        <FacetedSettings
+                            key={key + "settings"}
+                            componentId={facet.componentId}
+                            parentState={this.state}
+                            updateParentState={this.updateListType}
+                        />
+                        <SingleList
+                            key={key + "SingleList"}
+                            // componentId={facet.componentId}
+                            componentId={facet.componentId + "SingleList"}
+                            dataField={facet.dataField}
+                            // title={facet.title}
+                            title={facet.componentId}
+                            queryFormat="and"
+                            selectAllLabel={facet.selectAllLabel}
+                            showCheckbox={true}
+                            showCount={true}
+                            showSearch={false}
+                            react={{
+                                and: keys
+                            }}
+                            showFilter={true}
+                            filterLabel={facet.filterLabel}
+                            URLParams={false}
+                            innerClass={{
+                                label: "list-item",
+                                input: "list-input"
+                            }}
+                        />
+                    </div>
+                );
+            } else if (facet.facetListType === "TagCloud") {
+                // const dataField_in = this.props.facet.dataField.split(".")[0];
+                return (
+                    <div key={key}>
+                        <FacetedSettings
+                            key={key + "settings"}
+                            componentId={facet.componentId}
+                            parentState={this.state}
+                            updateParentState={this.updateListType}
+                        />
+                        <TagCloud
+                            key={key + "TagCloud"}
+                            componentId={facet.componentId + "TagCloud"}
+                            dataField={facet.dataField}
+                            title={facet.componentId}
+                            queryFormat="and"
+                            showCount={true}
+                            multiSelect={true}
+                            react={{
+                                and: keys
+                            }}
+                            showFilter={true}
+                            filterLabel={facet.filterLabel}
+                            URLParams={false}
+                            innerClass={{
+                                label: "list-item",
+                                input: "list-input"
+                            }}
+                        />
+                    </div>
+                );
+            } else if (facet.facetListType === "RangeInput") {
+                return (
+                    <div key={key}>
+                        <FacetedSettings
+                            key={key + "settings"}
+                            componentId={facet.componentId}
+                            parentState={this.state}
+                            updateParentState={this.updateListType}
+                        />
+                        <RangeInput
+                            key={key + "RangeInput"}
+                            // componentId={facet.componentId + "RangeInput"}
+                            componentId={facet.componentId}
+                            dataField={facet.dataField}
+                            title={facet.title}
+                            range={{
+                                "start": this.state.numericRanges[facet.title].min,
+                                "end": this.state.numericRanges[facet.title].max
+                            }}
+                        />
+                </div>
+                );
+            }
+            return(<div key={key}/>);
+            // console.log(facet);
+            // return (
+            //         <div>
+            //             <FacetedSettings
+            //                 key={key + "settings"}
+            //                 componentId={facet.componentId}
+            //                 parentState={this.state}
+            //                 updateParentState={this.updateListType}
+            //             />
+            //             <FacetList
+            //                 key={key + "list"}
+            //                 keyProp={key + "list"}
+            //                 keys={keys}
+            //                 index={index}
+            //                 facet={this.state.facets[key]}
+            //                 numericRanges={this.state.numericRanges}
+            //             />
+            //         </div>
+            // );
+            
+            
             // console.log("key "  + key);
             //if (facet.dataType === "text") {
             //    return (
@@ -393,18 +512,19 @@ class FacetedSearch extends Component {
 }
 
 class FacetList extends Component {
-    constructor(props){
-        super(props);
-        // console.log(this.props);
-    }
+    // constructor(props){
+    //     super(props);
+    //     // console.log(this.props);
+    // }
 
     render() {
-        console.log(this.props.facet.componentId);
+        // console.log(this.props.facet.componentId);
         if (this.props.facet.facetListType === "MultiList") {
             return (
                 <MultiList
                     key={this.props.keyProp + "MultiList"}
-                    componentId={this.props.facet.componentId + "MultiList"}
+                    componentId={this.props.facet.componentId}
+                    // componentId={this.props.facet.componentId + "MultiList"}
                     dataField={this.props.facet.dataField}
                     // title={facet.title}
                     title={this.props.facet.componentId}
@@ -429,8 +549,8 @@ class FacetList extends Component {
             return (
                 <SingleList
                     key={this.props.keyProp + "SingleList"}
-                    // componentId={this.props.facet.componentId}
-                    componentId={this.props.facet.componentId + "SingleList"}
+                    componentId={this.props.facet.componentId}
+                    // componentId={this.props.facet.componentId + "SingleList"}
                     dataField={this.props.facet.dataField}
                     // title={facet.title}
                     title={this.props.facet.componentId}
@@ -457,8 +577,8 @@ class FacetList extends Component {
             return (
                 <TagCloud
                     key={this.props.keyProp + "TagCloud"}
-                    // componentId={this.props.facet.componentId}
-                    componentId={this.props.facet.componentId + "TagCloud"}
+                    componentId={this.props.facet.componentId}
+                    // componentId={this.props.facet.componentId + "TagCloud"}
                     dataField={this.props.facet.dataField}
                     // dataField={dataField_in}
                     title={this.props.facet.componentId}
