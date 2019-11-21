@@ -32,18 +32,19 @@ const client = new Client({
 
 class FacetedSearch extends Component {
     constructor(props) {
-	super(props);
-	this.state = {
-	    facets: {},
-	    facetsSet: false,
-        numericRanges: {},
-        keys: {},
-	}
-	this.fetchResults = this.fetchResults.bind(this);
-	this.fetchScrollResults = this.fetchScrollResults.bind(this);
-	this.handleQueryChange = this.handleQueryChange.bind(this);
-	this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
-    this.updateListType = this.updateListType.bind(this);
+        super(props);
+        this.state = {
+            facets: {},
+            facetsSet: false,
+            numericRanges: {},
+            keys: {},
+        }
+        this.fetchResults = this.fetchResults.bind(this);
+        this.fetchScrollResults = this.fetchScrollResults.bind(this);
+        this.handleQueryChange = this.handleQueryChange.bind(this);
+        this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
+        this.updateListType = this.updateListType.bind(this);
+        this.updateComponentId = this.updateComponentId.bind(this);
     }
 
     componentDidMount() {
@@ -102,9 +103,16 @@ class FacetedSearch extends Component {
                                             keys: updateKey,
                                         })
                                     })
+                                    let updateKey = this.state.keys;
+                                    updateKey["mainSearch"] = "mainSearch";
+                                    updateKey["resultsList"] = "resultsList";
+                                    this.setState({
+                                        keys: updateKey,
+                                    });
                                 }
                             );
                             this.getNumericRangesFromElasticSearch(facets);
+                            console.log(this.state);
                             // console.log(Object.values(this.state.keys));
                         }
                     });
@@ -236,7 +244,7 @@ class FacetedSearch extends Component {
             this.setState(
                 { 
                     facets: updateListType,
-               },
+                },
                     this.forceUpdate(),
                     console.log( this.state.facets[componentId] )
             );
@@ -244,19 +252,35 @@ class FacetedSearch extends Component {
 
     }
 
+    updateComponentId = (filterLabel, listType) => {
+        console.log("=====updateComponentId=====");
+        console.log(filterLabel);
+        console.log(listType);
+        let updateKey = this.state.keys;
+        updateKey[filterLabel + "List"] = filterLabel + "List" + listType;
+        this.setState({
+            keys: updateKey
+        },
+            console.log(this.state.keys),
+            console.log("=====updateComponentId====="),
+        );
+    }
+
     render () {
 	if (!this.state.facetsSet) {
 	    return (<div/>)
 	} else {
-        // console.log(this.state.facets);
-	    const keys = Object.keys(this.state.facets);
-	    keys.push("mainSearch", "resultsList");
+	    // const keys = Object.keys(this.state.facets);
+	    // keys.push("mainSearch", "resultsList");
+        // let updateKey = this.state.keys;
+        // updateKey["mainSearch"] = "mainSearch";
+        // updateKey["resultsList"] = "resultsList";
+        // this.setState({
+        //     keys: updateKey,
+        // });
 	    const dataFields = [];
-        // console.log(keys);
-        // console.log(this.state.facets);
 	    Object.keys(this.state.facets).forEach( (key) => {
-		dataFields.push(this.state.facets[key].dataField);
-            // console.log(dataFields);
+            dataFields.push(this.state.facets[key].dataField);
 	    });
 
 	    return (
@@ -295,7 +319,8 @@ class FacetedSearch extends Component {
 		    }
 		})}
 		react={{
-		    and: keys
+		    // and: keys
+		    and: Object.values(this.state.keys)
 		}}
 		render={({ data }) => (
 			<div/>
@@ -311,6 +336,7 @@ class FacetedSearch extends Component {
 		    const facet = this.state.facets[key];
 
             if (facet.facetListType === "MultiList") {
+                // this.updateComponentId(facet.filterLabel, "MultiList");
                 return (
                     <div key={key}>
                         <FacetedSettings
@@ -331,7 +357,8 @@ class FacetedSearch extends Component {
                             showCount={true}
                             showSearch={false}
                             react={{
-                                and: keys
+                                // and: keys
+                                and: Object.values(this.state.keys)
                             }}
                             showFilter={true}
                             filterLabel={facet.filterLabel}
@@ -344,11 +371,12 @@ class FacetedSearch extends Component {
                     </div>
                 );
             } else if (facet.facetListType === "SingleList") {
+                // this.updateComponentId(facet.filterLabel, "SingleList");
                 return (
                     <div key={key}>
                         <FacetedSettings
                             key={key + "settings"}
-                            componentId={facet.componentId}
+                            componentId={facet.componentId + "SingleList"}
                             parentState={this.state}
                             updateParentState={this.updateListType}
                         />
@@ -365,7 +393,8 @@ class FacetedSearch extends Component {
                             showCount={true}
                             showSearch={false}
                             react={{
-                                and: keys
+                                // and: keys
+                                and: Object.values(this.state.keys)
                             }}
                             showFilter={true}
                             filterLabel={facet.filterLabel}
@@ -378,12 +407,13 @@ class FacetedSearch extends Component {
                     </div>
                 );
             } else if (facet.facetListType === "TagCloud") {
+                // this.updateComponentId(facet.filterLabel, "TagCloud");
                 // const dataField_in = this.props.facet.dataField.split(".")[0];
                 return (
                     <div key={key}>
                         <FacetedSettings
                             key={key + "settings"}
-                            componentId={facet.componentId}
+                            componentId={facet.componentId + "TagCloud"}
                             parentState={this.state}
                             updateParentState={this.updateListType}
                         />
@@ -396,7 +426,8 @@ class FacetedSearch extends Component {
                             showCount={true}
                             multiSelect={true}
                             react={{
-                                and: keys
+                                // and: keys
+                                and: Object.values(this.state.keys)
                             }}
                             showFilter={true}
                             filterLabel={facet.filterLabel}
@@ -409,6 +440,7 @@ class FacetedSearch extends Component {
                     </div>
                 );
             } else if (facet.facetListType === "RangeInput") {
+                // this.updateComponentId(facet.filterLabel, "RangeInput");
                 return (
                     <div key={key}>
                         <FacetedSettings
