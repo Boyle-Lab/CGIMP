@@ -44,7 +44,7 @@ class FacetedSearch extends Component {
         this.handleQueryChange = this.handleQueryChange.bind(this);
         this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
         this.updateListType = this.updateListType.bind(this);
-        this.updateComponentId = this.updateComponentId.bind(this);
+        // this.updateComponentId = this.updateComponentId.bind(this);
     }
 
     componentDidMount() {
@@ -270,8 +270,8 @@ class FacetedSearch extends Component {
 	if (!this.state.facetsSet) {
 	    return (<div/>)
 	} else {
-	    // const keys = Object.keys(this.state.facets);
-	    // keys.push("mainSearch", "resultsList");
+	    const keys = Object.keys(this.state.facets);
+	    keys.push("mainSearch", "resultsList");
         // let updateKey = this.state.keys;
         // updateKey["mainSearch"] = "mainSearch";
         // updateKey["resultsList"] = "resultsList";
@@ -319,8 +319,8 @@ class FacetedSearch extends Component {
 		    }
 		})}
 		react={{
-		    // and: keys
-		    and: Object.values(this.state.keys)
+		    and: keys
+		    // and: Object.values(this.state.keys)
 		}}
 		render={({ data }) => (
 			<div/>
@@ -357,8 +357,8 @@ class FacetedSearch extends Component {
                             showCount={true}
                             showSearch={false}
                             react={{
-                                // and: keys
-                                and: Object.values(this.state.keys)
+                                and: keys
+                                // and: Object.values(this.state.keys)
                             }}
                             showFilter={true}
                             filterLabel={facet.filterLabel}
@@ -393,8 +393,8 @@ class FacetedSearch extends Component {
                             showCount={true}
                             showSearch={false}
                             react={{
-                                // and: keys
-                                and: Object.values(this.state.keys)
+                                and: keys
+                                // and: Object.values(this.state.keys)
                             }}
                             showFilter={true}
                             filterLabel={facet.filterLabel}
@@ -426,8 +426,8 @@ class FacetedSearch extends Component {
                             showCount={true}
                             multiSelect={true}
                             react={{
-                                // and: keys
-                                and: Object.values(this.state.keys)
+                                and: keys
+                                // and: Object.values(this.state.keys)
                             }}
                             showFilter={true}
                             filterLabel={facet.filterLabel}
