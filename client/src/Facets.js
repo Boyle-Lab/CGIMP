@@ -44,7 +44,7 @@ class FacetedSearch extends Component {
         this.handleQueryChange = this.handleQueryChange.bind(this);
         this.getFacetsFromElasticsearch = this.getFacetsFromElasticsearch.bind(this);
         this.updateListType = this.updateListType.bind(this);
-        // this.updateComponentId = this.updateComponentId.bind(this);
+        this.updateComponentId = this.updateComponentId.bind(this);
     }
 
     componentDidMount() {
@@ -242,6 +242,16 @@ class FacetedSearch extends Component {
                     console.log( this.state.facets[componentId] )
             );
         }
+        this.updateComponentId(componentId, name, value);
+
+    }
+
+    updateComponentId = (componentId, name, value) => {
+        console.log("====updateComponentId====");
+        console.log("componentId " + componentId);
+        console.log("name " + name);
+        console.log("value " + value);
+        console.log("====updateComponentId====");
 
     }
 
