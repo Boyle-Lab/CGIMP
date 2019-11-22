@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import browser from './browser_config';
 import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
+import FacetedSettings from "./FacetedSettings";
 // import { Dialog, DialogTitle } from '@material-ui/core';
 
 /*
@@ -37,6 +38,7 @@ class FacetedSearch extends Component {
 	    facets: {},
 	    facetsSet: false,
         numericRanges: {},
+        keys: {},
         //for testing
         //showCountOption: true
 	}
@@ -61,48 +63,59 @@ class FacetedSearch extends Component {
 
     getFacetsFromElasticsearch = () => {
         const facets = [];
-	client.get({index: "browser",
-                    type: "modules",
-                    id: 1},
-                   (err, res) => {
-                       if (err) {
-                           console.log(err);
-		       } else {
-                           Object.keys(res._source).forEach( (key) => {
-                               let facetParams = {
-                                   dataType: "numeric",
-                                   componentId: "",
-                                   dataField: "",
-                                   title: "",
-                                   selectAllLabel:"",
-                                   filterLabel: "",
-                                   // for settings
-                                   facetType: "",
-                                   //showCountOption: true,
-                               }
-                               if (key !== "id" && key !== "node") {
-                                   facetParams.componentId = key + 'List';
-                                   facetParams.title = key;
-                                   facetParams.selectAllLabel = 'All ' + key;
-                                   facetParams.filterLabel = key;
-                                   if (isNaN(res._source[key])) {
-                                       facetParams.dataField = key + '.keyword';
-                                       facetParams.dataType = "text";
-                                   } else {
-                                       facetParams.dataField = key;
-                                   }
-                                   facets[key + 'List'] = facetParams;
-                               }
-                           });
-                           this.setState({
-			       facets: facets,
-			       //facetsSet: true
-			   }, () => {
-			       //console.log(this.state)
-			   });
-			   this.getNumericRangesFromElasticSearch(facets);
-                       }
-                   });
+        client.get({index: "browser",
+            type: "modules",
+            id: 1},
+            (err, res) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    Object.keys(res._source).forEach( (key) => {
+                        let facetParams = {
+                            dataType: "numeric",
+                            componentId: "",
+                            dataField: "",
+                            title: "",
+                            selectAllLabel:"",
+                            filterLabel: "",
+                            // for settings
+                            facetType: "",
+                            //showCountOption: true,
+                        }
+                        if (key !== "id" && key !== "node") {
+                            facetParams.componentId = key + 'List';
+                            facetParams.title = key;
+                            facetParams.selectAllLabel = 'All ' + key;
+                            facetParams.filterLabel = key;
+                            if (isNaN(res._source[key])) {
+                                facetParams.dataField = key + '.keyword';
+                                facetParams.dataType = "text";
+                            } else {
+                                facetParams.dataField = key;
+                            }
+                            facets[key + 'List'] = facetParams;
+                        }
+                    });
+                    this.setState({
+                        facets: facets,
+                        //facetsSet: true
+                    }, () => {
+                        let keyUpdate = this.state.keys;
+                        keyUpdate["mainSearch"] = "mainSearch";
+                        keyUpdate["resultsList"] = "resultsList";
+                        Object.keys(this.state.facets).forEach( (key) => {
+                            keyUpdate[key] = key;
+                        })
+                        this.setState({
+                            key: keyUpdate,
+                        }, 
+                            console.log(this.state)
+                        )
+                        //console.log(this.state)
+                    });
+                    this.getNumericRangesFromElasticSearch(facets);
+                }
+            });
     }
 
     getNumericRangesFromElasticSearch = async (facets) => {
@@ -229,6 +242,7 @@ class FacetedSearch extends Component {
 	if (!this.state.facetsSet) {
 	    return (<div/>)
 	} else {
+        // console.log(this.state.facets);
 	    const keys = Object.keys(this.state.facets);
 	    keys.push("mainSearch", "resultsList");
 	    const dataFields = [];
@@ -238,9 +252,16 @@ class FacetedSearch extends Component {
 
 	    return (
 		    <div>
-		    <div>
-                    Filter Data
+		            <div>
+                        Filter Data
                     </div>
+
+                    <FacetedSettings
+                        facets={this.state.facets}
+                        // parentState={this.state}
+                        // componentId={"test"}
+                        // updateParentState={this.ChangeShowCount}
+                    />
 		    <ReactiveBase
 		app="browser"
 		url={browser.elasticAddr}
@@ -272,7 +293,7 @@ class FacetedSearch extends Component {
 		    }
 		})}
 		react={{
-		    and: keys
+		    and: Object.values(this.state.keys)
 		}}
 		render={({ data }) => (
 			<div/>
@@ -284,80 +305,125 @@ class FacetedSearch extends Component {
 		onQueryChange={this.handleQueryChange}
 		    />
 
-		{Object.keys(this.state.facets).map( (key, index) => {
-		    const facet = this.state.facets[key];
 
-            if (facet.dataType === "text") {
-                return (
-                    <div>
-                        {/* <SettingsDialogue/> */}
-                        {/* <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/> */}
-                        <MultiList
+            {Object.keys(this.state.facets).map( (key, index) => {
+                const facet = this.state.facets[key];
+
+                // return( 
+                //     <FacetedSettings
+                //         key={key}
+                //         index={index}
+                //         facet={facet}
+                //         numericRanges={this.state.numericRanges}
+                //         keys={this.state.keys}
+                //     />
+                // );
+
+                if (facet.dataType === "text") {
+                    return (
+                        <div key={key}>
+                            {/* <SettingsDialogue/> */}
+                            {/* <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/> */}
+                            <MultiList
+                                key={key}
+                                componentId={facet.componentId}
+                                dataField={facet.dataField}
+                                title={facet.title}
+                                queryFormat="and"
+                                selectAllLabel={facet.selectAllLabel}
+                                showCheckbox={true}
+                                //showCount={this.state.showCountOption}
+                                showCount={true}
+                                showSearch={false}
+                                react={{
+                                    and: Object.values(this.state.keys)
+                                    // and: keys
+                                }}
+                                    showFilter={true}
+                                    filterLabel={facet.filterLabel}
+                                    URLParams={false}
+                                    innerClass={{
+                                        label: "list-item",
+                                        input: "list-input"
+                                    }}
+                                />
+                            </div>
+                    );
+                } else if (facet.dataType === "numeric") {
+                    return (
+                        <RangeInput
                             key={key}
                             componentId={facet.componentId}
                             dataField={facet.dataField}
                             title={facet.title}
-                            queryFormat="and"
-                            selectAllLabel={facet.selectAllLabel}
-                            showCheckbox={true}
-                            //showCount={this.state.showCountOption}
-                            showCount={true}
-                            showSearch={false}
-                            react={{
-                                and: keys
+                            range={{
+                                "start": this.state.numericRanges[facet.title].min,
+                                "end": this.state.numericRanges[facet.title].max
                             }}
+                        />);
+                        //return (<div key={key} />);
+                }
+                return(<div key={index}/>);
+            })}
+
+        </ReactiveBase>
+    </div>
+        );
+    }
+    }
+}
+
+class FacetList extends Component {
+    constructor(props) {
+        super(props);
+        console.log(this.props);
+    }
+    render() {
+        if (this.props.facet.dataType === "text") {
+            return (
+                <div key={this.props.key}>
+                    <MultiList
+                        key={this.props.key}
+                        componentId={this.props.facet.componentId}
+                        dataField={this.props.facet.dataField}
+                        title={this.props.facet.title}
+                        queryFormat="and"
+                        selectAllLabel={this.props.facet.selectAllLabel}
+                        showCheckbox={true}
+                        //showCount={this.state.showCountOption}
+                        showCount={true}
+                        showSearch={false}
+                        react={{
+                            and: Object.values(this.props.keys)
+                            // and: keys
+                        }}
                             showFilter={true}
-                            filterLabel={facet.filterLabel}
+                            filterLabel={this.props.facet.filterLabel}
                             URLParams={false}
                             innerClass={{
                                 label: "list-item",
                                 input: "list-input"
                             }}
                         />
-                        </div>
-                    );
-            } else if (facet.dataType === "numeric") {
-                return (
-                    <RangeInput
-                        key={key}
-                        componentId={facet.componentId}
-                        dataField={facet.dataField}
-                        title={facet.title}
-                        range={{
-                            "start": this.state.numericRanges[facet.title].min,
-                            "end": this.state.numericRanges[facet.title].max
-                        }}
-                    />);
-                    //return (<div key={key} />);
-            }
-            return(<div key={index}/>);
-        })}
+                    </div>
+            );
+        } else if (this.props.facet.dataType === "numeric") {
+            return (
+                <RangeInput
+                    key={this.props.key}
+                    componentId={this.props.facet.componentId}
+                    dataField={this.props.facet.dataField}
+                    title={this.props.facet.title}
+                    range={{
+                        "start": this.props.numericRanges[this.props.facet.title].min,
+                        "end": this.props.numericRanges[this.props.facet.title].max
+                    }}
+                />);
+                //return (<div key={key} />);
+        }
+        return(<div key={this.props.index}/>);
 
-    </ReactiveBase>
-</div>
-        );
-    }
     }
 }
-
-//class SettingsDialogue extends Component{
-//    constructor(props){
-//        super(props);
-//        this.handleClick = this.handleClick.bind(this);
-//    }
-
-//    handleClick(){
-//        console.log("settings dialogue");
-//        console.log(this.props);
-//        //this.props.option();
-//        //this.props.changeShowCount = !this.props.changeShowCount;
-//    }
-
-//    render(){
-//        return(
-//            <button onClick={this.handleClick} > show/hide count</button>
-//        );
-//    }
-//}
 
 export default FacetedSearch;
