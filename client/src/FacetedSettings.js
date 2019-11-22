@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import DeleteIcon from '@material-ui/icons/Delete';
-import AddIcon from '@material-ui/icons/Add';
+// import DeleteIcon from '@material-ui/icons/Delete';
+// import AddIcon from '@material-ui/icons/Add';
 import Dialog from '@material-ui/core/Dialog';
-import Divider from '@material-ui/core/Divider';
+// import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -15,6 +15,7 @@ import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
 import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 /*
 This code is part of the CGIMP distribution
@@ -35,9 +36,9 @@ GNU General Public License for more details.
 CONTACT: Adam Diehl, adadiehl@umich.edu
 */
 
-const nodeTypes = ["string", "count", "average", "concat"];
-const moduleTypes = ["string", "numeric", "array", "object"];
-const aggTypes = [false, "concat", "count", "density", "average"];
+// const nodeTypes = ["string", "count", "average", "concat"];
+// const moduleTypes = ["string", "numeric", "array", "object"];
+// const aggTypes = [false, "concat", "count", "density", "average"];
 
 const styles = theme => ({
     appBar: {
@@ -67,71 +68,106 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-class SettingsDialog extends React.Component {
+class FacetedSettings extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            listTypes: { 
+                "text" : [ "MultiList", "SingleList", "TagCloud" ],
+                "numeric" : [ "RangeInput" ],
+            },
+            // sortOrder: ["Count", "Ascending", "Descending"],
+            // facetName: this.props.key,
+            settingsOpen: false,    // Settings dialog display state
+        }
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSettingsClick = this.handleSettingsClick.bind(this);
     }
 
     componentDidMount() {
+        // console.log(this.props);
+    }
+
+    handleSettingsClick = () => {
+        this.setState({ settingsOpen: !this.state.settingsOpen });
     }
 
     handleClose = () => {
-        this.props.onSettingsClick();
+        this.handleSettingsClick();
     };
 
     handleChange = name => event => {
+        // console.log(this.props.componentId);
+        const id = this.props.componentId;
         this.setState({ [name]: event.target.value });
-        this.props.updateParentState(name, event.target.value);
+        this.props.updateParentState(id, name, event.target.value);
     };
 
     render() {
         const { classes } = this.props;
+        // console.log(this.props.parentState.facets[this.props.componentId]);
+        const dataType = this.props.parentState.facets[this.props.componentId].dataType;
+        // console.log(dataType);
+
         return (
             <div>
+                <IconButton color="inherit" onClick={this.handleSettingsClick} >
+                    <SettingsIcon />
+                </IconButton>
                 <Dialog
-                    open={this.props.open}
-                    onClose={this.handleClose}
+                    open={this.state.settingsOpen}
+                    onClose={this.handleSettingsClick}
                     TransitionComponent={Transition}
                 >
-
                     <form className={classes.container} noValidate autoComplete="off">
 
                         <AppBar className={classes.appBar}>
-                            <Toolbar>
-                                <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
+                            <Toolbar> 
+                                <IconButton 
+                                    color="inherit" 
+                                    onClick={this.handleClose} 
+                                    aria-label="Close"
+                                >
                                     <CloseIcon />
                                 </IconButton>
-                                <Typography variant="h6" color="inherit" className={classes.flex}>
+                                <Typography 
+                                    variant="h6" 
+                                    color="inherit" 
+                                    className={classes.flex}>
                                     Settings
                                 </Typography>
-                                <Button color="inherit" onClick={this.handleClose}>
+                                <Button 
+                                    color="inherit" 
+                                    onClick={this.handleClose}>
                                     save
                                 </Button>
                             </Toolbar>
                         </AppBar>
 
                         <List>
-                            {this.state.toolTips.map( (tipField, index) => {
-                                return (
-                                    <ListItem key={'tip' + index.toString()}>
-                                        <ToolTipPane
-                                            key={index.toString()}
-                                            classes={classes}
-                                            fields={this.props.parentState.nodeFields}
-                                            selectedField={this.state.toolTips[index].field}
-                                            types={nodeTypes}
-                                            selectedType={this.state.toolTips[index].type}
-                                            label={this.state.toolTips[index].label}
-                                            fs={this.state.toolTips[index].fs}
-                                            index={index}
-                                            handleChange={this.onToolTipChange}
-                                            remove={this.removeEl}
-                                        />
-                                    </ListItem>
-                                )
-                            })}
+                            <ListItem> 
+                                <TextField
+                                    select
+                                    label="Choose List Type"
+                                    className={classes.textField}
+                                    value={this.state.listValue}
+                                    onChange={this.handleChange("listValue")}
+                                    SelectProps={{
+                                        native: true,
+                                        MenuProps: {
+                                            className: classes.menu,
+                                        },
+                                    }}
+                                        margin="normal"
+                                    >
+                                        {this.state.listTypes[ dataType ].map((option, index) => (
+                                            <option key={this.props.componentId + index} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                </TextField>
+                            </ListItem>
                         </List>
-
                     </form>
                 </Dialog>
             </div>
@@ -139,164 +175,8 @@ class SettingsDialog extends React.Component {
     }
 }
 
-SettingsDialog.propTypes = {
+FacetedSettings.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-// prototype for individual search facet
-const ToolTipPane = ({classes, fields, selectedField, types, selectedType, label, fs, index, handleChange, remove}) => {
-
-    return (
-        <div>
-            <TextField
-                id={"tipFieldSelect" + index}
-                select
-                label="Field"
-                className={classes.textField}
-                value={selectedField}
-                onChange={handleChange('field', index)}
-                SelectProps={{
-                    native: true,
-                    MenuProps: {
-                        className: classes.menu,
-                    },
-                }}
-                    margin="normal"
-                >
-                    {fields.map(option => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </TextField>
-                <TextField
-                    id={"tipFieldType" + index}
-                    select
-                    label="Data Type"
-                    className={classes.textField}
-                    value={selectedType}
-                    onChange={handleChange('type', index)}
-                    SelectProps={{
-                        native: true,
-                        MenuProps: {
-                            className: classes.menu,
-                        },
-                    }}
-                        margin="normal"
-                    >
-                        {types.map(option => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}	
-                        </TextField>
-                        <TextField
-                            value={label}
-                            onChange={handleChange('label', index)}
-                            margin="normal"
-                            id={"label" + index}
-                            label="Label"
-                        />
-                        <TextField
-                            value={fs}
-                            onChange={handleChange('fs', index)}
-                            margin="normal"
-                            id={"tipFs" + index}
-                            label="Field Separator"
-                        />
-                        <IconButton className={classes.button} aria-label="Delete ToolTip" color="inherit" onClick={remove("toolTips", index)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </div>
-    );
-}
-
-const ModuleDataTable = ({classes, fields, selectedField, types, selectedType, aggTypes, selectedAggType, title, fs, index, handleChange, remove}) => {
-
-    return (
-        <div>
-            <TextField
-                id={"moduleFieldSelect" + index}
-                select
-                label="Field"
-                className={classes.textField}
-                value={selectedField}
-                onChange={handleChange('moduleTables', 'field', index)}
-                SelectProps={{
-                    native: true,
-                    MenuProps: {
-                        className: classes.menu,
-                    },
-                }}
-                    margin="normal"
-                >
-                    {fields.map(option => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </TextField>
-                <TextField
-                    id={"moduleFieldType" + index}
-                    select
-                    label="Data Type"
-                    className={classes.textField}
-                    value={selectedType}
-                    onChange={handleChange('moduleTables', 'type', index)}
-                    SelectProps={{
-                        native: true,
-                        MenuProps: {
-                            className: classes.menu,
-                        },
-                    }}
-                        margin="normal"
-                    >
-                        {types.map(option => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </TextField>
-                    <TextField
-                        id={"aggFieldType" + index}
-                        select
-                        label="Aggregation Type"
-                        className={classes.textField}
-                        value={selectedAggType}
-                        onChange={handleChange('moduleTables', 'aggregate', index)}
-                        SelectProps={{
-                            native: true,
-                            MenuProps: {
-                                className: classes.menu,
-                            },
-                        }}
-                            margin="normal"
-                        >
-                            {aggTypes.map(option => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </TextField>
-                        <TextField
-                            value={title}
-                            onChange={handleChange('moduleTables', 'title', index)}
-                            margin="normal"
-                            id={"title" + index}
-                            label="Title"
-                        />
-                        <TextField
-                            value={fs}
-                            onChange={handleChange('moduleTables', 'fs', index)}
-                            margin="normal"
-                            id={"moduleFs" + index}
-                            label="Field Separator"
-                        />
-                        <IconButton className={classes.button} aria-label="Delete Module Table" color="inherit" onClick={remove("moduleTables", index)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </div>
-    );
-}
-
-export default withStyles(styles)(SettingsDialog);
+export default withStyles(styles)(FacetedSettings);

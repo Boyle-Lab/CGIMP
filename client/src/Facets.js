@@ -289,7 +289,7 @@ class FacetedSearch extends Component {
 
             if (facet.dataType === "text") {
                 return (
-                    <div key={key}>
+                    <div>
                         {/* <SettingsDialogue/> */}
                         {/* <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/> */}
                         <MultiList
