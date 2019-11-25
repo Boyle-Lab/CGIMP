@@ -76,15 +76,22 @@ class FacetedSettings extends React.Component {
                 "text" : [ "MultiList", "SingleList", "TagCloud" ],
                 "numeric" : [ "RangeInput" ],
             },
+            listValue: {},
             settingsOpen: false,    // Settings dialog display state
         }
-        this.handleChange = this.handleChange.bind(this);
+        this.listChange = this.listChange.bind(this);
         this.handleSettingsClick = this.handleSettingsClick.bind(this);
-        console.log(this.props);
+        // console.log(this.props);
     }
 
     componentDidMount() {
-        // console.log(this.props);
+        let update_listValue = this.state.listValue;
+        Object.keys(this.props.facets).forEach((facet) => {
+            update_listValue[facet] = this.props.facets[facet].facetListType;
+        });
+        this.setState({
+            listValue: update_listValue,
+        });
     }
 
     handleSettingsClick = () => {
@@ -95,19 +102,22 @@ class FacetedSettings extends React.Component {
         this.handleSettingsClick();
     };
 
-    handleChange = name => event => {
-        // console.log(this.props.componentId);
+    listChange = facet => event => {
+        event.persist();
+        console.log("listChange");
+        console.log(event);
         // const id = this.props.componentId;
-        // this.setState({ [name]: event.target.value });
-        // this.props.updateParentState(id, name, event.target.value);
+        let update_listValue = this.state.listValue;
+        update_listValue[facet] = event.target.value;
+        this.setState({
+            listValue: update_listValue,
+        })
+        // this.setState({ listValue[facet]: event.target.value });
+        this.props.updateParentState(facet, event.target.value);
     };
 
     render() {
         const { classes } = this.props;
-        // console.log(this.props.parentState.facets[this.props.componentId]);
-        // const dataType = this.props.parentState.facets[this.props.componentId].dataType;
-        // const dataType = this.props.parentState.facets[this.props.componentId].dataType;
-        // console.log(dataType);
 
         return (
             <div>
@@ -145,13 +155,15 @@ class FacetedSettings extends React.Component {
                         </AppBar>
                         <List>
                             {Object.keys(this.props.facets).map( (facet) => {
+                                // let changeValue = "listValue." + facet;
                                 return (
                                     <ListItem key={facet}>
                                         <TextField
                                             select
                                             label={facet}
                                             className={classes.textField}
-                                            value={"temp"}
+                                            value={this.state.listValue[facet]}
+                                            onChange={this.listChange(facet)}
                                             SelectProps={{
                                                 native: true,
                                                 MenuProps: {
