@@ -81,7 +81,7 @@ class FacetedSettings extends React.Component {
         }
         this.listChange = this.listChange.bind(this);
         this.handleSettingsClick = this.handleSettingsClick.bind(this);
-        // console.log(this.props);
+        console.log(this.props);
     }
 
     componentDidMount() {
@@ -155,12 +155,11 @@ class FacetedSettings extends React.Component {
                         </AppBar>
                         <List>
                             {Object.keys(this.props.facets).map( (facet) => {
-                                // let changeValue = "listValue." + facet;
                                 return (
                                     <ListItem key={facet}>
                                         <TextField
                                             select
-                                            label={facet}
+                                            label={this.props.facets[facet].title}
                                             className={classes.textField}
                                             value={this.state.listValue[facet]}
                                             onChange={this.listChange(facet)}
