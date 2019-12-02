@@ -81,7 +81,7 @@ class FacetedSettings extends React.Component {
         }
         this.listChange = this.listChange.bind(this);
         this.handleSettingsClick = this.handleSettingsClick.bind(this);
-        console.log(this.props);
+        // console.log(this.props);
     }
 
     componentDidMount() {

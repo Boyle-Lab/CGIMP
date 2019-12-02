@@ -109,7 +109,13 @@ class FacetedSearch extends Component {
                             facetParams.title = key;
                             facetParams.selectAllLabel = 'All ' + key;
                             facetParams.filterLabel = key;
+
                             if (isNaN(res._source[key])) {
+                                console.log(res._source[key]);
+                                // loc facet 
+                                if (res._source[key].start != null && res._source[key].end != null) {
+
+                                }
                                 facetParams.dataField = key + '.keyword';
                                 facetParams.dataType = "text";
                                 facetParams.facetListType = "MultiList";
@@ -132,7 +138,7 @@ class FacetedSearch extends Component {
                         this.setState({
                             key: keyUpdate,
                         }, 
-                            console.log(this.state)
+                            // console.log(this.state)
                         )
                     });
                     this.getNumericRangesFromElasticSearch(facets);
@@ -397,12 +403,12 @@ class FacetedSearch extends Component {
 }
 
 class FacetList extends Component {
-    constructor(props) {
-        super(props);
-        // console.log(this.props.facet.facetListType)
-        // console.log(this.props.keys);
-        console.log(this.props);
-    }
+    // constructor(props) {
+    //     super(props);
+    //     // console.log(this.props.facet.facetListType)
+    //     // console.log(this.props.keys);
+    //     // console.log(this.props);
+    // }
     render() {
         if (this.props.facet.dataType === "text") {
             if (this.props.facet.facetListType === "MultiList") {
