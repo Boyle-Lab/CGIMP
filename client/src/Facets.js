@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import browser from './browser_config';
-import { ReactiveBase, MultiList, SelectedFilters, RangeInput, ReactiveList } from '@appbaseio/reactivesearch';
+import { ReactiveBase, SelectedFilters, RangeInput, ReactiveList, MultiList, SingleList, TagCloud } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 import FacetedSettings from "./FacetedSettings";
 // import { Dialog, DialogTitle } from '@material-ui/core';
@@ -72,7 +72,7 @@ class FacetedSearch extends Component {
         this.setState(
             { 
                 facets: updateListType,
-                keys: updateKeys,
+                // keys: updateKeys,
             },
             // this.forceUpdate(),
             console.log( this.state.facets[facet] ),
@@ -400,28 +400,58 @@ class FacetList extends Component {
     constructor(props) {
         super(props);
         // console.log(this.props.facet.facetListType)
-        console.log(this.props.keys);
+        // console.log(this.props.keys);
+        console.log(this.props);
     }
     render() {
         if (this.props.facet.dataType === "text") {
-            return (
-                <div key={this.props.facetKey}>
-                    <MultiList
-                        key={this.props.facetKey}
-                        // componentId={this.props.facet.componentId}
-                        componentId={this.props.keys[this.props.facetKey]}
-                        dataField={this.props.facet.dataField}
-                        title={this.props.facet.title}
-                        queryFormat="and"
-                        selectAllLabel={this.props.facet.selectAllLabel}
-                        showCheckbox={true}
-                        //showCount={this.state.showCountOption}
-                        showCount={true}
-                        showSearch={false}
-                        react={{
-                            and: Object.values(this.props.keys)
-                            // and: keys
-                        }}
+            if (this.props.facet.facetListType === "MultiList") {
+                return (
+                    <div key={this.props.facetKey}>
+                        <MultiList
+                            key={this.props.facetKey}
+                            // componentId={this.props.facet.componentId}
+                            componentId={this.props.keys[this.props.facetKey]}
+                            dataField={this.props.facet.dataField}
+                            title={this.props.facet.title}
+                            queryFormat="and"
+                            selectAllLabel={this.props.facet.selectAllLabel}
+                            showCheckbox={true}
+                            //showCount={this.state.showCountOption}
+                            showCount={true}
+                            showSearch={false}
+                            react={{
+                                and: Object.values(this.props.keys)
+                                // and: keys
+                            }}
+                                showFilter={true}
+                                filterLabel={this.props.facet.filterLabel}
+                                URLParams={false}
+                                innerClass={{
+                                    label: "list-item",
+                                    input: "list-input"
+                                }}
+                            />
+                        </div>
+                );
+            } else if (this.props.facet.facetListType === "SingleList") {
+                return (
+                    <div key={this.props.facetKey}>
+                        <SingleList
+                            key={this.props.facetKey}
+                            // componentId={facet.componentId}
+                            componentId={this.props.keys[this.props.facetKey]}
+                            dataField={this.props.facet.dataField}
+                            title={this.props.facet.title}
+                            queryFormat="and"
+                            selectAllLabel={this.props.facet.selectAllLabel}
+                            showCheckbox={true}
+                            showCount={true}
+                            showSearch={false}
+                            react={{
+                                // and: keys
+                                and: Object.values(this.props.keys)
+                            }}
                             showFilter={true}
                             filterLabel={this.props.facet.filterLabel}
                             URLParams={false}
@@ -431,7 +461,34 @@ class FacetList extends Component {
                             }}
                         />
                     </div>
-            );
+                );
+            } else if (this.props.facet.facetListType === "TagCloud") { 
+                return (
+                    <div key={this.props.facetKey}>
+                        <TagCloud
+                            key={this.props.facetKey}
+                            componentId={this.props.keys[this.props.facetKey]}
+                            dataField={this.props.facet.dataField}
+                            title={this.props.facet.title}
+                            selectAllLabel={this.props.facet.selectAllLabel}
+                            queryFormat="and"
+                            showCount={true}
+                            multiSelect={true}
+                            react={{
+                                // and: keys
+                                and: Object.values(this.props.keys)
+                            }}
+                                showFilter={true}
+                                filterLabel={this.props.facet.filterLabel}
+                                URLParams={false}
+                                innerClass={{
+                                    label: "list-item",
+                                    input: "list-input"
+                                }}
+                            />
+                    </div>
+                );
+            }
         } else if (this.props.facet.dataType === "numeric") {
             return (
                 <RangeInput
