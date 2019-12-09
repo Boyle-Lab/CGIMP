@@ -75,6 +75,7 @@ class FacetedSettings extends React.Component {
             listTypes: { 
                 "text" : [ "MultiList", "SingleList", "TagCloud" ],
                 "numeric" : [ "RangeInput" ],
+                "nested" : [ "Temp" ],
             },
             listValue: {},
             settingsOpen: false,    // Settings dialog display state
@@ -181,146 +182,15 @@ class FacetedSettings extends React.Component {
                                 );
                             })}
                         </List>
-
-                        {/* <List> */}
-                        {/*     <ListItem> */} 
-                            {/*         <TextField */}
-                            {/*             select */}
-                            {/*             label="Choose List Type" */}
-                            {/*             className={classes.textField} */}
-                            {/*             value={this.state.listValue} */}
-                            {/*             onChange={this.handleChange("listValue")} */}
-                            {/*             SelectProps={{ */}
-                            {/*                 native: true, */}
-                            {/*                 MenuProps: { */}
-                            {/*                     className: classes.menu, */}
-                            {/*                 }, */}
-                            {/*             }} */}
-                            {/*                 margin="normal" */}
-                            {/*             > */}
-                            {/*                 {this.state.listTypes[ dataType ].map((option, index) => ( */}
-                            {/*                     <option key={this.props.componentId + index} value={option}> */}
-                            {/*                         {option} */}
-                            {/*                     </option> */}
-                            {/*                 ))} */}
-                            {/*         </TextField> */}
-                            {/*     </ListItem> */}
-                            {/* </List> */}
                         </form>
                     </Dialog>
                 </div>
         );
     }
 }
-// class FacetedSettings extends React.Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             listTypes: { 
-//                 "text" : [ "MultiList", "SingleList", "TagCloud" ],
-//                 "numeric" : [ "RangeInput" ],
-//             },
-//             // sortOrder: ["Count", "Ascending", "Descending"],
-//             // facetName: this.props.key,
-//             settingsOpen: false,    // Settings dialog display state
-//         }
-//         this.handleChange = this.handleChange.bind(this);
-//         this.handleSettingsClick = this.handleSettingsClick.bind(this);
-//     }
 
-//     componentDidMount() {
-//         // console.log(this.props);
-//     }
-
-//     handleSettingsClick = () => {
-//         this.setState({ settingsOpen: !this.state.settingsOpen });
-//     }
-
-//     handleClose = () => {
-//         this.handleSettingsClick();
-//     };
-
-//     handleChange = name => event => {
-//         // console.log(this.props.componentId);
-//         const id = this.props.componentId;
-//         this.setState({ [name]: event.target.value });
-//         this.props.updateParentState(id, name, event.target.value);
-//     };
-
-//     render() {
-//         const { classes } = this.props;
-//         // console.log(this.props.parentState.facets[this.props.componentId]);
-//         const dataType = this.props.parentState.facets[this.props.componentId].dataType;
-//         // console.log(dataType);
-
-//         return (
-//             <div>
-//                 <IconButton color="inherit" onClick={this.handleSettingsClick} >
-//                     <SettingsIcon />
-//                 </IconButton>
-//                 <Dialog
-//                     open={this.state.settingsOpen}
-//                     onClose={this.handleSettingsClick}
-//                     TransitionComponent={Transition}
-//                 >
-//                     <form className={classes.container} noValidate autoComplete="off">
-
-//                         <AppBar className={classes.appBar}>
-//                             <Toolbar> 
-//                                 <IconButton 
-//                                     color="inherit" 
-//                                     onClick={this.handleClose} 
-//                                     aria-label="Close"
-//                                 >
-//                                     <CloseIcon />
-//                                 </IconButton>
-//                                 <Typography 
-//                                     variant="h6" 
-//                                     color="inherit" 
-//                                     className={classes.flex}>
-//                                     Settings
-//                                 </Typography>
-//                                 <Button 
-//                                     color="inherit" 
-//                                     onClick={this.handleClose}>
-//                                     save
-//                                 </Button>
-//                             </Toolbar>
-//                         </AppBar>
-
-//                         <List>
-//                             <ListItem> 
-//                                 <TextField
-//                                     select
-//                                     label="Choose List Type"
-//                                     className={classes.textField}
-//                                     value={this.state.listValue}
-//                                     onChange={this.handleChange("listValue")}
-//                                     SelectProps={{
-//                                         native: true,
-//                                         MenuProps: {
-//                                             className: classes.menu,
-//                                         },
-//                                     }}
-//                                         margin="normal"
-//                                     >
-//                                         {this.state.listTypes[ dataType ].map((option, index) => (
-//                                             <option key={this.props.componentId + index} value={option}>
-//                                                 {option}
-//                                             </option>
-//                                         ))}
-//                                 </TextField>
-//                             </ListItem>
-//                         </List>
-//                     </form>
-//                 </Dialog>
-//             </div>
-    //         );
-    //     }
-    // }
-
-    FacetedSettings.propTypes = {
-        classes: PropTypes.object.isRequired,
-    };
+FacetedSettings.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
 
 export default withStyles(styles)(FacetedSettings);

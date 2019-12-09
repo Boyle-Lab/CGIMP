@@ -38,9 +38,8 @@ class FacetedSearch extends Component {
             facets: {},
             facetsSet: false,
             numericRanges: {},
+            nestedRanges: {},
             keys: {},
-            //for testing
-            //showCountOption: true
         }
         this.fetchResults = this.fetchResults.bind(this);
         this.fetchScrollResults = this.fetchScrollResults.bind(this);
@@ -84,14 +83,19 @@ class FacetedSearch extends Component {
 
     getFacetsFromElasticsearch = () => {
         const facets = [];
-        client.get({index: "browser",
-            type: "modules",
-            id: 1},
+        client.get(
+            {
+                index: "browser",
+                type: "modules",
+                id: 1
+            },
             (err, res) => {
                 if (err) {
                     console.log(err);
                 } else {
+                    console.log(res._source);
                     Object.keys(res._source).forEach( (key) => {
+                        // Default: numeric
                         let facetParams = {
                             dataType: "numeric",
                             componentId: "",
@@ -99,10 +103,9 @@ class FacetedSearch extends Component {
                             title: "",
                             selectAllLabel:"",
                             filterLabel: "",
-                            // for settings
                             facetType: "",
                             facetListType: "RangeInput",
-                            //showCountOption: true,
+                            // nestedField: false,
                         }
                         if (key !== "id" && key !== "node") {
                             facetParams.componentId = key + 'List';
@@ -111,13 +114,17 @@ class FacetedSearch extends Component {
                             facetParams.filterLabel = key;
 
                             if (isNaN(res._source[key])) {
-                                console.log(res._source[key]);
                                 // loc facet 
                                 if (res._source[key].start != null && res._source[key].end != null) {
-
+                                    console.log(res._source[key]);
+                                    console.log(key);
+                                    facetParams.dataType = "nested";
+                                    facetParams.nest = res._source[key];
+                                } 
+                                else {
+                                    facetParams.dataType = "text";
                                 }
                                 facetParams.dataField = key + '.keyword';
-                                facetParams.dataType = "text";
                                 facetParams.facetListType = "MultiList";
                             } else {
                                 facetParams.dataField = key;
@@ -138,114 +145,193 @@ class FacetedSearch extends Component {
                         this.setState({
                             key: keyUpdate,
                         }, 
-                            // console.log(this.state)
+                            console.log(this.state)
                         )
                     });
                     this.getNumericRangesFromElasticSearch(facets);
+                    this.getNestedRangesFromElasticSearch(facets);
                 }
             });
     }
 
+    /*
+     * Display nested objects as numeric range using "start" and "end" as min and max
+    */
+    getNestedRangesFromElasticSearch = async (facets) => {
+        const ranges = {};
+        const nestedFields = [];
+
+        Object.keys(facets).forEach( (key, index) => {
+            const facet = this.state.facets[key];
+            if (facet.dataType === "nested") {
+                nestedFields.push(facet);
+            }
+        });
+
+        let i = 1;
+        console.log("nested");
+        nestedFields.forEach( (facet, index) => {
+            console.log( facet );
+            console.log( index );
+            let key = facet.nest.chrom + '.keyword';
+            // client.search({
+            //     index: 'browser',
+            //     type: 'modules',
+            //     body: {
+            //         aggs: {
+            //             "field" : key
+            //             // "max": { "max" : { "field": facet.title } },
+            //             // "min": { "min" : { "field": facet.title } },
+            //         },
+            //         query: {
+            //             match_all: {}
+            //         }
+            //     }
+            // },
+            //     (err, res) => {
+            //         if (err) {
+            //             console.log(err);
+            //         } else {
+            //             console.log(res);
+            //         }
+            //     }
+            // );
+
+            //client.search({
+            //    index: 'browser',
+            //    type: 'modules',
+            //    body: {
+            //        // aggs: {
+            //        //     "max": { "max" : { "field": facet.title } },
+            //        //     "min": { "min" : { "field": facet.title } },
+            //        // },
+            //        query: {
+            //            match_all: {}
+            //        }
+            //    }
+            //},
+            //    (err, res) => {
+            //        if (err) {
+            //            console.log(err);
+            //        } else {
+            //            ranges[facet.title] = {
+            //                min: res.aggregations.min.value,
+            //                max: res.aggregations.max.value
+            //            };
+            //        }
+            //        if (i === numericFields.length ) {
+            //            this.setState({ numericRanges: ranges,
+            //                facetsSet: true },
+            //                () => {
+            //                    //console.log(this.state.numericRanges);
+            //                    //this.props.updateParentState("dataIsLoaded", "true");
+            //                });
+            //        }
+            //        i++;
+            //    });
+        });
+    }
+
     getNumericRangesFromElasticSearch = async (facets) => {
-	const ranges = {};
-	const numericFields = [];
+        const ranges = {};
+        const numericFields = [];
 
-	Object.keys(facets).forEach( (key, index) => {
-	    const facet = this.state.facets[key];
+        Object.keys(facets).forEach( (key, index) => {
+            const facet = this.state.facets[key];
             if (facet.dataType === "numeric") {
-		numericFields.push(facet);
-	    }
-	});
+                numericFields.push(facet);
+            }
+        });
 
-	let i = 1;
-	numericFields.forEach( (facet, index) => {
-	    client.search({
-		index: 'browser',
-		type: 'modules',
-		body: {
-		    aggs: {
-			"max": { "max" : { "field": facet.title } },
-			"min": { "min" : { "field": facet.title } },
-		    },
-		    query: {
-			match_all: {}
-		    }
-		}
-	    },
-			  (err, res) => {
-			      if (err) {
-				  console.log(err);
-			      } else {
-				  ranges[facet.title] = {
-				      min: res.aggregations.min.value,
-				      max: res.aggregations.max.value
-				  };
-			      }
-			      if (i === numericFields.length ) {
-				  this.setState({ numericRanges: ranges,
-						  facetsSet: true },
-						() => {
-						    //console.log(this.state.numericRanges);
-						    //this.props.updateParentState("dataIsLoaded", "true");
-						});
-			      }
-			      i++;
-			  });
-	});
+        let i = 1;
+        numericFields.forEach( (facet, index) => {
+            client.search({
+                index: 'browser',
+                type: 'modules',
+                body: {
+                    aggs: {
+                        "max": { "max" : { "field": facet.title } },
+                        "min": { "min" : { "field": facet.title } },
+                    },
+                    query: {
+                        match_all: {}
+                    }
+                }
+            },
+                (err, res) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        ranges[facet.title] = {
+                            min: res.aggregations.min.value,
+                            max: res.aggregations.max.value
+                        };
+                    }
+                    if (i === numericFields.length ) {
+                        this.setState({ numericRanges: ranges,
+                            facetsSet: true },
+                            () => {
+                                //console.log(this.state.numericRanges);
+                                //this.props.updateParentState("dataIsLoaded", "true");
+                            });
+                    }
+                    i++;
+                });
+        });
     }
 
 
     fetchResults = (query, api) => {
-	return fetch(api, {
-	    method: "POST",
-	    headers: {
-		"content-type": "application/json",
-	    },
-	    body: JSON.stringify(query)
-	})
-	    .then(res => res.json())
-	    .catch(err => console.error(err));
+        return fetch(api, {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify(query)
+        })
+            .then(res => res.json())
+            .catch(err => console.error(err));
     };
 
     fetchScrollResults = async query => {
-	const res = await this.fetchResults(query, scrollUrl);
-	const { hits } = res.hits;
-	if (hits.length) {
-	    return [
-		...hits,
-		...(await this.fetchScrollResults({
-		    scroll: "1m",
-		    scroll_id: res._scroll_id
-		}))
-	    ];
-	}
-	return [];
+        const res = await this.fetchResults(query, scrollUrl);
+        const { hits } = res.hits;
+        if (hits.length) {
+            return [
+                ...hits,
+                ...(await this.fetchScrollResults({
+                    scroll: "1m",
+                    scroll_id: res._scroll_id
+                }))
+            ];
+        }
+        return [];
     };
 
     getAllDisplayedData = async (prev, next) => {
-	if (next && !next.query.match_all) {
-	    this.props.onNewSearchAction("loading");
-	    //console.log("Fetching all results for query:", next);
-	    next.size = 100000;
-	    // initial url to obtain scroll id is different
-	    const initialResults = await this.fetchResults(next, initScrollUrl);
-	    // keep scrolling till hits are present
-	    const scrollResults = await this.fetchScrollResults({
-		scroll: "1m",
-		scroll_id: initialResults._scroll_id
-	    });
-	    // concat hits from initialResults with hits from scrollResults
-	    const allResults = {};
-	    initialResults.hits.hits.forEach( (hit) => {
+        if (next && !next.query.match_all) {
+            this.props.onNewSearchAction("loading");
+            //console.log("Fetching all results for query:", next);
+            next.size = 100000;
+            // initial url to obtain scroll id is different
+            const initialResults = await this.fetchResults(next, initScrollUrl);
+            // keep scrolling till hits are present
+            const scrollResults = await this.fetchScrollResults({
+                scroll: "1m",
+                scroll_id: initialResults._scroll_id
+            });
+            // concat hits from initialResults with hits from scrollResults
+            const allResults = {};
+            initialResults.hits.hits.forEach( (hit) => {
                 allResults[hit._id] = hit._source;
             });
-	    scrollResults.forEach( (hit) => {
+            scrollResults.forEach( (hit) => {
                 allResults[hit._id] = hit._source;
             });
-	    this.props.onDataChange(allResults);
-	    this.props.onNewSearchAction("loaded");
-	    //console.log(`${Object.keys(allResults).length} results found:`, allResults);
-	}
+            this.props.onDataChange(allResults);
+            this.props.onNewSearchAction("loaded");
+            //console.log(`${Object.keys(allResults).length} results found:`, allResults);
+        }
     };
 
     handleQueryChange = async (prev, next) => {
@@ -260,11 +346,6 @@ class FacetedSearch extends Component {
 	    this.getAllDisplayedData(prev, next);
         }
     };
-
-
-    ChangeShowCount = (e) => {
-        e = !e;
-    }
 
     render () {
 	if (!this.state.facetsSet) {
@@ -426,6 +507,7 @@ class FacetList extends Component {
                             //showCount={this.state.showCountOption}
                             showCount={true}
                             showSearch={false}
+                            nestedField={this.props.facet.nestedField}
                             react={{
                                 and: Object.values(this.props.keys)
                                 // and: keys
@@ -454,6 +536,7 @@ class FacetList extends Component {
                             showCheckbox={true}
                             showCount={true}
                             showSearch={false}
+                            nestedField={this.props.facet.nestedField}
                             react={{
                                 // and: keys
                                 and: Object.values(this.props.keys)
@@ -480,6 +563,7 @@ class FacetList extends Component {
                             queryFormat="and"
                             showCount={true}
                             multiSelect={true}
+                            nestedField={this.props.facet.nestedField}
                             react={{
                                 // and: keys
                                 and: Object.values(this.props.keys)
@@ -496,6 +580,7 @@ class FacetList extends Component {
                 );
             }
         } else if (this.props.facet.dataType === "numeric") {
+            // console.log(this.props.numericRanges[this.props.facet.title]);
             return (
                 <RangeInput
                     key={this.props.facetKey}
