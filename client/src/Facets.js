@@ -93,7 +93,8 @@ class FacetedSearch extends Component {
                 if (err) {
                     console.log(err);
                 } else {
-                    console.log(res._source);
+                    console.log(res);
+                    console.log(Object.keys(res._source));
                     Object.keys(res._source).forEach( (key) => {
                         // Default: numeric
                         let facetParams = {
@@ -149,7 +150,7 @@ class FacetedSearch extends Component {
                         )
                     });
                     this.getNumericRangesFromElasticSearch(facets);
-                    // this.getNestedRangesFromElasticSearch(facets);
+                    this.getNestedRangesFromElasticSearch(facets);
                 }
             });
     }
@@ -157,80 +158,116 @@ class FacetedSearch extends Component {
     /*
      * Display nested objects as numeric range using "start" and "end" as min and max
     */
-    //getNestedRangesFromElasticSearch = async (facets) => {
-    //    const ranges = {};
-    //    const nestedFields = [];
+    getNestedRangesFromElasticSearch = async (facets) => {
+        // const ranges = {};
+        // const nestedFields = [];
 
-    //    Object.keys(facets).forEach( (key, index) => {
-    //        const facet = this.state.facets[key];
-    //        if (facet.dataType === "nested") {
-    //            nestedFields.push(facet);
-    //        }
-    //    });
+        // client.search({
+        //     index: 'browser',
+        //     type: 'modules',
+        // }, (err, res) =>  {
+        //     if (err) {
+        //         console.log(err);
+        //     } else {
+        //         console.log(res);
+        //     }
+        // });
 
-    //    let i = 1;
-    //    console.log("nested");
-    //    nestedFields.forEach( (facet, index) => {
-    //        console.log( facet );
-    //        console.log( index );
-    //        let key = facet.nest.chrom + '.keyword';
-    //        // client.search({
-    //        //     index: 'browser',
-    //        //     type: 'modules',
-    //        //     body: {
-    //        //         aggs: {
-    //        //             "field" : key
-    //        //             // "max": { "max" : { "field": facet.title } },
-    //        //             // "min": { "min" : { "field": facet.title } },
-    //        //         },
-    //        //         query: {
-    //        //             match_all: {}
-    //        //         }
-    //        //     }
-    //        // },
-    //        //     (err, res) => {
-    //        //         if (err) {
-    //        //             console.log(err);
-    //        //         } else {
-    //        //             console.log(res);
-    //        //         }
-    //        //     }
-    //        // );
 
-    //        //client.search({
-    //        //    index: 'browser',
-    //        //    type: 'modules',
-    //        //    body: {
-    //        //        // aggs: {
-    //        //        //     "max": { "max" : { "field": facet.title } },
-    //        //        //     "min": { "min" : { "field": facet.title } },
-    //        //        // },
-    //        //        query: {
-    //        //            match_all: {}
-    //        //        }
-    //        //    }
-    //        //},
-    //        //    (err, res) => {
-    //        //        if (err) {
-    //        //            console.log(err);
-    //        //        } else {
-    //        //            ranges[facet.title] = {
-    //        //                min: res.aggregations.min.value,
-    //        //                max: res.aggregations.max.value
-    //        //            };
-    //        //        }
-    //        //        if (i === numericFields.length ) {
-    //        //            this.setState({ numericRanges: ranges,
-    //        //                facetsSet: true },
-    //        //                () => {
-    //        //                    //console.log(this.state.numericRanges);
-    //        //                    //this.props.updateParentState("dataIsLoaded", "true");
-    //        //                });
-    //        //        }
-    //        //        i++;
-    //        //    });
-    //    });
-    //}
+        Object.keys(facets).forEach( (key, index) => {
+            const facet = this.state.facets[key];
+            console.log(facet);
+            if (facet.dataType === "nested") {
+                // nestedFields.push(facet);
+                client.search({
+                    index: 'browser',
+                    // type: 'modules',
+                    body: {
+                        query: {
+                            bool: {
+                                must: [
+                                    {
+                                        match: {
+                                            "loc.start": "43245951"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }, (err, res) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log(res);
+                    }
+                })
+            }
+        });
+
+        //let i = 1;
+        //console.log("nested");
+        //nestedFields.forEach( (facet, index) => {
+        //    console.log( facet );
+        //    console.log( index );
+        //    let key = facet.nest.chrom + '.keyword';
+        //    // client.search({
+        //    //     index: 'browser',
+        //    //     type: 'modules',
+        //    //     body: {
+        //    //         aggs: {
+        //    //             "field" : key
+        //    //             // "max": { "max" : { "field": facet.title } },
+        //    //             // "min": { "min" : { "field": facet.title } },
+        //    //         },
+        //    //         query: {
+        //    //             match_all: {}
+        //    //         }
+        //    //     }
+        //    // },
+        //    //     (err, res) => {
+        //    //         if (err) {
+        //    //             console.log(err);
+        //    //         } else {
+        //    //             console.log(res);
+        //    //         }
+        //    //     }
+        //    // );
+
+        //    //client.search({
+        //    //    index: 'browser',
+        //    //    type: 'modules',
+        //    //    body: {
+        //    //        // aggs: {
+        //    //        //     "max": { "max" : { "field": facet.title } },
+        //    //        //     "min": { "min" : { "field": facet.title } },
+        //    //        // },
+        //    //        query: {
+        //    //            match_all: {}
+        //    //        }
+        //    //    }
+        //    //},
+        //    //    (err, res) => {
+        //    //        if (err) {
+        //    //            console.log(err);
+        //    //        } else {
+        //    //            ranges[facet.title] = {
+        //    //                min: res.aggregations.min.value,
+        //    //                max: res.aggregations.max.value
+        //    //            };
+        //    //        }
+        //    //        if (i === numericFields.length ) {
+        //    //            this.setState({ numericRanges: ranges,
+        //    //                facetsSet: true },
+        //    //                () => {
+        //    //                    //console.log(this.state.numericRanges);
+        //    //                    //this.props.updateParentState("dataIsLoaded", "true");
+        //    //                });
+        //    //        }
+        //    //        i++;
+        //    //    });
+        //});
+    }
 
     getNumericRangesFromElasticSearch = async (facets) => {
         const ranges = {};
