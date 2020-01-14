@@ -155,42 +155,20 @@ class FacetedSearch extends Component {
             });
     }
 
-    /*
-     * Display nested objects as numeric range using "start" and "end" as min and max
-    */
     getNestedRangesFromElasticSearch = async (facets) => {
-        // const ranges = {};
-        // const nestedFields = [];
-
-        // client.search({
-        //     index: 'browser',
-        //     type: 'modules',
-        // }, (err, res) =>  {
-        //     if (err) {
-        //         console.log(err);
-        //     } else {
-        //         console.log(res);
-        //     }
-        // });
-
-
+        console.log(facets);
         Object.keys(facets).forEach( (key, index) => {
             const facet = this.state.facets[key];
-            console.log(facet);
             if (facet.dataType === "nested") {
-                // nestedFields.push(facet);
                 client.search({
                     index: 'browser',
-                    // type: 'modules',
                     body: {
                         query: {
                             bool: {
                                 must: [
-                                    {
-                                        match: {
-                                            "loc.start": "43245951"
-                                        }
-                                    }
+                                    { match: { "loc.chrom": "chr7" }},
+                                    { range: { "loc.start": { gte: 40000000 } }},
+                                    { range: { "loc.end": { lte: 60000000 } }}
                                 ]
                             }
                         }
@@ -204,69 +182,6 @@ class FacetedSearch extends Component {
                 })
             }
         });
-
-        //let i = 1;
-        //console.log("nested");
-        //nestedFields.forEach( (facet, index) => {
-        //    console.log( facet );
-        //    console.log( index );
-        //    let key = facet.nest.chrom + '.keyword';
-        //    // client.search({
-        //    //     index: 'browser',
-        //    //     type: 'modules',
-        //    //     body: {
-        //    //         aggs: {
-        //    //             "field" : key
-        //    //             // "max": { "max" : { "field": facet.title } },
-        //    //             // "min": { "min" : { "field": facet.title } },
-        //    //         },
-        //    //         query: {
-        //    //             match_all: {}
-        //    //         }
-        //    //     }
-        //    // },
-        //    //     (err, res) => {
-        //    //         if (err) {
-        //    //             console.log(err);
-        //    //         } else {
-        //    //             console.log(res);
-        //    //         }
-        //    //     }
-        //    // );
-
-        //    //client.search({
-        //    //    index: 'browser',
-        //    //    type: 'modules',
-        //    //    body: {
-        //    //        // aggs: {
-        //    //        //     "max": { "max" : { "field": facet.title } },
-        //    //        //     "min": { "min" : { "field": facet.title } },
-        //    //        // },
-        //    //        query: {
-        //    //            match_all: {}
-        //    //        }
-        //    //    }
-        //    //},
-        //    //    (err, res) => {
-        //    //        if (err) {
-        //    //            console.log(err);
-        //    //        } else {
-        //    //            ranges[facet.title] = {
-        //    //                min: res.aggregations.min.value,
-        //    //                max: res.aggregations.max.value
-        //    //            };
-        //    //        }
-        //    //        if (i === numericFields.length ) {
-        //    //            this.setState({ numericRanges: ranges,
-        //    //                facetsSet: true },
-        //    //                () => {
-        //    //                    //console.log(this.state.numericRanges);
-        //    //                    //this.props.updateParentState("dataIsLoaded", "true");
-        //    //                });
-        //    //        }
-        //    //        i++;
-        //    //    });
-        //});
     }
 
     getNumericRangesFromElasticSearch = async (facets) => {
@@ -282,6 +197,7 @@ class FacetedSearch extends Component {
 
         let i = 1;
         numericFields.forEach( (facet, index) => {
+            console.log(facet);
             client.search({
                 index: 'browser',
                 type: 'modules',
@@ -396,6 +312,8 @@ class FacetedSearch extends Component {
 		dataFields.push(this.state.facets[key].dataField);
 	    });
 
+        console.log(this.state);
+
 	    return (
 		    <div>
 		        <div>
@@ -465,52 +383,6 @@ class FacetedSearch extends Component {
                     keys={this.state.keys}
                 />
             );
-
-            // if (facet.dataType === "text") {
-            //     return (
-            //         <div key={key}>
-            //             {/* <SettingsDialogue/> */}
-            //             {/* <SettingsDialogue value={this.state.facets[key]} option={this.changeShowCount}/> */}
-            //             <MultiList
-            //                 key={key}
-            //                 componentId={facet.componentId}
-            //                 dataField={facet.dataField}
-            //                 title={facet.title}
-            //                 queryFormat="and"
-            //                 selectAllLabel={facet.selectAllLabel}
-            //                 showCheckbox={true}
-            //                 //showCount={this.state.showCountOption}
-            //                 showCount={true}
-            //                 showSearch={false}
-            //                 react={{
-            //                     and: Object.values(this.state.keys)
-            //                     // and: keys
-            //                 }}
-            //                     showFilter={true}
-            //                     filterLabel={facet.filterLabel}
-            //                     URLParams={false}
-            //                     innerClass={{
-            //                         label: "list-item",
-            //                         input: "list-input"
-            //                     }}
-            //                 />
-            //             </div>
-            //     );
-            // } else if (facet.dataType === "numeric") {
-            //     return (
-            //         <RangeInput
-            //             key={key}
-            //             componentId={facet.componentId}
-            //             dataField={facet.dataField}
-            //             title={facet.title}
-            //             range={{
-            //                 "start": this.state.numericRanges[facet.title].min,
-            //                 "end": this.state.numericRanges[facet.title].max
-            //             }}
-            //         />
-            //     );
-            // }
-            // return(<div key={index}/>);
         })}
 
         </ReactiveBase>
@@ -630,6 +502,18 @@ class FacetList extends Component {
                     }}
                 />);
                 //return (<div key={key} />);
+        // } else if (this.props.facet.dataType === "nested") {
+        //     return (
+        //         <RangeInput
+        //             key={this.props.facetKey}
+        //             componentId={this.props.keys[this.props.facetKey]}
+        //             dataField={this.props.facet.dataField}
+        //             title={this.props.facet.title}
+        //             range={{
+        //                 "start": this.props.numericRanges[this.props.facet.title].min,
+        //                 "end": this.props.numericRanges[this.props.facet.title].max
+        //             }}
+        //         />);
         }
         return(<div key={this.props.index}/>);
 
