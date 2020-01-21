@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import browser from './browser_config';
-import { ReactiveBase, SelectedFilters, RangeInput, ReactiveList, MultiList, SingleList, TagCloud, ReactiveComponent } from '@appbaseio/reactivesearch';
+import { ReactiveBase, SelectedFilters, RangeInput, SingleDropdownRange, MultiRange, ReactiveList, MultiList, SingleList, TagCloud, ReactiveComponent } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 import FacetedSettings from "./FacetedSettings";
 // import { Dialog, DialogTitle } from '@material-ui/core';
@@ -490,24 +490,46 @@ class FacetList extends Component {
                 );
             }
         } else if (this.props.facet.dataType === "numeric") {
-            // console.log(this.props.numericRanges[this.props.facet.title]);
-            return (
-                <RangeInput
-                    key={this.props.facetKey}
-                    componentId={this.props.keys[this.props.facetKey]}
-                    dataField={this.props.facet.dataField}
-                    title={this.props.facet.title}
-                    range={{
-                        "start": this.props.numericRanges[this.props.facet.title].min,
-                        "end": this.props.numericRanges[this.props.facet.title].max
-                    }}
-                />);
-        } else if (this.props.facet.dataType === "nested") {
-            return (
-                <ChromosomeRangeSelect
-                    facet={this.props.facet}
-                />);
-        }
+            console.log(this.props.facet);
+            console.log(this.props.numericRanges[this.props.facet.title]);
+            if ( this.props.facet.facetListType === "RangeInput" ) {
+                return (
+                    <RangeInput
+                        key={this.props.facetKey}
+                        componentId={this.props.keys[this.props.facetKey]}
+                        dataField={this.props.facet.dataField}
+                        title={this.props.facet.title}
+                        range={{
+                            "start": this.props.numericRanges[this.props.facet.title].min,
+                            "end": this.props.numericRanges[this.props.facet.title].max
+                        }}
+                    />);
+            } else if (this.props.facet.facetListType === "SingleDropdownRange") {
+                let data_array = Array( this.props.numericRanges[this.props.facet.title].max - this.props.numericRanges[this.props.facet.title].min + 1)
+                for (var i =  this.props.numericRanges[this.props.facet.title].min; i <= this.props.numericRanges[this.props.facet.title].max; ++i) {
+                    data_array[i] = { start: i, end: i, label: String(i) };
+                }
+                this.setState( {
+                    data_array: data_array,
+                }, => () {
+                    console.log(this.state.data_array);
+                    return (
+                        <SingleDropdownRange
+                            key={this.props.facetKey}
+                            componentId={this.props.keys[this.props.facetKey]}
+                            dataField={this.props.facet.dataField}
+                            title={this.props.facet.title}
+                            data={this.state.data_array}
+                        />);
+                }); // setState
+            }
+        } 
+        // else if (this.props.facet.dataType === "nested") {
+        //     return (
+        //         <ChromosomeRangeSelect
+        //             facet={this.props.facet}
+        //         />);
+        // }
         return(<div key={this.props.index}/>);
 
     }

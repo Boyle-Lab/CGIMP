@@ -74,7 +74,7 @@ class FacetedSettings extends React.Component {
         this.state = {
             listTypes: { 
                 "text" : [ "MultiList", "SingleList", "TagCloud" ],
-                "numeric" : [ "RangeInput" ],
+                "numeric" : [ "RangeInput", "SingleDropdownRange", "MultiRange" ],
                 "nested" : [ "Temp" ],
             },
             listValue: {},
