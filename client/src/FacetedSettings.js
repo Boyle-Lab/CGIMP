@@ -74,7 +74,7 @@ class FacetedSettings extends React.Component {
         this.state = {
             listTypes: { 
                 "text" : [ "MultiList", "SingleList", "TagCloud" ],
-                "numeric" : [ "RangeInput", "SingleDropdownRange", "MultiRange" ],
+                "numeric" : [ "RangeInput", "SingleDropdownRange", "MultiDropdownRange" ],
                 "nested" : [ "Temp" ],
             },
             listValue: {},
@@ -105,8 +105,8 @@ class FacetedSettings extends React.Component {
 
     listChange = facet => event => {
         event.persist();
-        console.log("listChange");
-        console.log(event);
+        // console.log("listChange");
+        // console.log(event);
         // const id = this.props.componentId;
         let update_listValue = this.state.listValue;
         update_listValue[facet] = event.target.value;

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import browser from './browser_config';
-import { ReactiveBase, SelectedFilters, RangeInput, SingleDropdownRange, MultiRange, ReactiveList, MultiList, SingleList, TagCloud, ReactiveComponent } from '@appbaseio/reactivesearch';
+import { ReactiveBase, SelectedFilters, RangeInput, SingleDropdownRange, MultiRange, MultiDropdownRange, ReactiveList, MultiList, SingleList, TagCloud, ReactiveComponent } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 import FacetedSettings from "./FacetedSettings";
 // import { Dialog, DialogTitle } from '@material-ui/core';
@@ -49,36 +49,18 @@ class FacetedSearch extends Component {
     }
 
     componentDidMount() {
-	this.getFacetsFromElasticsearch();
+        this.getFacetsFromElasticsearch();
     }
 
-    //changeShowCount = ( facet ) => {
-    //    facet.showCountOption = !facet.showCountOption;
-    //    //this.setState({
-    //    //    showCountOption: !this.state.showCountOption,
-    //    //});
-    //}
 
     updateListType = (facet, value) => {
-        console.log("updateListType");
-        console.log(facet);
-        console.log(value);
-        // if (name === "listValue") {
         let updateListType = this.state.facets;
         updateListType[facet].facetListType = value;
         let updateKeys = this.state.keys;
         updateKeys[facet] = facet + value;
-        this.setState(
-            { 
-                facets: updateListType,
-                // keys: updateKeys,
-            },
-            // this.forceUpdate(),
-            console.log( this.state.facets[facet] ),
-            console.log( this.state.keys )
-        );
-        // }
-        // this.updateComponentId(componentId, name, value);
+        this.setState({ 
+            facets: updateListType,
+        });
     }
 
     getFacetsFromElasticsearch = () => {
@@ -93,8 +75,8 @@ class FacetedSearch extends Component {
                 if (err) {
                     console.log(err);
                 } else {
-                    console.log(res);
-                    console.log(Object.keys(res._source));
+                    // console.log(res);
+                    // console.log(Object.keys(res._source));
                     Object.keys(res._source).forEach( (key) => {
                         // Default: numeric
                         let facetParams = {
@@ -117,8 +99,8 @@ class FacetedSearch extends Component {
                             if (isNaN(res._source[key])) {
                                 // loc facet 
                                 if (res._source[key].start != null && res._source[key].end != null) {
-                                    console.log(res._source[key]);
-                                    console.log(key);
+                                    // console.log(res._source[key]);
+                                    // console.log(key);
                                     facetParams.dataType = "nested";
                                     facetParams.nest = res._source[key];
                                     facetParams.facetListType = "ChromosomeRangeSelect";
@@ -147,7 +129,7 @@ class FacetedSearch extends Component {
                         this.setState({
                             key: keyUpdate,
                         }, 
-                            console.log(this.state)
+                            // console.log(this.state)
                         )
                     });
                     this.getNumericRangesFromElasticSearch(facets);
@@ -157,7 +139,7 @@ class FacetedSearch extends Component {
     }
 
     getNestedRangesFromElasticSearch = async (facets) => {
-        console.log(facets);
+        // console.log(facets);
         Object.keys(facets).forEach( (key, index) => {
             const facet = this.state.facets[key];
             if (facet.dataType === "nested") {
@@ -178,7 +160,7 @@ class FacetedSearch extends Component {
                     if (err) {
                         console.log(err);
                     } else {
-                        console.log(res);
+                        // console.log(res);
                     }
                 })
             }
@@ -198,7 +180,7 @@ class FacetedSearch extends Component {
 
         let i = 1;
         numericFields.forEach( (facet, index) => {
-            console.log(facet);
+            // console.log(facet);
             client.search({
                 index: 'browser',
                 type: 'modules',
@@ -490,8 +472,6 @@ class FacetList extends Component {
                 );
             }
         } else if (this.props.facet.dataType === "numeric") {
-            console.log(this.props.facet);
-            console.log(this.props.numericRanges[this.props.facet.title]);
             if ( this.props.facet.facetListType === "RangeInput" ) {
                 return (
                     <RangeInput
@@ -505,23 +485,38 @@ class FacetList extends Component {
                         }}
                     />);
             } else if (this.props.facet.facetListType === "SingleDropdownRange") {
-                let data_array = Array( this.props.numericRanges[this.props.facet.title].max - this.props.numericRanges[this.props.facet.title].min + 1)
-                for (var i =  this.props.numericRanges[this.props.facet.title].min; i <= this.props.numericRanges[this.props.facet.title].max; ++i) {
-                    data_array[i] = { start: i, end: i, label: String(i) };
+                let min = this.props.numericRanges[this.props.facet.title].min;
+                let max = this.props.numericRanges[this.props.facet.title].max;
+                let data_array = Array( max - min + 1 );
+                for ( let i = 0; i < data_array.length; i++ ) {
+                    data_array[i] = { start: i + min, end: i + min, label: String(i + min) };
                 }
-                this.setState( {
-                    data_array: data_array,
-                }, => () {
-                    console.log(this.state.data_array);
-                    return (
-                        <SingleDropdownRange
-                            key={this.props.facetKey}
-                            componentId={this.props.keys[this.props.facetKey]}
-                            dataField={this.props.facet.dataField}
-                            title={this.props.facet.title}
-                            data={this.state.data_array}
-                        />);
-                }); // setState
+                return (
+                    <SingleDropdownRange
+                        key={this.props.facetKey}
+                        componentId={this.props.keys[this.props.facetKey]}
+                        dataField={this.props.facet.dataField}
+                        title={this.props.facet.title}
+                        data={data_array}
+                    />
+                );
+            } else {
+                let min = this.props.numericRanges[this.props.facet.title].min;
+                let max = this.props.numericRanges[this.props.facet.title].max;
+                let data_array = Array( max - min + 1 );
+                for ( let i = 0; i < data_array.length; i++ ) {
+                    data_array[i] = { start: i + min, end: i + min, label: String(i + min) };
+                }
+                return (
+                    // <MultiDropdownRange
+                    <MultiRange
+                        key={this.props.facetKey}
+                        componentId={this.props.keys[this.props.facetKey]}
+                        dataField={this.props.facet.dataField}
+                        title={this.props.facet.title}
+                        data={data_array}
+                    />
+                );
             }
         } 
         // else if (this.props.facet.dataType === "nested") {
@@ -535,22 +530,22 @@ class FacetList extends Component {
     }
 }
 
-class ChromosomeRangeSelect extends Component {
-    constructor(props) { 
-        super(props);
-        console.log(this.props);
-        console.log(this.props.componentId);
-    }
+// class ChromosomeRangeSelect extends Component {
+//     constructor(props) { 
+//         super(props);
+//         console.log(this.props);
+//         console.log(this.props.componentId);
+//     }
 
-    render() {
-        return (
-            <ReactiveComponent
-                // key={this.props.facetKey}
-                componentId={this.props.componentId}
-                // title={this.props.facet.title}
-            />
-        );
-    }
-}
+//     render() {
+//         return (
+//             <ReactiveComponent
+//                 // key={this.props.facetKey}
+//                 componentId={this.props.componentId}
+//                 // title={this.props.facet.title}
+//             />
+//         );
+//     }
+// }
 
 export default FacetedSearch;
