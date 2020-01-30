@@ -487,6 +487,20 @@ class FacetList extends Component {
             } else if (this.props.facet.facetListType === "SingleDropdownRange") {
                 let min = this.props.numericRanges[this.props.facet.title].min;
                 let max = this.props.numericRanges[this.props.facet.title].max;
+                if (max - min > 100) {
+                    return (
+                        <RangeInput
+                            key={this.props.facetKey}
+                            componentId={this.props.keys[this.props.facetKey]}
+                            dataField={this.props.facet.dataField}
+                            title={this.props.facet.title}
+                            range={{
+                                "start": this.props.numericRanges[this.props.facet.title].min,
+                                "end": this.props.numericRanges[this.props.facet.title].max
+                            }}
+                        />
+                    );
+                }
                 let data_array = Array( max - min + 1 );
                 for ( let i = 0; i < data_array.length; i++ ) {
                     data_array[i] = { start: i + min, end: i + min, label: String(i + min) };
@@ -503,13 +517,26 @@ class FacetList extends Component {
             } else {
                 let min = this.props.numericRanges[this.props.facet.title].min;
                 let max = this.props.numericRanges[this.props.facet.title].max;
+                if (max - min > 100) {
+                    return (
+                        <RangeInput
+                            key={this.props.facetKey}
+                            componentId={this.props.keys[this.props.facetKey]}
+                            dataField={this.props.facet.dataField}
+                            title={this.props.facet.title}
+                            range={{
+                                "start": this.props.numericRanges[this.props.facet.title].min,
+                                "end": this.props.numericRanges[this.props.facet.title].max
+                            }}
+                        />
+                    );
+                }
                 let data_array = Array( max - min + 1 );
                 for ( let i = 0; i < data_array.length; i++ ) {
                     data_array[i] = { start: i + min, end: i + min, label: String(i + min) };
                 }
                 return (
-                    // <MultiDropdownRange
-                    <MultiRange
+                    <MultiDropdownRange
                         key={this.props.facetKey}
                         componentId={this.props.keys[this.props.facetKey]}
                         dataField={this.props.facet.dataField}
