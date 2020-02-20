@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import browser from './browser_config';
-import { ReactiveBase, SelectedFilters, RangeInput, SingleDropdownRange, MultiRange, MultiDropdownRange, ReactiveList, MultiList, SingleList, TagCloud, ReactiveComponent } from '@appbaseio/reactivesearch';
+import { ReactiveBase, SelectedFilters, RangeInput, SingleDropdownRange, MultiDropdownRange, ReactiveList, MultiList, SingleList, TagCloud, ReactiveComponent } from '@appbaseio/reactivesearch';
 import { Client } from 'elasticsearch';
 import FacetedSettings from "./FacetedSettings";
-// import { Dialog, DialogTitle } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import { TextField } from '@material-ui/core';
 
 /*
 This code is part of the CGIMP distribution
@@ -160,7 +161,7 @@ class FacetedSearch extends Component {
                     if (err) {
                         console.log(err);
                     } else {
-                        // console.log(res);
+                        console.log(res);
                     }
                 })
             }
@@ -389,14 +390,12 @@ class FacetList extends Component {
                     <div key={this.props.facetKey}>
                         <MultiList
                             key={this.props.facetKey}
-                            // componentId={this.props.facet.componentId}
                             componentId={this.props.keys[this.props.facetKey]}
                             dataField={this.props.facet.dataField}
                             title={this.props.facet.title}
                             queryFormat="and"
                             selectAllLabel={this.props.facet.selectAllLabel}
                             showCheckbox={true}
-                            //showCount={this.state.showCountOption}
                             showCount={true}
                             showSearch={false}
                             nestedField={this.props.facet.nestedField}
@@ -419,7 +418,6 @@ class FacetList extends Component {
                     <div key={this.props.facetKey}>
                         <SingleList
                             key={this.props.facetKey}
-                            // componentId={facet.componentId}
                             componentId={this.props.keys[this.props.facetKey]}
                             dataField={this.props.facet.dataField}
                             title={this.props.facet.title}
@@ -546,33 +544,101 @@ class FacetList extends Component {
                 );
             }
         } 
-        // else if (this.props.facet.dataType === "nested") {
-        //     return (
-        //         <ChromosomeRangeSelect
-        //             facet={this.props.facet}
-        //         />);
-        // }
+        else if (this.props.facet.dataType === "nested") {
+            return (
+                <ReactiveComponent
+                    key={this.props.facetKey}
+                    componentId={this.props.keys[this.props.facetKey]}
+                    facet={this.props.facet}
+                    defaultQuery={() => ({
+                    index: 'browser',
+                        body: {
+                            query: {
+                                bool: {
+                                    must: [
+                                        { match: { "loc.chrom": "chr7" }},
+                                        { range: { "loc.start": { gte: 40000000 } }},
+                                        { range: { "loc.end": { lte: 60000000 } }}
+                                    ]
+                                }
+                            }
+                        }
+                    })}
+                    // defaultQuery={() => ({
+                    //     size: 1,
+                    //     aggs: {
+                    //         nodes: {
+                    //             terms: {
+                    //                 field: 'node',
+                    //                 size: 100000
+                    //             }
+                    //         }
+                    //     }
+                    // })}
+                        // render={ ({facet, defaultQuery }) => (
+                        render={ () => (
+                            <ChromosomeRangeSelect facet={this.props.facet} />
+                        )}
+                />
+                );
+        }
         return(<div key={this.props.index}/>);
 
     }
 }
 
-// class ChromosomeRangeSelect extends Component {
-//     constructor(props) { 
-//         super(props);
-//         console.log(this.props);
-//         console.log(this.props.componentId);
-//     }
+class ChromosomeRangeSelect extends Component {
+    constructor(props) { 
+        super(props);
+        console.log(this.props);
+        console.log(this.props.facet);
+        this.state = {
+            textValue: "",
+        }
 
-//     render() {
-//         return (
-//             <ReactiveComponent
-//                 // key={this.props.facetKey}
-//                 componentId={this.props.componentId}
-//                 // title={this.props.facet.title}
-//             />
-//         );
-//     }
-// }
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleSubmit = () => {
+        console.log(this.state);
+        let query = this.state.textValue.split(':');
+        console.log(query);
+    }
+
+    handleChange = event => {
+        // console.log(event.target.value);
+        this.setState({
+            textValue: event.target.value,
+        }, 
+            // console.log(this.state.textValue)
+        );
+        // console.log(this.state.textValue);
+    }
+
+    render() {
+        return (
+            <div>
+                <div>
+                    <TextField
+                        label={this.props.facet.title}
+                        placeholder="chrom:start:end"
+                        onChange={this.handleChange}
+                    />
+                </div>
+                <div></div>
+                <div>
+                    <Button color="inherit" variant="outlined" onClick={this.handleSubmit}> Submit </Button>
+                </div>
+            </div>
+
+            // <ReactiveComponent
+            //     // key={this.props.facetKey}
+            //     componentId={this.props.componentId}
+            //     // title={this.props.facet.title}
+            // />
+        );
+    }
+}
 
 export default FacetedSearch;
