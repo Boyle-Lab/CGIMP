@@ -551,30 +551,16 @@ class FacetList extends Component {
                     componentId={this.props.keys[this.props.facetKey]}
                     facet={this.props.facet}
                     defaultQuery={() => ({
-                    index: 'browser',
-                        body: {
-                            query: {
-                                bool: {
-                                    must: [
-                                        { match: { "loc.chrom": "chr7" }},
-                                        { range: { "loc.start": { gte: 40000000 } }},
-                                        { range: { "loc.end": { lte: 60000000 } }}
-                                    ]
+                        size: 1,
+                        aggs: {
+                            nodes: {
+                                terms: {
+                                    field: 'node',
+                                    size: 100000
                                 }
                             }
                         }
                     })}
-                    // defaultQuery={() => ({
-                    //     size: 1,
-                    //     aggs: {
-                    //         nodes: {
-                    //             terms: {
-                    //                 field: 'node',
-                    //                 size: 100000
-                    //             }
-                    //         }
-                    //     }
-                    // })}
                         // render={ ({facet, defaultQuery }) => (
                         render={ () => (
                             <ChromosomeRangeSelect facet={this.props.facet} />
