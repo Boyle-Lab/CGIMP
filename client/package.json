@@ -13,7 +13,7 @@
     "classnames": "^2.2.6",
     "elasticsearch": "^15.4.1",
     "filepond": "^4.3.5",
-    "jquery": "^1.9.1",
+    "jquery": "^3.5.0",
     "lunr": "^2.3.6",
     "prop-types": "^15.7.2",
     "react": "^16.8.3",
