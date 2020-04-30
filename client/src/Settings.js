@@ -374,7 +374,7 @@ class SettingsDialog extends React.Component {
                 <ListItem key={Math.random().toString()}>
 	        <IconButton className={classes.button} aria-label="Add Module Table" color="inherit" onClick={this.addModuleTable}>
                 <AddIcon/>
-                </IconButton>
+            </IconButton>
 		</ListItem>
 		
 	    {/*<Divider />
